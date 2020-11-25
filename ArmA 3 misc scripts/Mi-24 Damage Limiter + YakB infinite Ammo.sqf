@@ -1,4 +1,4 @@
-this addEventHandler ["Fired",{(_this select 0) setVehicleAmmo 1}];
+this addEventHandler ["Fired",{_this select 0 turretUnit [0] setAmmo ["rhs_weap_yakB", 5000];}];
 
 this addEventHandler ["HandleDamage", {
 var_hit_selection = _this select 1;
