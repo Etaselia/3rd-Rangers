@@ -84,79 +84,85 @@ class cfgFactionClasses
 
 	};
 	class Man;
-    class CAManBase: Man 
+    class CAManBase: Man
 	{
-        class ACE_SelfActions 
+        class ACE_SelfActions
 		{
-			class change_Uniform 
+			class change_Uniform
 			{
-				condition = "uniform _player == 'Nanite_MTP' || uniform _player == 'NaniteSuit'";   
+				condition = "uniform _player == 'Nanite_MTP' || uniform _player == 'NaniteSuit'";
 				displayName = "Change Uniform";
 
-                class MTP 
+                class MTP
 				{
 				displayName = "MTP";
 				exceptions[] = {};
 				statement = "_player setObjectTextureGlobal [0,'\a3\characters_f\BLUFOR\Data\clothing1_co.paa']";
 				};
-				class Woodland 
+				class Woodland
 				{
 				displayName = "Woodland";
 				exceptions[] = {};
 				statement = "_player setObjectTextureGlobal [0,'a3\characters_f_enoch\uniforms\data\clothing_mcam_wdl_co.paa']";
 				};
-				class Weeb 
+				class Weeb
 				{
 				displayName = "Weeb";
 				exceptions[] = {};
 				statement = "_player setObjectTextureGlobal [0,'\uniform\Wuni.jpg']";
 				};
-				class Winter 
+				class Winter
 				{
 				displayName = "Winter";
 				exceptions[] = {};
 				statement = "_player setObjectTextureGlobal [0,'\uniform\WintCamo.jpg']";
 				};
-				class CTRG_N_Combat 
+				class CTRG_N_Combat
 				{
 				displayName = "CTRG Combat";
 				exceptions[] = {};
 				statement = "_player setObjectTextureGlobal [0,'a3\characters_f_epa\blufor\data\clothing1_mtp_co.paa']";
 				};
-				class CTRG_N_Stealth 
+				class CTRG_N_Stealth
 				{
 				displayName = "CTRG Stealth";
 				exceptions[] = {};
 				statement = "_player setObjectTextureGlobal [0,'a3\characters_f_exp\blufor\data\u_b_ctrg_soldier_f_co.paa']";
 				};
-				class CTRG_N_Urban 
+				class CTRG_N_Urban
 				{
 				displayName = "CTRG Urban";
 				exceptions[] = {};
 				statement = "_player setObjectTextureGlobal [0,'a3\characters_f_exp\blufor\data\clothing1_mtp_urban_co.paa']";
 				};
 			};
-			class activate_suit 
+			class activate_suit_ONI
 			{
-			condition = "uniform _player == 'NaniteSuit'";   
+			condition = "uniform _player == 'NaniteSuit'";
 			displayName = "Activate NaniteSuit";
-			statement = "[ [], 'Nano_Suit', player ] call BIS_fnc_MP;";
+			statement = "[ [], 'Nano_Suit_ONI', player ] call BIS_fnc_MP;";
 			};
-			class deactivate_suit 
+      class activate_suit_SPARTAN
+      {
+      condition = "uniform _player == 'MJOLNIR_MKVI_Undersuit'";
+      displayName = "Activate NaniteSuit";
+      statement = "[ [], 'Nano_Suit_SPARTAN', player ] call BIS_fnc_MP;";
+      };
+			class deactivate_suit
 			{
-			condition = "uniform _player == 'NaniteSuit'";   
+			condition = "uniform _player == 'NaniteSuit' or uniform _player == 'MJOLNIR_MKIV_Undersuit'";
 			displayName = "Deactivate NaniteSuit";
 			statement = "[ [], 'Nano_Off', player ] call BIS_fnc_MP;";
 			};
-			class cats_marksman_class 
+			class cats_marksman_class
 			{
-			condition = "goggles _player == 'CATS_Marksman' and uniform _player != 'NaniteSuit'";   
+			condition = "goggles _player == 'CATS_Marksman' and uniform _player != 'NaniteSuit'";
 			displayName = "Activate C.A.T.S";
 			statement = "[ [], 'cats_marksman', player ] call BIS_fnc_MP;";
 			};
-			class cats_assault_class 
+			class cats_assault_class
 			{
-			condition = "goggles _player == 'CATS_CQC' and uniform _player != 'NaniteSuit'";   
+			condition = "goggles _player == 'CATS_CQC' and uniform _player != 'NaniteSuit'";
 			displayName = "Activate C.A.T.S";
 			statement = "[ [], 'cats_assault', player ] call BIS_fnc_MP;";
 			};
