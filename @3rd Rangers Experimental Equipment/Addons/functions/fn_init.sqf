@@ -1,5 +1,8 @@
 waitUntil { not isNull player };
 
+ONI_Suit_Active = false;
+SPARTAN_Suit_Active = false;
+
 //function for supply beacon, gets called on init
 EH_ShotsFiredResupply = player addEventHandler ["FiredMan", {
 AmmoType = _this select 4;
@@ -89,13 +92,28 @@ _AirCrate addItemCargoGlobal ["ACE_morphine", 20];
 }];
 Nano_Off = {
 comment "Remove eventHandlers.";
-player removeEventHandler ["FiredMan", EH_ShotsFired];
-player removeEventHandler ["FiredMan", EH_ShotsFiredAirburst];
-player removeEventHandler ["FiredNear", EH_ProximitySensor];
-player removeEventHandler ["HandleDamage", EH_NoFallDamage];
-removeMissionEventHandler ["EachFrame", MEH_CompatACE];
+if ((ShotBreakInvis_ONI and ONI_Suit_Active) or (ShotBreakInvis_SPARTAN and SPARTAN_Suit_Active)) then {
+  player removeEventHandler ["FiredMan", EH_ShotsFired];
+};
+if ((ProximitySensor_ONI and ONI_Suit_Active) or (ProximitySensor_SPARTAN and SPARTAN_Suit_Active)) then {
+  player removeEventHandler ["FiredNear", EH_ProximitySensor];
+};
+if ((NoFallDamageACEmedicalCompat_ONI and ONI_Suit_Active) or (NoFallDamageACEmedicalCompat_SPARTAN and SPARTAN_Suit_Active)) then {
+
+  removeMissionEventHandler ["EachFrame", MEH_CompatACE];
+}
+else
+  {
+    player removeEventHandler ["HandleDamage", EH_NoFallDamage];
+  };
+
+if ((WeaponCoreNoSway_ONI and ONI_Suit_Active) or (WeaponCoreNoSway_SPARTAN and SPARTAN_Suit_Active)) then
+  {
+    [] call Nano_AIM;
+    [] call Nano_STOP;
+    removeMissionEventHandler ["EachFrame", MEH_NoSway];
+  };
 removeMissionEventHandler ["EachFrame", MEH_HUD];
-removeMissionEventHandler ["EachFrame", MEH_NoSway];
 
 comment "Remove sceduled code.";
 terminate ArmorKey;
@@ -107,7 +125,8 @@ terminate NanABKey;
 terminate DisengageKey;
 
 comment "Remove scrollmenu.";
-if (!DisableScrollMenu) then {removeallactions player;};
+if (!DisableScrollMenu_ONI) then {removeallactions player;};
+if (!DisableScrollMenu_SPARTAN) then {removeallactions player;};
 
 comment "Remove functions.";
 NoFallDamageACE = {};
@@ -135,6 +154,8 @@ InvisBreakRDY = 0;
 ArmorActive = 0;
 SpeedActive = 0;
 NanoAIMSW = 0;
+ONI_Suit_Active = false;
+SPARTAN_Suit_Active = false;
 
 
 comment "Remove abuilities effects.";
@@ -159,6 +180,7 @@ Nanite_Suit_Active = 0;
 //function definitions for NaniteSuit, gets called in Uniform config.cpp
 Nano_Suit_ONI ={
 
+ONI_Suit_Active = true;
 DevOptions = false;                          comment "[Boolean]  Development options. Used for script debuging.";
 TextureArmor      = "Uniform\NanoArmor.jpg";     comment "[String]   Texture name of Armor mode texture.";
 TextureSpeed      = "Uniform\NanoSpeed.jpg";     comment "[String]   Texture name of Speed mode texture.";
@@ -939,6 +961,7 @@ systemChat "Self scan complete. Press [Activate suit] to start.";
 
 Nano_Suit_SPARTAN ={
 
+SPARTAN_Suit_Active = true;
 DevOptions = false;                          comment "[Boolean]  Development options. Used for script debuging.";
 TextureArmor      = "Uniform\NanoArmor.jpg";     comment "[String]   Texture name of Armor mode texture.";
 TextureSpeed      = "Uniform\NanoSpeed.jpg";     comment "[String]   Texture name of Speed mode texture.";

@@ -150,7 +150,7 @@ class cfgFactionClasses
       };
 			class deactivate_suit
 			{
-			condition = "uniform _player == 'NaniteSuit' or uniform _player == 'MJOLNIR_MKIV_Undersuit'";
+			condition = "uniform _player == 'NaniteSuit' or uniform _player == 'MJOLNIR_MKVI_Undersuit'";
 			displayName = "Deactivate NaniteSuit";
 			statement = "[ [], 'Nano_Off', player ] call BIS_fnc_MP;";
 			};
