@@ -27,8 +27,6 @@ if (_this select 7 isEqualTo "hitvrotor") then {
 	};
 };
 
-hintSilent formatText ["Damage: %1 GetHit: %2",var_damage,var_damage_temp];
-
 _damage = var_damage;
 _damage
 }];
