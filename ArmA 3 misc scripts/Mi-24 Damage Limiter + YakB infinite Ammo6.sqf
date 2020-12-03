@@ -21,7 +21,7 @@ if (var_damage >= 0.75) then {
 		var_damage = 0.75;
 	};
 };
-if (_this select 7 isEqualTo "hitvrotor") then {
+if (_this select 7 in ["hitvrotor","hitengine","hitengine1","hitengine2"]) then {
 	if (var_damage - var_damage_temp <=0.1) then {
 		var_damage = _damage;
 	};
