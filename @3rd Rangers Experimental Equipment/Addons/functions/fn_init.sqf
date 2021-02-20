@@ -30,6 +30,8 @@ _AirCrate setPos [(position _AirCrate) select 0, (position _AirCrate) select 1, 
 
 clearItemCargoGlobal _AirCrate;
 
+_AirCrate allowDamage false;
+
 _AirCrate addItemCargoGlobal ["ACE_packingBandage", 50];
 _AirCrate addItemCargoGlobal ["ACE_elasticBandage", 50];
 
