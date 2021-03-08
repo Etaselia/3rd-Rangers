@@ -945,6 +945,7 @@ Nanite_Suit_Active = 1;
 cats_assault ={
 	hintSilent formatText ["Assault C.A.T.S. Online %1 Detection Range: %2m",linebreak,prox_distance];
   ShotLocation = [];
+
   ["itemAdd", ["cats_assault", {
 
     all_units = nearestObjects [player, ["Man"], prox_distance];
