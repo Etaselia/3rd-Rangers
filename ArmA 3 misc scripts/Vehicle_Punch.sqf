@@ -4,8 +4,7 @@ PunchKeyRespawn = {
   PunchKey = [] spawn {
     waitUntil {inputAction "User1" > 0};
     _target = cursorTarget;
-    hintSilent(str(player distance _target));
-    if ((player distance _target and _target call BIS_fnc_objectType select 0 in ["vehicle","Man"]) <= 8) then {
+    if ((player distance _target <= 8 and _target call BIS_fnc_objectType select 0 in ["Vehicle","Soldier"])) then {
 
     [player, "AwopPercMstpSgthWrflDnon_End1"] remoteExec ["switchMove", 0];
 
@@ -28,8 +27,7 @@ PunchKeyRespawn = {
     };
     }
     else {
-        [player, "AwopPercMstpSgthWnonDnon_end"] remoteExec ["switchMove", 0];
-        playSound3D ["A3\Sounds_F\sfx\ZoomOut.wss", player];
+        hintSilent "Nothing to Punch";
     };
     sleep 0.5;
 
