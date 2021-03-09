@@ -18,9 +18,9 @@ class cfgPatches
 
 class Extended_PreInit_EventHandlers
 {
-	class my_preInit
+	class etaPU_preInit
 	{
-		init="call compile preProcessFileLineNumbers 'Base\XEH_preInit.sqf'";
+		init="call compile preProcessFileLineNumbers 'Base\etaPU_preInit.sqf'";
 	};
 };
 
@@ -29,10 +29,10 @@ class CfgFunctions
 {
 
 	class ADDON{
-		class functions
+		class etaPU_functions
 		{
-			file = "\functions";
-			class init{postInit = 1;};
+			file = "\etaPU_functions";
+			class etaPU_init{postInit = 1;};
 		};
 	};
 };
