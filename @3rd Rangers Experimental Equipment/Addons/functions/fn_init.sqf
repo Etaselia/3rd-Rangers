@@ -238,7 +238,7 @@ if (NoFallDamageACEmedicalCompat) then{
 };
 
   comment "Adding eventHandler for invisibility break and recoil compensator energy consumption.";
-        EH_ShotsFired = player addEventHandler ["FiredMan", {
+EH_ShotsFired = player addEventHandler ["FiredMan", {
 RecoilConmpensationWeaponType = _this select 1;
 RecoilConmpensationMuzzleType = _this select 2;
 RecoilConmpensationFiremodeType = _this select 3;
