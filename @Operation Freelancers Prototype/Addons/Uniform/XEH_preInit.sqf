@@ -1,7 +1,21 @@
 
 //Nanite Hotkeys
+#include "\a3\editor_f\Data\Scripts\dikCodes.h"
 
+//Keybinding Menu
 
+//Armor
+["NaniteKeys","eta_nanite_armor_id", "Armor Key", {_this call fnc_MaximumArmorKey}, "", [DIK_Q, [false, true, false]],false,0,false] call CBA_fnc_addKeybind;
+//Cloak
+["NaniteKeys","eta_nanite_cloak_id", "Cloak Key", {_this call fnc_CloakKey}, "", [DIK_E, [false, true, false]],false,0,false] call CBA_fnc_addKeybind;
+//MaxSpeed
+["NaniteKeys","eta_nanite_speed_id", "MaxSpeed Key", {_this call fnc_MaximumSpeedKey}, "", [DIK_W, [true, false, true]],false,0,false] call CBA_fnc_addKeybind;
+//Jump
+["NaniteKeys","eta_nanite_jump_id", "Jump Key", {_this call fnc_JumpKey}, "", [DIK_SPACE, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
+//Disengage
+["NaniteKeys","eta_nanite_disengage_id", "Disengage Key", {_this call fnc_Disengage_Key}, "", [DIK_SPACE, [false, true, false]],false,0,false] call CBA_fnc_addKeybind;
+//WeaponsCore
+["NaniteKeys","eta_nanite_weapon_core_id", "WeaponCore Key", {_this call fnc_WeaponKey}, "", [DIK_1, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
 
 //CATS
 [

@@ -29,26 +29,23 @@ class cfgPatches
 
 class Extended_PreInit_EventHandlers
 {
-	class my_preInit
+	class eta_Nanite_preInit
 	{
 		init="call compile preProcessFileLineNumbers 'Uniform\XEH_preInit.sqf'";
 	};
 };
 
-
-class CfgFunctions
+class Extended_PostInit_EventHandlers
 {
-
-	class ADDON{
-		class functions
-		{
-			file = "\functions";
-			class init{postInit = 1;};
-		};
+	class eta_nanite_suit_functions
+	{
+		init="execVM '\functions\fn_init.sqf';";
+	};
+	class eta_nanite_suit_hotkeys
+	{
+		init="execVM '\functions\hotkeys.sqf';";
 	};
 };
-
-
 
 class CfgVehicles
 {

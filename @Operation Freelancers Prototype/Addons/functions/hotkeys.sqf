@@ -51,3 +51,15 @@ fnc_JumpKey={
 fnc_Disengage_Key={
   [] spawn {[] call Nano_STOP_ACT;};
 };
+
+fnc_WeaponKey={
+  if ((WeaponHandlingSwitch_ONI and ONI_Suit_Active) or (WeaponHandlingSwitch_SPARTAN and SPARTAN_Suit_Active) or (WeaponHandlingSwitch_SPARTAN_V2 and SPARTAN_V2_Suit_Active)) then
+  {
+    if ((HotkeysEnabeled_ONI and ONI_Suit_Active) or (HotkeysEnabeled_SPARTAN and SPARTAN_Suit_Active) or (HotkeysEnabeled_SPARTAN_V2 and SPARTAN_V2_Suit_Active)) then
+    {
+      if ((isNil "NanoAIMSW") or (NanoAIMSW == 0)) then {
+        [] spawn {[] call Nano_AIM;};
+      };
+    };
+  };
+};

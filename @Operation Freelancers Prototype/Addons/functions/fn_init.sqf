@@ -1,7 +1,5 @@
 waitUntil { not isNull player };
 
-_Hotkeys = execVM "functions/hotkeys.sqf";
-
 ONI_Suit_Active = false;
 SPARTAN_Suit_Active = false;
 SPARTAN_V2_Suit_Active = false;
@@ -119,13 +117,7 @@ if ((WeaponCoreNoSway_ONI and ONI_Suit_Active) or (WeaponCoreNoSway_SPARTAN and 
 removeMissionEventHandler ["EachFrame", MEH_HUD];
 
 comment "Remove sceduled code.";
-terminate ArmorKey;
-terminate SneakKey;
-terminate SpeedKey;
-terminate JumpKey;
-terminate WeaponKey;
 terminate NanABKey;
-terminate DisengageKey;
 
 comment "Remove scrollmenu.";
 if (!DisableScrollMenu_ONI) then {removeallactions player;};
@@ -232,13 +224,7 @@ removeMissionEventHandler ["EachFrame", MEH_HUD];
 removeMissionEventHandler ["EachFrame", MEH_NoSway];
 
   comment "Removing sceduled hotkey code in case of multiple script activations.";
-terminate ArmorKey;
-terminate SneakKey;
-terminate SpeedKey;
-terminate JumpKey;
-terminate WeaponKey;
 terminate NanABKey;
-terminate DisengageKey;
 
   comment "No fall damage. It's integral part of jump function and speed mode. Small bump on high speed will kill player because game don't distinguish between vertical and horizontal speed for fall damage calculation.";
 if (!NoFallDamageACEmedicalCompat_ONI) then{
@@ -534,68 +520,6 @@ MEH_HUD = addMissionEventHandler ["EachFrame", {
 systemChat "EventHandlers loaded.";
 
   comment "Adding functions for hotkeys handling.";
-if (HotkeysEnabeled_ONI) then{
-
-if (MaximumArmorSwitch_ONI) then {
-  ArmorKeyRespawn = {
-      ArmorKey = [] spawn {
-          waitUntil {inputAction "User9" > 0};
-          [] spawn {[] call Nano_Armor2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call ArmorKeyRespawn;
-      };
-  };
-[] call ArmorKeyRespawn;
-};
-
-if (CloakSwitch_ONI) then {
-  SneakKeyRespawn = {
-      SneakKey = [] spawn {
-          waitUntil {inputAction "User10" > 0};
-          [] spawn {[] call Nano_Sneak2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call SneakKeyRespawn;
-      };
-  };
-[] call SneakKeyRespawn;
-};
-
-if (MaximumSpeedSwitch_ONI) then {
-  SpeedKeyRespawn = {
-      SpeedKey = [] spawn {
-          waitUntil {inputAction "User11" > 0};
-          [] spawn {[] call Nano_FAFB2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call SpeedKeyRespawn;
-      };
-  };
-[] call SpeedKeyRespawn;
-};
-
-if (JumpSwitch_ONI) then {
-  JumpKeyRespawn = {
-      JumpKey = [] spawn {
-          waitUntil {inputAction "User12" > 0};
-          [] spawn {[] call Nano_JUMP;};
-          Sleep (DisengageTick + 0.1);
-          [] call JumpKeyRespawn;
-      };
-  };
-[] call JumpKeyRespawn;
-};
-
-if (WeaponHandlingSwitch_ONI) then {
-  WeapnHandlingKeyRespawn = {
-      WeaponKey = [] spawn {
-          waitUntil {inputAction "User13" > 0};
-          [] spawn {[] call Nano_AIM;};
-          Sleep (DisengageTick + 0.1);
-          [] call WeapnHandlingKeyRespawn;
-      };
-  };
-[] call WeapnHandlingKeyRespawn;
-};
-
 if (NanoAirburst_ONI) then {
   ABLockKeyRespawn = {
       NanABKey = [] spawn {
@@ -606,19 +530,6 @@ if (NanoAirburst_ONI) then {
       };
   };
 [] call ABLockKeyRespawn;
-};
-
-  DisengageKeyRespawn = {
-      DisengageKey = [] spawn {
-          waitUntil {inputAction "User14" > 0};
-          [] spawn {[] call Nano_STOP_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call DisengageKeyRespawn;
-      };
-  };
-[] call DisengageKeyRespawn;
-
-systemChat "Hotkeys loaded.";
 };
 
   comment "Scrollmenu functions.";
@@ -1013,13 +924,7 @@ removeMissionEventHandler ["EachFrame", MEH_HUD];
 removeMissionEventHandler ["EachFrame", MEH_NoSway];
 
   comment "Removing sceduled hotkey code in case of multiple script activations.";
-terminate ArmorKey;
-terminate SneakKey;
-terminate SpeedKey;
-terminate JumpKey;
-terminate WeaponKey;
 terminate NanABKey;
-terminate DisengageKey;
 
   comment "No fall damage. It's integral part of jump function and speed mode. Small bump on high speed will kill player because game don't distinguish between vertical and horizontal speed for fall damage calculation.";
 if (!NoFallDamageACEmedicalCompat_SPARTAN) then{
@@ -1315,68 +1220,6 @@ MEH_HUD = addMissionEventHandler ["EachFrame", {
 systemChat "EventHandlers loaded.";
 
   comment "Adding functions for hotkeys handling.";
-if (HotkeysEnabeled_SPARTAN) then{
-
-if (MaximumArmorSwitch_SPARTAN) then {
-  ArmorKeyRespawn = {
-      ArmorKey = [] spawn {
-          waitUntil {inputAction "User9" > 0};
-          [] spawn {[] call Nano_Armor2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call ArmorKeyRespawn;
-      };
-  };
-[] call ArmorKeyRespawn;
-};
-
-if (CloakSwitch_SPARTAN) then {
-  SneakKeyRespawn = {
-      SneakKey = [] spawn {
-          waitUntil {inputAction "User10" > 0};
-          [] spawn {[] call Nano_Sneak2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call SneakKeyRespawn;
-      };
-  };
-[] call SneakKeyRespawn;
-};
-
-if (MaximumSpeedSwitch_SPARTAN) then {
-  SpeedKeyRespawn = {
-      SpeedKey = [] spawn {
-          waitUntil {inputAction "User11" > 0};
-          [] spawn {[] call Nano_FAFB2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call SpeedKeyRespawn;
-      };
-  };
-[] call SpeedKeyRespawn;
-};
-
-if (JumpSwitch_SPARTAN) then {
-  JumpKeyRespawn = {
-      JumpKey = [] spawn {
-          waitUntil {inputAction "User12" > 0};
-          [] spawn {[] call Nano_JUMP;};
-          Sleep (DisengageTick + 0.1);
-          [] call JumpKeyRespawn;
-      };
-  };
-[] call JumpKeyRespawn;
-};
-
-if (WeaponHandlingSwitch_SPARTAN) then {
-  WeapnHandlingKeyRespawn = {
-      WeaponKey = [] spawn {
-          waitUntil {inputAction "User13" > 0};
-          [] spawn {[] call Nano_AIM;};
-          Sleep (DisengageTick + 0.1);
-          [] call WeapnHandlingKeyRespawn;
-      };
-  };
-[] call WeapnHandlingKeyRespawn;
-};
-
 if (NanoAirburst_SPARTAN) then {
   ABLockKeyRespawn = {
       NanABKey = [] spawn {
@@ -1388,20 +1231,6 @@ if (NanoAirburst_SPARTAN) then {
   };
 [] call ABLockKeyRespawn;
 };
-
-  DisengageKeyRespawn = {
-      DisengageKey = [] spawn {
-          waitUntil {inputAction "User14" > 0};
-          [] spawn {[] call Nano_STOP_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call DisengageKeyRespawn;
-      };
-  };
-[] call DisengageKeyRespawn;
-
-systemChat "Hotkeys loaded.";
-};
-
   comment "Scrollmenu functions.";
 
 if (!DisableScrollMenu_SPARTAN) then {removeallactions player;};
@@ -1794,13 +1623,7 @@ removeMissionEventHandler ["EachFrame", MEH_HUD];
 removeMissionEventHandler ["EachFrame", MEH_NoSway];
 
   comment "Removing sceduled hotkey code in case of multiple script activations.";
-terminate ArmorKey;
-terminate SneakKey;
-terminate SpeedKey;
-terminate JumpKey;
-terminate WeaponKey;
 terminate NanABKey;
-terminate DisengageKey;
 
   comment "No fall damage. It's integral part of jump function and speed mode. Small bump on high speed will kill player because game don't distinguish between vertical and horizontal speed for fall damage calculation.";
 if (!NoFallDamageACEmedicalCompat_SPARTAN_V2) then{
@@ -2096,68 +1919,6 @@ MEH_HUD = addMissionEventHandler ["EachFrame", {
 systemChat "EventHandlers loaded.";
 
   comment "Adding functions for hotkeys handling.";
-if (HotkeysEnabeled_SPARTAN_V2) then{
-
-if (MaximumArmorSwitch_SPARTAN_V2) then {
-  ArmorKeyRespawn = {
-      ArmorKey = [] spawn {
-          waitUntil {inputAction "User9" > 0};
-          [] spawn {[] call Nano_Armor2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call ArmorKeyRespawn;
-      };
-  };
-[] call ArmorKeyRespawn;
-};
-
-if (CloakSwitch_SPARTAN_V2) then {
-  SneakKeyRespawn = {
-      SneakKey = [] spawn {
-          waitUntil {inputAction "User10" > 0};
-          [] spawn {[] call Nano_Sneak2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call SneakKeyRespawn;
-      };
-  };
-[] call SneakKeyRespawn;
-};
-
-if (MaximumSpeedSwitch_SPARTAN_V2) then {
-  SpeedKeyRespawn = {
-      SpeedKey = [] spawn {
-          waitUntil {inputAction "User11" > 0};
-          [] spawn {[] call Nano_FAFB2_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call SpeedKeyRespawn;
-      };
-  };
-[] call SpeedKeyRespawn;
-};
-
-if (JumpSwitch_SPARTAN_V2) then {
-  JumpKeyRespawn = {
-      JumpKey = [] spawn {
-          waitUntil {inputAction "User12" > 0};
-          [] spawn {[] call Nano_JUMP;};
-          Sleep (DisengageTick + 0.1);
-          [] call JumpKeyRespawn;
-      };
-  };
-[] call JumpKeyRespawn;
-};
-
-if (WeaponHandlingSwitch_SPARTAN_V2) then {
-  WeapnHandlingKeyRespawn = {
-      WeaponKey = [] spawn {
-          waitUntil {inputAction "User13" > 0};
-          [] spawn {[] call Nano_AIM;};
-          Sleep (DisengageTick + 0.1);
-          [] call WeapnHandlingKeyRespawn;
-      };
-  };
-[] call WeapnHandlingKeyRespawn;
-};
-
 if (NanoAirburst_SPARTAN_V2) then {
   ABLockKeyRespawn = {
       NanABKey = [] spawn {
@@ -2168,19 +1929,6 @@ if (NanoAirburst_SPARTAN_V2) then {
       };
   };
 [] call ABLockKeyRespawn;
-};
-
-  DisengageKeyRespawn = {
-      DisengageKey = [] spawn {
-          waitUntil {inputAction "User14" > 0};
-          [] spawn {[] call Nano_STOP_ACT;};
-          Sleep (DisengageTick + 0.1);
-          [] call DisengageKeyRespawn;
-      };
-  };
-[] call DisengageKeyRespawn;
-
-systemChat "Hotkeys loaded.";
 };
 
   comment "Scrollmenu functions.";
