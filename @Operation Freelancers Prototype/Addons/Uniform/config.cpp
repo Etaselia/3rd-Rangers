@@ -1,4 +1,3 @@
-requiredAddons[] = {"cba_settings"};
 
 class cfgPatches
 {
@@ -6,7 +5,7 @@ class cfgPatches
     {
         name = "Nanite Uniform";
         author = "Eta";
-		text= "";
+		    text= "";
         url = "";
         version="0.0.1";
         versionStr="0.0.1";
@@ -19,7 +18,9 @@ class cfgPatches
 		"ace_common",
 		"ace_smallarms",
 		"ace_realisticnames",
-		"cba_jr"
+		"cba_jr",
+    "cba_settings",
+    ""
 		};
         units[] = {};
         weapons[] = {};
@@ -67,7 +68,7 @@ class cfgFactionClasses
     {
         scope = 2;
         author = "Eta";
-		faction = "Nanite_Units";
+		    faction = "Nanite_Units";
         model = "\A3\characters_F\BLUFOR\b_soldier_01.p3d";
         hiddenSelections[] = {"camo","insignia"};
 		hiddenSelectionsTextures[] = {"\a3\characters_f\BLUFOR\Data\clothing1_co.paa"};
@@ -77,7 +78,7 @@ class cfgFactionClasses
     {
         scope = 2;
         author = "Eta";
-		faction = "Nanite_Units";
+		    faction = "Nanite_Units";
         model = "\A3\characters_F\BLUFOR\b_soldier_01.p3d";
         hiddenSelections[] = {"camo","insignia"};
 		hiddenSelectionsTextures[] = {"Uniform\NanoBase.jpg"};
@@ -148,6 +149,12 @@ class cfgFactionClasses
       displayName = "Activate NaniteSuit";
       statement = "[ [], 'Nano_Suit_SPARTAN', player ] call BIS_fnc_MP;";
       };
+      class activate_suit_SPARTAN_v2
+      {
+        condition = "uniform _player == 'MJOLNIR_MKVI_Undersuit_v2'";
+        displayName = "Activate NaniteSuit";
+        statement = "[ [], 'Nano_Suit_SPARTAN', player ] call BIS_fnc_MP;";
+      };
 			class deactivate_suit
 			{
 			condition = "uniform _player == 'NaniteSuit' or uniform _player == 'MJOLNIR_MKVI_Undersuit'";
@@ -174,6 +181,7 @@ class cfgWeapons
 {
 	class ItemInfo;
 	class Uniform_Base;
+  class MJOLNIR_MKVI_Undersuit;
 
     class Nanite_MTP: Uniform_Base
     {
@@ -189,7 +197,13 @@ class cfgWeapons
             mass = 100;
             allowedSlots[] = {"701","801","901"};
 		};
-	};
+    class MJOLNIR_MKVI_Undersuit_v2: MJOLNIR_MKVI_Undersuit
+    {
+      scope = 2;
+      author = "Eta";
+      displayName = "MJOLNIR MKVI Undersuit v2"
+    };
+  };
 
 	class NaniteSuit: Uniform_Base
     {
