@@ -1,5 +1,7 @@
 waitUntil { not isNull player };
 
+_Hotkeys = execVM "functions/hotkeys.sqf";
+
 ONI_Suit_Active = false;
 SPARTAN_Suit_Active = false;
 SPARTAN_V2_Suit_Active = false;
@@ -2359,7 +2361,7 @@ Nano_Sneak2 = {
               SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - (selectMin [EnergyConsumption,5]);
               uiSleep 0.1;
             } else {
-              SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - 1;
+              SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - SimpleSneakDrain_SPARTAN_V2;
               uiSleep SneakTick_SPARTAN_V2;
             };
         [] call Nano_Sneak2;

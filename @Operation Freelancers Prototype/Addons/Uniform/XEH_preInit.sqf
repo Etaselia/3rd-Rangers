@@ -1,3 +1,8 @@
+
+//Nanite Hotkeys
+
+
+
 //CATS
 [
     "distance_fail", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
@@ -1018,11 +1023,21 @@
  [
     "AdvancedInvisibility_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
-    "AdvancedInvisibility", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "Velocity based Invisibility Power Drain", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
     "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
     true, // data for this setting: [min, max, default, number of shown trailing decimals]
     nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
     {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+  "SimpleSneakDrain_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+  "SLIDER", // setting type
+  "Simple Stealth Energy Drain per Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+  "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+  [0, 10, 1, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+  nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+  {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
  [

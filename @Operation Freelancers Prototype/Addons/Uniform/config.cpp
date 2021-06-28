@@ -20,7 +20,7 @@ class cfgPatches
 		"ace_realisticnames",
 		"cba_jr",
     "cba_settings",
-    ""
+    "Project_MJOLNIR"
 		};
         units[] = {};
         weapons[] = {};
@@ -153,7 +153,7 @@ class cfgFactionClasses
       {
         condition = "uniform _player == 'MJOLNIR_MKVI_Undersuit_v2'";
         displayName = "Activate NaniteSuit";
-        statement = "[ [], 'Nano_Suit_SPARTAN', player ] call BIS_fnc_MP;";
+        statement = "[ [], 'Nano_Suit_SPARTAN_V2', player ] call BIS_fnc_MP;";
       };
 			class deactivate_suit
 			{
@@ -180,8 +180,8 @@ class cfgFactionClasses
 class cfgWeapons
 {
 	class ItemInfo;
+  class UniformItem;
 	class Uniform_Base;
-  class MJOLNIR_MKVI_Undersuit;
 
     class Nanite_MTP: Uniform_Base
     {
@@ -196,14 +196,21 @@ class cfgWeapons
             containerClass = "Supply0";
             mass = 100;
             allowedSlots[] = {"701","801","901"};
-		};
+		    };
+    };
+    class MJOLNIR_MKVI_Undersuit;
     class MJOLNIR_MKVI_Undersuit_v2: MJOLNIR_MKVI_Undersuit
     {
       scope = 2;
       author = "Eta";
-      displayName = "MJOLNIR MKVI Undersuit v2"
+      displayName = "MJOLNIR MKVI Undersuit v2";
+      class ItemInfo: UniformItem
+        {
+          uniformClass="MJOLNIR_Mark_VI_Undersuit";
+          containerClass="Supply300";
+          mass=10;
+        };
     };
-  };
 
 	class NaniteSuit: Uniform_Base
     {
@@ -218,8 +225,8 @@ class cfgWeapons
             containerClass = "Supply80";
             mass = 100;
             allowedSlots[] = {"701","801","901"};
-		};
-	};
+		    };
+	  };
 };
 
 class cfgGlasses
