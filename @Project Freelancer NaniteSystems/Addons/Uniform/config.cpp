@@ -149,7 +149,7 @@ class cfgFactionClasses
       class activate_suit_SPARTAN_v2
       {
         condition = "uniform _player == 'MJOLNIR_MKVI_Undersuit_v2'";
-        displayName = "Activate NaniteSuit";
+        displayName = "Activate NaniteSuitv2";
         statement = "[ [], 'Nano_Suit_SPARTAN_V2', player ] call BIS_fnc_MP;";
       };
 			class deactivate_suit
