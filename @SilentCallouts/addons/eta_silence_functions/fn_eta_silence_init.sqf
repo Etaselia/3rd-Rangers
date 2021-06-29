@@ -1,0 +1,3 @@
+waitUntil { not isNull player };
+//IDK how nobody made this an easy mod yet...
+player setSpeaker "NoVoice";
