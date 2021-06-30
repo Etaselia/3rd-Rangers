@@ -1,0 +1,18 @@
+If you want to use this as a standalone feature without having everyone download the mod do the following
+
+SCRIPT INSTALL
+
+STEP 1:
+copy/paste the cau folder and description.ext into your mission file
+
+STEP 2:
+modify simplePasswordPrompt.sqf to fit what you want it to do
+
+STEP 3:
+add the contents simplePasswordPrompt.sqf into the init field of the device asking for a Password
+
+STEP 4:
+add a picture for the BIS_fnc_initInspectable into the mission folder (make sure its a jpg or paa)
+
+STEP 5:
+make the players find the PW :)
