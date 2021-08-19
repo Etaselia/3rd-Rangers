@@ -1,5 +1,4 @@
 ////////////////////////////////////////////////////////////////////////////////////
-
 fnc_MaximumArmorKey={
   if ((MaximumArmorSwitch_ONI and ONI_Suit_Active) or (MaximumArmorSwitch_SPARTAN and SPARTAN_Suit_Active) or (MaximumArmorSwitch_SPARTAN_V2 and SPARTAN_V2_Suit_Active)) then
   {

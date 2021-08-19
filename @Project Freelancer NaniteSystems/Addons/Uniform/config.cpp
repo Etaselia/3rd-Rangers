@@ -45,6 +45,19 @@ class Extended_PostInit_EventHandlers
 	{
 		init="execVM '\functions\hotkeys.sqf';";
 	};
+  class eta_ONI_suit
+  {
+    init="execVM 'functions\ONI_suit.sqf';"
+  };
+  class eta_spartan_suit
+  {
+    init="execVM 'functions\spartan_suit.sqf';"
+  };
+  class eta_spartan_suit_v2
+  {
+    init="execVM 'functions\spartan_suit_v2.sqf';"
+  };
+
 };
 
 class CfgVehicles
