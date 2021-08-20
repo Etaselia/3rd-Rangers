@@ -31,6 +31,7 @@ NanoStopping = 0;
 Cease = 0;
 InvisSTOP = 0;
 ActiveScan = 0;
+shield_size_switch = 0;
 FastAsFuckTick = FastAsFuckTickEff_ONI;
 GottaGoFastMultiplier = GottaGoFastMultiplierEff_ONI;
 GenStopTick = RechargeTick_ONI + 0.2;
@@ -376,9 +377,16 @@ NanoActivateActionID = player addAction ["<t>Activate Suit</t>", {
   };
 }];
 
+fnc_shield_size_switch_addaction = {
+  player removeAction shield_switch_action_id;
+  shield_switch_action_id = player addAction[format["<t color='#C4CACE'>>>Shield Size %1</t>",(["[ >SINGLE | GROUP ]","[ SINGLE | >GROUP ]"] select shield_size_switch)],{if (shield_size_switch == 0) then {shield_size_switch = 1} else {shield_size_switch = 0}; Nano_menu2effHidden;   if (FastAsFuckTick == FastAsFuckTickMAX_ONI) then {[] call Nano_menu2eff;}else {[] call Nano_menu2max;};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+};
+
 Nano_menu2eff = {
   removeallactions player;
    if (MaximumArmorSwitch_ONI)     then {player addAction ["<t color='#C4CACE'>>>Maximum Armor</t>", {[] call Nano_Armor2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (shield_size_switch_ONI) then {player call fnc_shield_size_switch_addaction;};
+
    if (CloakSwitch_ONI)            then {player addAction ["<t color='#606060'>>>Engage Cloak</t>", {[] call Nano_Sneak2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
    if (MaximumSpeedSwitch_ONI)    then {player addAction ["<t color='#FF0000'>>>Maximum Speed</t>", {[] call Nano_FAFB2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
                                           player addAction ["<t>>Disengage abilities</t>", {[] call Nano_STOP_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
@@ -401,6 +409,7 @@ Nano_menu2effHidden = {
 Nano_menu2max = {
   removeallactions player;
      if (MaximumArmorSwitch_ONI)     then {player addAction ["<t color='#C4CACE'>>>Maximum Armor</t>", {[] call Nano_Armor2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+     if (shield_size_switch_ONI) then {player call fnc_shield_size_switch_addaction;};
      if (CloakSwitch_ONI)            then {player addAction ["<t color='#606060'>>>Engage Cloak</t>", {[] call Nano_Sneak2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
      if (MaximumSpeedSwitch_ONI)    then {player addAction ["<t color='#FF0000'>>>Maximum Speed</t>", {[] call Nano_FAFB2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
                                             player addAction ["<t>>Disengage abilities</t>", {[] call Nano_STOP_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
@@ -522,12 +531,21 @@ Nano_Shield = {
     if (TextureHandling) then {if (SpeedActive == 1) then {player setObjectTextureGlobal [0,TextureArmorSpeed];} else {player setObjectTextureGlobal [0,TextureArmor];};};
     if (!ActiveRecharge_ONI) then {AbiliyActive = 1;};
     if (ArmorActive == 0) then {
-      _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
-      _player_shield attachTo [player, [0, 0, 1]];
-      _player_shield setObjectScale 0.3;
+      if (shield_size_switch == 0) then {
+        _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+        _player_shield attachTo [player, [0, 0, 1]];
+        _player_shield setObjectScale eta_small_shield_size_ONI;
+        shield_power_drain = eta_small_shield_power_drain_ONI;
+      };
+      if (shield_size_switch == 1) then {
+        _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+        _player_shield attachTo [player, [0, 0, 1]];
+        _player_shield setObjectScale eta_big_shield_size_ONI;
+        shield_power_drain = eta_big_shield_power_drain_ONI;
+      };
     };
     ArmorActive = 1;
-    SuitPower_ONI = SuitPower_ONI - 1;
+    SuitPower_ONI = SuitPower_ONI - shield_power_drain;
     uiSleep ArmorTick_ONI;
     [] call Nano_Shield;
   } else {

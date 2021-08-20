@@ -31,6 +31,7 @@ NanoStopping = 0;
 Cease = 0;
 InvisSTOP = 0;
 ActiveScan = 0;
+shield_size_switch = 0;
 FastAsFuckTick = FastAsFuckTickEff_SPARTAN_V2;
 GottaGoFastMultiplier = GottaGoFastMultiplierEff_SPARTAN_V2;
 GenStopTick = RechargeTick_SPARTAN_V2 + 0.2;
@@ -376,48 +377,56 @@ NanoActivateActionID = player addAction ["<t>Activate Suit</t>", {
   };
 }];
 
+fnc_shield_size_switch_addaction = {
+  player removeAction shield_switch_action_id;
+  shield_switch_action_id = player addAction[format["<t color='#C4CACE'>>>Shield Size %1</t>",(["[ >SINGLE | GROUP ]","[ SINGLE | >GROUP ]"] select shield_size_switch)],{if (shield_size_switch == 0) then {shield_size_switch = 1} else {shield_size_switch = 0}; Nano_menu2effHidden;   if (FastAsFuckTick == FastAsFuckTickMAX_SPARTAN_V2) then {[] call Nano_menu2eff;}else {[] call Nano_menu2max;};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+};
+
 Nano_menu2eff = {
-removeallactions player;
- if (MaximumArmorSwitch_SPARTAN_V2)     then {player addAction ["<t color='#C4CACE'>>>Maximum Armor</t>", {[] call Nano_Armor2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (CloakSwitch_SPARTAN_V2)            then {player addAction ["<t color='#606060'>>>Engage Cloak</t>", {[] call Nano_Sneak2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (MaximumSpeedSwitch_SPARTAN_V2)    then {player addAction ["<t color='#FF0000'>>>Maximum Speed</t>", {[] call Nano_FAFB2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-                                        player addAction ["<t>>Disengage abilities</t>", {[] call Nano_STOP_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
- if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t>^Jump^</t>", {[] call Nano_JUMP;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (WeaponHandlingSwitch_SPARTAN_V2)   then {player addAction ["<t>>Weapon handling</t>", {[] call Nano_AIM;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (TwoSpeedModeSwitch_SPARTAN_V2)    then {player addAction ["<t>Speed mode switch [ >Eff | MAX ]</t>", {FastAsFuckTick = FastAsFuckTickMAX_SPARTAN_V2; GottaGoFastMultiplier = GottaGoFastMultiplierMAX_SPARTAN_V2; DisengageTick = selectMax [ArmorTick_SPARTAN_V2,SneakTick_SPARTAN_V2,FastAsFuckTick] +0.1; [] call Nano_menu2max;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (NanoAirburst_SPARTAN_V2)           then {player addAction ["<t>Switch airburst ON/OFF</t>", {if (ABswitch == 0) then{ABswitch = 1;}else{ABswitch = 0;};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-                                        player addAction ["<t color='#BBBBBB'>>>Hide menu</t>", {[] call Nano_menu2effHidden;}];
- if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Unstuck (don't use jump in buildings next time)</t>", {player setVelocity [0,0,0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-                                        player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Restart suit generator</t>", {[] call GeneratorRestart;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
- if ((DevOptions) and (TextureHandling)) then {player addAction ["<t>[DEV] Check textures.</t>", {player setObjectTextureGlobal [0,TextureArmor]; sleep 0.5; player setObjectTextureGlobal [0,TextureSpeed]; sleep 0.5; player setObjectTextureGlobal [0,TextureArmorSpeed]; sleep 0.5;player setObjectTextureGlobal [0,TextureIdle];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (DevOptions)                              then {player addAction ["<t>[DEV] Start generator (no checks)</t>", {[] call SuitGenerator;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (DevOptions)                              then {player addAction ["<t>[DEV] Stop generator</t>", {[] call GeneratorStop;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+  removeallactions player;
+   if (MaximumArmorSwitch_SPARTAN_V2)     then {player addAction ["<t color='#C4CACE'>>>Maximum Armor</t>", {[] call Nano_Armor2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (shield_size_switch_SPARTAN_V2) then {player call fnc_shield_size_switch_addaction;};
+
+   if (CloakSwitch_SPARTAN_V2)            then {player addAction ["<t color='#606060'>>>Engage Cloak</t>", {[] call Nano_Sneak2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (MaximumSpeedSwitch_SPARTAN_V2)    then {player addAction ["<t color='#FF0000'>>>Maximum Speed</t>", {[] call Nano_FAFB2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+                                          player addAction ["<t>>Disengage abilities</t>", {[] call Nano_STOP_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+   if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t>^Jump^</t>", {[] call Nano_JUMP;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (WeaponHandlingSwitch_SPARTAN_V2)   then {player addAction ["<t>>Weapon handling</t>", {[] call Nano_AIM;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (TwoSpeedModeSwitch_SPARTAN_V2)    then {player addAction ["<t>Speed mode switch [ >Eff | MAX ]</t>", {FastAsFuckTick = FastAsFuckTickMAX_SPARTAN_V2; GottaGoFastMultiplier = GottaGoFastMultiplierMAX_SPARTAN_V2; DisengageTick = selectMax [ArmorTick_SPARTAN_V2,SneakTick_SPARTAN_V2,FastAsFuckTick] +0.1; [] call Nano_menu2max;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (NanoAirburst_SPARTAN_V2)           then {player addAction ["<t>Switch airburst ON/OFF</t>", {if (ABswitch == 0) then{ABswitch = 1;}else{ABswitch = 0;};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+                                          player addAction ["<t color='#BBBBBB'>>>Hide menu</t>", {[] call Nano_menu2effHidden;}];
+   if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Unstuck (don't use jump in buildings next time)</t>", {player setVelocity [0,0,0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+                                          player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Restart suit generator</t>", {[] call GeneratorRestart;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+   if ((DevOptions) and (TextureHandling)) then {player addAction ["<t>[DEV] Check textures.</t>", {player setObjectTextureGlobal [0,TextureArmor]; sleep 0.5; player setObjectTextureGlobal [0,TextureSpeed]; sleep 0.5; player setObjectTextureGlobal [0,TextureArmorSpeed]; sleep 0.5;player setObjectTextureGlobal [0,TextureIdle];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (DevOptions)                              then {player addAction ["<t>[DEV] Start generator (no checks)</t>", {[] call SuitGenerator;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+   if (DevOptions)                              then {player addAction ["<t>[DEV] Stop generator</t>", {[] call GeneratorStop;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
 };
 Nano_menu2effHidden = {
-removeallactions player;
-player addAction ["<t color='#BBBBBB'>>>Nano menu</t>", {[] call Nano_menu2eff;}];
+  removeallactions player;
+  player addAction ["<t color='#BBBBBB'>>>Nano menu</t>", {[] call Nano_menu2eff;}];
 };
 
 Nano_menu2max = {
-removeallactions player;
- if (MaximumArmorSwitch_SPARTAN_V2)     then {player addAction ["<t color='#C4CACE'>>>Maximum Armor</t>", {[] call Nano_Armor2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (CloakSwitch_SPARTAN_V2)            then {player addAction ["<t color='#606060'>>>Engage Cloak</t>", {[] call Nano_Sneak2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (MaximumSpeedSwitch_SPARTAN_V2)    then {player addAction ["<t color='#FF0000'>>>Maximum Speed</t>", {[] call Nano_FAFB2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-                                        player addAction ["<t>>Disengage abilities</t>", {[] call Nano_STOP_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
- if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t>^Jump^</t>", {[] call Nano_JUMP;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (WeaponHandlingSwitch_SPARTAN_V2)   then {player addAction ["<t>>Weapon handling</t>", {[] call Nano_AIM;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-                                        player addAction ["<t>Speed mode switch [ Eff | >MAX ]</t>", {FastAsFuckTick = FastAsFuckTickEff_SPARTAN_V2; GottaGoFastMultiplier = GottaGoFastMultiplierEff_SPARTAN_V2; DisengageTick = selectMax [ArmorTick_SPARTAN_V2,SneakTick_SPARTAN_V2,FastAsFuckTick] +0.1; [] call Nano_menu2eff;}];
- if (NanoAirburst_SPARTAN_V2)           then {player addAction ["<t>Switch airburst ON/OFF</t>", {if (ABswitch == 0) then{ABswitch = 1;}else{ABswitch = 0;};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-                                        player addAction ["<t color='#BBBBBB'>>>Hide menu</t>", {[] call Nano_menu2maxHidden;}];
- if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Unstuck (don't use jump in buildings next time)</t>", {player setVelocity [0,0,0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-                                        player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Restart suit generator</t>", {[] call GeneratorRestart;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
- if ((DevOptions) and (TextureHandling)) then {player addAction ["<t>[DEV] Check textures.</t>", {player setObjectTextureGlobal [0,TextureArmor]; sleep 0.5; player setObjectTextureGlobal [0,TextureSpeed]; sleep 0.5; player setObjectTextureGlobal [0,TextureArmorSpeed]; sleep 0.5;player setObjectTextureGlobal [0,TextureIdle];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (DevOptions)                              then {player addAction ["<t>[DEV] Start generator (no checks)</t>", {[] call SuitGenerator;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
- if (DevOptions)                              then {player addAction ["<t>[DEV] Stop generator</t>", {[] call GeneratorStop;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
-};
-Nano_menu2maxHidden = {
-removeallactions player;
-player addAction ["<t color='#BBBBBB'>>>Nano menu</t>", {[] call Nano_menu2max;}];
+  removeallactions player;
+     if (MaximumArmorSwitch_SPARTAN_V2)     then {player addAction ["<t color='#C4CACE'>>>Maximum Armor</t>", {[] call Nano_Armor2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+     if (shield_size_switch_SPARTAN_V2) then {player call fnc_shield_size_switch_addaction;};
+     if (CloakSwitch_SPARTAN_V2)            then {player addAction ["<t color='#606060'>>>Engage Cloak</t>", {[] call Nano_Sneak2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+     if (MaximumSpeedSwitch_SPARTAN_V2)    then {player addAction ["<t color='#FF0000'>>>Maximum Speed</t>", {[] call Nano_FAFB2_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+                                            player addAction ["<t>>Disengage abilities</t>", {[] call Nano_STOP_ACT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+     if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t>^Jump^</t>", {[] call Nano_JUMP;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+     if (WeaponHandlingSwitch_SPARTAN_V2)   then {player addAction ["<t>>Weapon handling</t>", {[] call Nano_AIM;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+                                            player addAction ["<t>Speed mode switch [ Eff | >MAX ]</t>", {FastAsFuckTick = FastAsFuckTickEff_SPARTAN_V2; GottaGoFastMultiplier = GottaGoFastMultiplierEff_SPARTAN_V2; DisengageTick = selectMax [ArmorTick_SPARTAN_V2,SneakTick_SPARTAN_V2,FastAsFuckTick] +0.1; [] call Nano_menu2eff;}];
+     if (NanoAirburst_SPARTAN_V2)           then {player addAction ["<t>Switch airburst ON/OFF</t>", {if (ABswitch == 0) then{ABswitch = 1;}else{ABswitch = 0;};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+                                            player addAction ["<t color='#BBBBBB'>>>Hide menu</t>", {[] call Nano_menu2maxHidden;}];
+     if (JumpSwitch_SPARTAN_V2)             then {player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Unstuck (don't use jump in buildings next time)</t>", {player setVelocity [0,0,0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+                                            player addAction ["<t color='#ff6700'>[Manual debug]</t><t> Restart suit generator</t>", {[] call GeneratorRestart;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+     if ((DevOptions) and (TextureHandling)) then {player addAction ["<t>[DEV] Check textures.</t>", {player setObjectTextureGlobal [0,TextureArmor]; sleep 0.5; player setObjectTextureGlobal [0,TextureSpeed]; sleep 0.5; player setObjectTextureGlobal [0,TextureArmorSpeed]; sleep 0.5;player setObjectTextureGlobal [0,TextureIdle];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+     if (DevOptions)                              then {player addAction ["<t>[DEV] Start generator (no checks)</t>", {[] call SuitGenerator;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+     if (DevOptions)                              then {player addAction ["<t>[DEV] Stop generator</t>", {[] call GeneratorStop;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];};
+  };
+  Nano_menu2maxHidden = {
+  removeallactions player;
+  player addAction ["<t color='#BBBBBB'>>>Nano menu</t>", {[] call Nano_menu2max;}];
 };
 systemChat "Menu loaded.";
 
@@ -431,13 +440,14 @@ SuitGenerator = {
           if ((StaticRecharge_SPARTAN_V2)and(PlayerSpeedPower == 0) and(SuitPower_SPARTAN_V2 < 100)) then {SuitPower_SPARTAN_V2 = round (SuitPower_SPARTAN_V2 + 1);};
           uiSleep RechargeTick_SPARTAN_V2;
         };
-if (Cease == 0) then {[] call SuitGenerator;};
-    } else {
-      uiSleep 1;
-      if (NanoHeal_SPARTAN_V2) then {player setDamage ((getDammage player) - NanoHealRate_SPARTAN_V2);};
-      if (Cease == 0) then {[] call SuitGenerator;};
-    };
-};
+        if (Cease == 0) then {[] call SuitGenerator;};
+          }
+          else {
+            uiSleep 1;
+            if (NanoHeal_SPARTAN_V2) then {player setDamage ((getDammage player) - NanoHealRate_SPARTAN_V2);};
+            if (Cease == 0) then {[] call SuitGenerator;};
+          };
+  };
   comment "Generator debugging functions.";
 GeneratorStop = {
   Cease = 1;
@@ -479,70 +489,80 @@ GeneratorRestart = {
   comment "Armor global switch.";
     if (MaximumArmorSwitch_SPARTAN_V2) then {
   comment "Armor activation function.";
-  Nano_Armor2_ACT = {
-    if (SuitPower_ONI >= 10) then {
-      if (ArmorActive == 0) then {
-        systemChat "Maximum armor";
-        playSound "Hint";
-        if (shield_switch_ONI) then {
-          [] call Nano_Shield;
-        }
-        else {
-          [] call Nano_Armor2;
-        };
+Nano_Armor2_ACT = {
+  if (SuitPower_SPARTAN_V2 >= 10) then {
+    if (ArmorActive == 0) then {
+      systemChat "Maximum armor";
+      playSound "Hint";
+      if (shield_switch_SPARTAN_V2) then {
+        [] call Nano_Shield;
+      }
+      else {
+        [] call Nano_Armor2;
       };
-    } else {
-      systemChat "At least 10 percent needed.";
     };
+  } else {
+    systemChat "At least 10 percent needed.";
   };
-    comment "Armor function.";
-  Nano_Armor2 = {
-    if (SuitPower_SPARTAN_V2 > 0) then {
-      if (TextureHandling) then {if (SpeedActive == 1) then {player setObjectTextureGlobal [0,TextureArmorSpeed];} else {player setObjectTextureGlobal [0,TextureArmor];};};
-      if (!ActiveRecharge_SPARTAN_V2) then {AbiliyActive = 1;};
-      ArmorActive = 1;
-      SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - 1;
-      player allowDamage false;
-      uiSleep ArmorTick_SPARTAN_V2;
-      [] call Nano_Armor2;
-    } else {
-      if (SuitPower_SPARTAN_V2 > -5) then {systemChat "Out of energy"; playSound "Alarm";};
-      ArmorActive = 0;
-      AbiliyActive = 0;
-      player allowDamage true;
-      if (TextureHandling) then {player setObjectTextureGlobal [0,TextureIdle];};
-      uiSleep (DisengageTick + GenStopTick + 0.1);
-      if (ActiveScan == 0) then {[] spawn{[] call GeneratorScan;};};
-    };
+};
+  comment "Armor function.";
+Nano_Armor2 = {
+  if (SuitPower_SPARTAN_V2 > 0) then {
+    if (TextureHandling) then {if (SpeedActive == 1) then {player setObjectTextureGlobal [0,TextureArmorSpeed];} else {player setObjectTextureGlobal [0,TextureArmor];};};
+    if (!ActiveRecharge_SPARTAN_V2) then {AbiliyActive = 1;};
+    ArmorActive = 1;
+    SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - 1;
+    player allowDamage false;
+    uiSleep ArmorTick_SPARTAN_V2;
+    [] call Nano_Armor2;
+  } else {
+    if (SuitPower_SPARTAN_V2 > -5) then {systemChat "Out of energy"; playSound "Alarm";};
+    ArmorActive = 0;
+    AbiliyActive = 0;
+    player allowDamage true;
+    if (TextureHandling) then {player setObjectTextureGlobal [0,TextureIdle];};
+    uiSleep (DisengageTick + GenStopTick + 0.1);
+    if (ActiveScan == 0) then {[] spawn{[] call GeneratorScan;};};
   };
+};
 
-  Nano_Shield = {
-    if (SuitPower_SPARTAN_V2 > 0) then {
-      if (TextureHandling) then {if (SpeedActive == 1) then {player setObjectTextureGlobal [0,TextureArmorSpeed];} else {player setObjectTextureGlobal [0,TextureArmor];};};
-      if (!ActiveRecharge_SPARTAN_V2) then {AbiliyActive = 1;};
-      if (ArmorActive == 0) then {
+Nano_Shield = {
+  if (SuitPower_SPARTAN_V2 > 0) then {
+    if (TextureHandling) then {if (SpeedActive == 1) then {player setObjectTextureGlobal [0,TextureArmorSpeed];} else {player setObjectTextureGlobal [0,TextureArmor];};};
+    if (!ActiveRecharge_SPARTAN_V2) then {AbiliyActive = 1;};
+    if (ArmorActive == 0) then {
+      if (shield_size_switch == 0) then {
         _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
         _player_shield attachTo [player, [0, 0, 1]];
-        _player_shield setObjectScale 0.3;
-      };
-      ArmorActive = 1;
-      SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - 1;
-      uiSleep ArmorTick_SPARTAN_V2;
-      [] call Nano_Shield;
-    } else {
-      if (SuitPower_SPARTAN_V2 > -5) then {systemChat "Out of energy"; playSound "Alarm";};
-      ArmorActive = 0;
-      AbiliyActive = 0;
+        _player_shield setObjectScale eta_small_shield_size_SPARTAN_V2;
+        shield_power_drain = eta_small_shield_power_drain_SPARTAN_V2;
+      }
+      else
       {
-        if (_x isKindOf "OPTRE_FC_Energy_shield") then {
-          deleteVehicle _x;
-        };
-      } forEach attachedObjects player;
-      if (TextureHandling) then {player setObjectTextureGlobal [0,TextureIdle];};
-      uiSleep (DisengageTick + GenStopTick + 0.1);
-      if (ActiveScan == 0) then {[] spawn{[] call GeneratorScan;};};
+        _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+        _player_shield attachTo [player, [0, 0, 1]];
+        _player_shield setObjectScale eta_big_shield_size_SPARTAN_V2;
+        shield_power_drain = eta_big_shield_power_drain_SPARTAN_V2;
+      };
     };
+    ArmorActive = 1;
+    SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - shield_power_drain;
+    uiSleep ArmorTick_SPARTAN_V2;
+    [] call Nano_Shield;
+  } else {
+    if (SuitPower_SPARTAN_V2 > -5) then {systemChat "Out of energy"; playSound "Alarm";};
+    ArmorActive = 0;
+    AbiliyActive = 0;
+    {
+      if (_x isKindOf "OPTRE_FC_Energy_shield") then {
+        deleteVehicle _x;
+      };
+    } forEach attachedObjects player;
+    if (TextureHandling) then {player setObjectTextureGlobal [0,TextureIdle];};
+    uiSleep (DisengageTick + GenStopTick + 0.1);
+    if (ActiveScan == 0) then {[] spawn{[] call GeneratorScan;};};
   };
+};
     };
 
   comment "Cloak global switch.";
@@ -570,7 +590,7 @@ Nano_Sneak2 = {
               SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - (selectMin [EnergyConsumption,5]);
               uiSleep 0.1;
             } else {
-              SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - SimpleSneakDrain_SPARTAN_V2;
+              SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - 1;
               uiSleep SneakTick_SPARTAN_V2;
             };
         [] call Nano_Sneak2;

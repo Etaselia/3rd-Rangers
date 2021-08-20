@@ -60,6 +60,56 @@
 ] call cba_settings_fnc_init;
 
 [
+    "shield_size_switch_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Multiple Shield Sizes", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+    {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_small_shield_power_drain_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Single Shield Power/Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 50, 1, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_big_shield_power_drain_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Group Shield Power/Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 50, 5, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_small_shield_size_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Single Shield Size", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 10, 0.3, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_big_shield_size_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Group Shield Size", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 10, 1.5, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
     "MaximumArmorSwitch_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
     "Maximum Armor", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
@@ -452,6 +502,56 @@
 ] call cba_settings_fnc_init;
 
 [
+    "shield_size_switch_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Multiple Shield Sizes", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+    {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_small_shield_power_drain_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Single Shield Power/Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 50, 1, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_big_shield_power_drain_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Group Shield Power/Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 50, 5, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_small_shield_size_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Single Shield Size", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 10, 0.3, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_big_shield_size_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Group Shield Size", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 10, 1.5, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
     "MaximumArmorSwitch_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
     "Maximum Armor", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
@@ -841,6 +941,56 @@
     false, // data for this setting: [min, max, default, number of shown trailing decimals]
     nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
     {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+    "shield_size_switch_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Multiple Shield Sizes", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+    {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_small_shield_power_drain_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Single Shield Power/Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 50, 1, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_big_shield_power_drain_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Group Shield Power/Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 50, 5, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_small_shield_size_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Single Shield Size", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 10, 0.3, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_big_shield_size_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Group Shield Size", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 10, 1.5, 1], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
 [
