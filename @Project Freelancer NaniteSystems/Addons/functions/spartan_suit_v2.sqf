@@ -1,6 +1,6 @@
 Nano_Suit_SPARTAN_V2 ={
 
-SPARTAN_V2_Suit_Active = true;
+ONI_Suit_Active = true;
 DevOptions = false;                          comment "[Boolean]  Development options. Used for script debuging.";
 TextureArmor      = "Uniform\NanoArmor.jpg";     comment "[String]   Texture name of Armor mode texture.";
 TextureSpeed      = "Uniform\NanoSpeed.jpg";     comment "[String]   Texture name of Speed mode texture.";
@@ -536,9 +536,8 @@ Nano_Shield = {
         _player_shield attachTo [player, [0, 0, 1]];
         _player_shield setObjectScale eta_small_shield_size_SPARTAN_V2;
         shield_power_drain = eta_small_shield_power_drain_SPARTAN_V2;
-      }
-      else
-      {
+      };
+      if (shield_size_switch == 1) then {
         _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
         _player_shield attachTo [player, [0, 0, 1]];
         _player_shield setObjectScale eta_big_shield_size_SPARTAN_V2;
@@ -570,7 +569,7 @@ Nano_Shield = {
   comment "Cloak activation function.";
 Nano_Sneak2_ACT = {
   if (SuitPower_SPARTAN_V2 >= 10) then {
-    if (InvisActive == 0) then {systemChat "Cloak Engaged"; playSound "Hint"; if ((vehicle player) != player) then{systemchat "Vehicles cannot be hidden and will cause suspition.";}; [] call Nano_Sneak2;};
+    if (InvisActive == 0) then {systemChat "Cloak Engaged"; playSound "Hint"; [] call Nano_Sneak2;};
   } else {
     systemChat "At least 10 percent needed.";
   };
@@ -581,16 +580,63 @@ Nano_Sneak2 = {
       if (SuitPower_SPARTAN_V2 > 0) then {
           if (!ActiveRecharge_SPARTAN_V2) then {AbiliyActive = 1;};
           if (ShotBreakInvis_SPARTAN_V2) then {InvisBreakRDY = 1;};
-          InvisActive = 1;
           [player] remoteExec["hideobject",0,true];
-          if ((vehicle player) == player) then{player setCaptive true;};
+          if ((vehicle player) != player) then{
+            if (eta_cloak_vehicles_SPARTAN_V2) then {
+              if (InvisActive == 0) then {
+                player setVariable ["tts_cloak_isCloaked", false,true];
+                systemChat "VehicleStealth Activated";
+                [vehicle player] call fnc_vehicle_stealth;
+                _player_stealth_vehicle_exit_EH = player addEventHandler ["GetOutMan",
+                {
+                   params ["_unit", "_role", "_vehicle", "_turret"];
+                   [_vehicle] call fnc_remove_vehicle_stealth;
+                   if (eta_nanite_cloak_particles_SPARTAN_V2) then {
+                     player setVariable ["tts_cloak_isCloaked", true,true];
+                     [player] spawn eta_cloak_fnc_cloakParticles;
+                     _unit removeEventHandler ["GetOutMan", _thisEventHandler];
+                   };
+                }];
+                player setVariable ["_player_stealth_vehicle_exit_EH", _player_stealth_vehicle_exit_EH];
+
+                _passenger_stealth_vehicle_exit_EH = vehicle player addEventHandler ["GetOut",
+                {
+                   params ["_vehicle", "_role", "_unit", "_turret"];
+                   _captive_list = _vehicle getVariable ["captive_list", objNull];
+                   if !(_unit in _captive_list) then
+                   {
+                     _unit setCaptive false;
+                   };
+                }];
+                player setVariable ["_passenger_stealth_vehicle_exit_EH", _passenger_stealth_vehicle_exit_EH];
+                player setCaptive true;
+              };
+            };
+          }
+          else
+          {
+            if (InvisActive == 0) then {
+            systemChat "STEALTH ACTIVATED";
+            if (eta_nanite_cloak_particles_SPARTAN_V2) then {
+              player setVariable ["tts_cloak_isCloaked", true,true];
+              [player] spawn eta_cloak_fnc_cloakParticles;
+              [player] call eta_cloak_fnc_transition;
+            };
+            player setCaptive true;
+          };
+          };
             if (AdvancedInvisibility_SPARTAN_V2) then {
               PlayerSpeed = (((abs(velocity player select 0)) + (abs(velocity player select 1)) + (abs(velocity player select 2)))*3.6);
               EnergyConsumption = (exp (PlayerSpeed*0.005)-0.95)+((PlayerSpeed^3)/10000);
+              InvisActive = 1;
               SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - (selectMin [EnergyConsumption,5]);
               uiSleep 0.1;
             } else {
+              InvisActive = 1;
               SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - 1;
+              if (vehicle player != player) then {
+                SuitPower_SPARTAN_V2 = SuitPower_SPARTAN_V2 - eta_vehicle_stealth_energy_cost_SPARTAN_V2;
+              };
               uiSleep SneakTick_SPARTAN_V2;
             };
         [] call Nano_Sneak2;
@@ -599,13 +645,26 @@ Nano_Sneak2 = {
         AbiliyActive = 0;
         InvisActive = 0;
         InvisBreakRDY = 0;
+        _player_stealth_vehicle_exit_EH = player getVariable ["_player_stealth_vehicle_exit_EH", objNull];
+        _passenger_stealth_vehicle_exit_EH = player getVariable ["_passenger_stealth_vehicle_exit_EH", objNull];
+        player removeEventHandler ["GetOutMan", _player_stealth_vehicle_exit_EH];
+        vehicle player removeEventHandler ["GetOut", _passenger_stealth_vehicle_exit_EH];
+
+        player setVariable ["tts_cloak_isCloaked", false,true];
+        [vehicle player] call fnc_remove_vehicle_stealth;
         [player,false] remoteExec["hideobject",0];
         player setCaptive false;
         if (TextureHandling) then {player setObjectTextureGlobal [0,TextureIdle];};
-    uiSleep (DisengageTick + GenStopTick + 0.1);
+        uiSleep (DisengageTick + GenStopTick + 0.1);
         if (ActiveScan == 0) then {[] spawn{[] call GeneratorScan;};};
       };
-  }else{
+      }
+      else
+      {
+      if (vehicle player != player) then
+      {
+        [vehicle player] call fnc_remove_vehicle_stealth;
+      };
       [player,false] remoteExec["hideobject",0];
       player setCaptive false;
       systemChat "Shot fired. Cloak failure.";
@@ -743,6 +802,7 @@ Nano_STOP = {
   uiSleep 0.01;
   if ((TraceBullets_SPARTAN_V2) and (NanoAIMSW == 1)) then {[player, TraceNumber_SPARTAN_V2] spawn BIS_fnc_traceBullets;};
   player allowDamage true;
+  [vehicle player] remoteExec ["fnc_remove_vehicle_stealth"];
   [player,false] remoteExec["hideobject",0];
   player setCaptive false;
   systemChat "Abilities disengaged.";

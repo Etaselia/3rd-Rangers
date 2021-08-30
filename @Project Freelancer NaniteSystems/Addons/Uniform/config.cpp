@@ -57,6 +57,18 @@ class Extended_PostInit_EventHandlers
   {
     init="execVM 'functions\spartan_suit_v2.sqf';"
   };
+  class tts_active_cloak_particles
+  {
+    init="execVM 'functions\active_camo\fn_cloakParticles.sqf';"
+  };
+  class tts_active_cloak_transition
+  {
+    init="execVM 'functions\active_camo\fn_cloakTransition.sqf';"
+  };
+  class eta_vehicle_cloak
+  {
+    init="execVM 'functions\active_camo\eta_vehicles\fn_vehicle_stealth.sqf';"
+  };
 
 };
 
@@ -91,9 +103,18 @@ class cfgFactionClasses
 		    faction = "Nanite_Units";
         model = "\A3\characters_F\BLUFOR\b_soldier_01.p3d";
         hiddenSelections[] = {"camo","insignia"};
-		hiddenSelectionsTextures[] = {"Uniform\NanoBase.jpg"};
-
+		    hiddenSelectionsTextures[] = {"Uniform\NanoBase.jpg"};
 	};
+
+  class NANITE_ACTIVE_DEBUG: O_Soldier_base_F
+    {
+        scope = 2;
+        author = "Eta";
+        faction = "Nanite_Units";
+        model = "\A3\characters_F\BLUFOR\b_soldier_01.p3d";
+        hiddenSelections[] = {"camo","insignia"};
+        hiddenSelectionsTextures[] = {"Uniform\NanoBase.jpg"};
+  };
 	class Man;
     class CAManBase: Man
 	{
