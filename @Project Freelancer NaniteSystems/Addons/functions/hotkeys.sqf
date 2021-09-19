@@ -62,3 +62,13 @@ fnc_WeaponKey={
     };
   };
 };
+
+fnc_ShieldKey={
+  if ((ShieldChargeSwitch_ONI and ONI_Suit_Active) or (ShieldChargeSwitch_SPARTAN and SPARTAN_Suit_Active) or (ShieldChargeSwitch_SPARTAN_V2 and SPARTAN_V2_Suit_Active)) then
+  {
+    if ((HotkeysEnabeled_ONI and ONI_Suit_Active) or (HotkeysEnabeled_SPARTAN and SPARTAN_Suit_Active) or (HotkeysEnabeled_SPARTAN_V2 and SPARTAN_V2_Suit_Active)) then
+    {
+      [] spawn {[] call Nano_Shield_Charge;};
+    };
+  };
+};

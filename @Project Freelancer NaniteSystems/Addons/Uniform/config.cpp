@@ -276,3 +276,13 @@ class cfgGlasses
 		mass = 4;
 	};
 };
+
+class CfgSounds
+{
+   class eta_sound_cloak_charge
+   {
+         name = "";
+         sound[] = {"\Uniform\sounds\charging.ogg",100, 1,100};
+         titles[] = {0, ""};
+   };
+};

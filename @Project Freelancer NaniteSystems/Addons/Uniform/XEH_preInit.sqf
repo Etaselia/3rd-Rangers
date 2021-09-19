@@ -16,6 +16,8 @@
 ["NaniteKeys","eta_nanite_disengage_id", "Disengage Key", {_this call fnc_Disengage_Key}, "", [DIK_SPACE, [false, true, false]],false,0,false] call CBA_fnc_addKeybind;
 //WeaponsCore
 ["NaniteKeys","eta_nanite_weapon_core_id", "WeaponCore Key", {_this call fnc_WeaponKey}, "", [DIK_1, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
+//SpartanShieldCharge
+["NaniteKeys","eta_nanite_shield_core_id", "ShieldOveride Key", {_this call fnc_ShieldKey}, "", [DIK_2, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
 
 //CATS
 [
@@ -57,6 +59,36 @@
     false, // data for this setting: [min, max, default, number of shown trailing decimals]
     nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
     {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+    "ShieldChargeSwitch_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Recharge Spartan Shields Function", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+    {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_energy_shield_recharge_cost_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Spartan Shield Charge Cost", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 25, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_energy_shield_recharge_amount_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Spartan Shield Charge Amount", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 25, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
 [
@@ -120,6 +152,26 @@
 ] call cba_settings_fnc_init;
 
 [
+    "eta_vehicle_shield_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Allow Vehicle Shield?", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+  {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_vehicle_shield_power_drain_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Energy Cost for Vehicle Shield / Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 15, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
     "CloakSwitch_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
     "Cloak", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
@@ -155,6 +207,26 @@
    "Extra Energy Cost for Vehicle Cloak / Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
    "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
    [0, 10, 2, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_sneak_chargeup_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Stealth Activation Delay", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 60, 3, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_cloak_cooldown_timer_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Stealth Cooldown", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 60, 10, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
    {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
@@ -532,6 +604,36 @@
 ] call cba_settings_fnc_init;
 
 [
+    "ShieldChargeSwitch_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Recharge Spartan Shields Function", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+    {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_energy_shield_recharge_cost_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Spartan Shield Charge Cost", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 25, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_energy_shield_recharge_amount_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Spartan Shield Charge Amount", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 25, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
     "shield_size_switch_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
     "Multiple Shield Sizes", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
@@ -592,6 +694,26 @@
 ] call cba_settings_fnc_init;
 
 [
+    "eta_vehicle_shield_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Allow Vehicle Shield?", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+  {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_vehicle_shield_power_drain_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Energy Cost for Vehicle Shield / Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 15, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
     "CloakSwitch_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
     "Cloak", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
@@ -627,6 +749,26 @@
    "Extra Energy Cost for Vehicle Cloak / Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
    "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
    [0, 10, 2, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_sneak_chargeup_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Stealth Activation Delay", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 60, 3, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_cloak_cooldown_timer_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Stealth Cooldown", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 60, 10, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
    {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
@@ -992,7 +1134,7 @@
     {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
-//SPARTAN_V2 NanoSuit
+//SPARTAN_V2
 [
     "shield_switch_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
@@ -1001,6 +1143,36 @@
     false, // data for this setting: [min, max, default, number of shown trailing decimals]
     nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
     {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+    "ShieldChargeSwitch_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Recharge Spartan Shields Function", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+    {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_energy_shield_recharge_cost_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Spartan Shield Charge Cost", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 25, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_energy_shield_recharge_amount_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Spartan Shield Charge Amount", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 25, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
 [
@@ -1064,6 +1236,26 @@
 ] call cba_settings_fnc_init;
 
 [
+    "eta_vehicle_shield_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    "Allow Vehicle Shield?", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+    true, // data for this setting: [min, max, default, number of shown trailing decimals]
+    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+  {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_vehicle_shield_power_drain_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Energy Cost for Vehicle Shield / Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 100, 15, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
     "CloakSwitch_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
     "Cloak", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
@@ -1099,6 +1291,26 @@
    "Extra Energy Cost for Vehicle Cloak / Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
    "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
    [0, 10, 2, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_sneak_chargeup_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Stealth Activation Delay", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 60, 3, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "eta_cloak_cooldown_timer_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "SLIDER", // setting type
+   "Stealth Cooldown", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   [0, 60, 10, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
    nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
    {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
@@ -1307,21 +1519,11 @@
  [
     "AdvancedInvisibility_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
-    "Velocity based Invisibility Power Drain", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+    "AdvancedInvisibility", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
     "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
     true, // data for this setting: [min, max, default, number of shown trailing decimals]
     nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
     {} // function that will be executed once on mission start and every time the setting is changed.
-] call cba_settings_fnc_init;
-
-[
-  "SimpleSneakDrain_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
-  "SLIDER", // setting type
-  "Simple Stealth Energy Drain per Tick", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
-  "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
-  [0, 10, 1, 0], // data for this setting: [min, max, default, number of shown trailing decimals]
-  nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
-  {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
  [

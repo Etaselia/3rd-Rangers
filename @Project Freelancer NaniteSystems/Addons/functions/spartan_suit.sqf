@@ -1,6 +1,6 @@
 Nano_Suit_SPARTAN ={
 
-ONI_Suit_Active = true;
+SPARTAN_Suit_Active = true;
 DevOptions = false;                          comment "[Boolean]  Development options. Used for script debuging.";
 TextureArmor      = "Uniform\NanoArmor.jpg";     comment "[String]   Texture name of Armor mode texture.";
 TextureSpeed      = "Uniform\NanoSpeed.jpg";     comment "[String]   Texture name of Speed mode texture.";
@@ -8,9 +8,9 @@ TextureArmorSpeed = "Uniform\NanoBoth.jpg";      comment "[String]   Texture nam
 TextureIdle       = "Uniform\NanoBase.jpg";      comment "[String]   Texture name of default texture when no abilities listed above active.";
 TextureHandling = true;
 
+player setVariable ["_eta_cloak_cooldown", true, true];
 AbiliyActive = 0;
 ArmorActive = 0;
-InvisActive = 0;
 SpeedActive = 0;
 InvisBreakRDY = 0;
 NanoStopping = 0;
@@ -531,18 +531,59 @@ Nano_Shield = {
     if (TextureHandling) then {if (SpeedActive == 1) then {player setObjectTextureGlobal [0,TextureArmorSpeed];} else {player setObjectTextureGlobal [0,TextureArmor];};};
     if (!ActiveRecharge_SPARTAN) then {AbiliyActive = 1;};
     if (ArmorActive == 0) then {
-      if (shield_size_switch == 0) then {
-        _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
-        _player_shield attachTo [player, [0, 0, 1]];
-        _player_shield setObjectScale eta_small_shield_size_SPARTAN;
-        shield_power_drain = eta_small_shield_power_drain_SPARTAN;
+      if (player == vehicle player) then {
+        if (shield_size_switch == 0) then {
+          _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+          _player_shield attachTo [player, [0, 0, 1]];
+          _player_shield setObjectScale eta_small_shield_size_SPARTAN;
+          shield_power_drain = eta_small_shield_power_drain_SPARTAN;
+        };
+        if (shield_size_switch == 1) then {
+          _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+          _player_shield attachTo [player, [0, 0, 1]];
+          _player_shield setObjectScale eta_big_shield_size_SPARTAN;
+          shield_power_drain = eta_big_shield_power_drain_SPARTAN;
+        };
+      }
+      else {
+        if (eta_vehicle_shield_SPARTAN) then
+        {
+          _dimension = sizeOf typeOf vehicle player;
+          _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+          _player_shield attachTo [vehicle player, [0, 0, 0]];
+          _player_shield setObjectScale (_dimension / 3.5) / 2;
+          shield_power_drain = eta_vehicle_shield_power_drain_SPARTAN;
+
+          _VehicleShieldEH = player addEventHandler ["GetOutMan", {
+	           params ["_unit", "_role", "_vehicle", "_turret"];
+             //Despawn Shield when player exits
+             {
+               if (_x isKindOf "OPTRE_FC_Energy_shield") then {
+                 deleteVehicle _x;
+               };
+             } forEach attachedObjects _vehicle;
+
+             if (shield_size_switch == 0) then {
+               _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+               _player_shield attachTo [player, [0, 0, 1]];
+               _player_shield setObjectScale eta_small_shield_size_SPARTAN;
+               shield_power_drain = eta_small_shield_power_drain_SPARTAN;
+             };
+             if (shield_size_switch == 1) then {
+               _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
+               _player_shield attachTo [player, [0, 0, 1]];
+               _player_shield setObjectScale eta_big_shield_size_SPARTAN;
+               shield_power_drain = eta_big_shield_power_drain_SPARTAN;
+             };
+
+             player removeEventHandler ["GetOutMan", _thisEventHandler];
+          }];
+        }
+        else {
+          hint "Shields are not powerful enough to cover the vehicle";
+        };
       };
-      if (shield_size_switch == 1) then {
-        _player_shield = createVehicle ["OPTRE_FC_Energy_shield", position player, [], 0, "CAN_COLLIDE"];
-        _player_shield attachTo [player, [0, 0, 1]];
-        _player_shield setObjectScale eta_big_shield_size_SPARTAN;
-        shield_power_drain = eta_big_shield_power_drain_SPARTAN;
-      };
+
     };
     ArmorActive = 1;
     SuitPower_SPARTAN = SuitPower_SPARTAN - shield_power_drain;
@@ -556,7 +597,8 @@ Nano_Shield = {
       if (_x isKindOf "OPTRE_FC_Energy_shield") then {
         deleteVehicle _x;
       };
-    } forEach attachedObjects player;
+    } forEach attachedObjects vehicle player;
+    player removeEventHandler ["GetOutMan",_VehicleShieldEH];
     if (TextureHandling) then {player setObjectTextureGlobal [0,TextureIdle];};
     uiSleep (DisengageTick + GenStopTick + 0.1);
     if (ActiveScan == 0) then {[] spawn{[] call GeneratorScan;};};
@@ -569,7 +611,18 @@ Nano_Shield = {
   comment "Cloak activation function.";
 Nano_Sneak2_ACT = {
   if (SuitPower_SPARTAN >= 10) then {
-    if (InvisActive == 0) then {systemChat "Cloak Engaged"; playSound "Hint"; [] call Nano_Sneak2;};
+    if (InvisActive == 0) then {
+      if (player getVariable ["_eta_cloak_cooldown", true]) then {
+        [player,"eta_sound_cloak_charge"] remoteExec ["say"];
+        sleep eta_sneak_chargeup_SPARTAN;
+        systemChat "Cloak Engaged";
+        playSound "Hint";
+        [] call Nano_Sneak2;}
+        else {
+          playsound "Alarm";
+          systemchat "Cloak Field Recalibrating";
+        }
+      };
   } else {
     systemChat "At least 10 percent needed.";
   };
@@ -774,8 +827,24 @@ Nano_AIM = {
       systemChat "Weapon handling protocols disengaged.";
       playSound "Hint";
     };
+  };
 };
-    };
+
+Nano_Shield_Charge = {
+  if (SuitPower_SPARTAN >= eta_energy_shield_recharge_cost_SPARTAN) then {
+    player setVariable ["optre_stopcharging", false, true];
+    _optre_suit_energy = player getVariable ["optre_suit_energy", 100];
+    _new_suit_energy = _optre_suit_energy + eta_energy_shield_recharge_amount_SPARTAN;
+    if (_new_suit_energy > 100) then {_new_suit_energy = 100};
+    player setVariable ["optre_suit_energy", _new_suit_energy, true];
+    SuitPower_SPARTAN = SuitPower_SPARTAN - eta_energy_shield_recharge_cost_SPARTAN;
+    systemChat "Shields Charged";
+  }
+  else {
+    playSound "Alarm";
+    systemchat "Not Enough Energy to charge Shields";
+  };
+};
 
   comment "Disengage activation function";
 Nano_STOP_ACT = {
@@ -791,6 +860,11 @@ Nano_STOP = {
   InvisBreakRDY = 0;
   ArmorActive = 0;
   SpeedActive = 0;
+  [] spawn {
+    player setVariable ["_eta_cloak_cooldown", false, true];
+    sleep eta_cloak_cooldown_timer_SPARTAN;
+    player setVariable ["_eta_cloak_cooldown", true, true];
+  };
   {
     if (_x isKindOf "OPTRE_FC_Energy_shield") then {
       deleteVehicle _x;
