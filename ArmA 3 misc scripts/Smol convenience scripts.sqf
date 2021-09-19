@@ -1,4 +1,6 @@
-//---SP Slow-mo
+//A lot of scripts below starting with "this". In most of situations "this" serve as target object for script. "this" itself points at object in init field of which code being contained.
+
+//---Single Player Slow-mo
 //Pretty self explanatory. Do not work in multiplayer! In case of singleplayer even if script located in init of Eden object it will be applied to player.
 //Code:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,23 +35,14 @@ this addAction ["<t color='#00FF00'>Arsenal</t>", {["Open",true] spawn BIS_fnc_a
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+player additem "HandGrenade_Stone";
+player additem "Integrated_NVG_TI_0_F";
 
 //---Infinite ammo
 //Works on any vehicles/turrets/AI/Players. Player guns still jam though. Affects UGLs but not AT/AA launchers. DAKKA DAKKA DAKKA DAKKA
 //Code:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 this addEventHandler ["Fired",{(_this select 0) setVehicleAmmo 1;}];
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//---Image usage scripts (just code).
-//Extended giude located above.
-//Code:
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-this setObjectTextureGlobal [0,"example.jpg"];
-this addAction ["<t>ActionName</t>", {ScreenName setObjectTextureGlobal [0,"example.jpg"];}];
-this addAction ["<t>Repaint</t>", {IFV1 setObjectTextureGlobal [0,"Gcamo.jpg"]; IFV1 setObjectTextureGlobal [2,"Gcamo.jpg"]; IFV1 removeAction 0;}];
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,9 +112,9 @@ this addAction ["<t>Grab texture</t>", {_textures = getObjectTextures Analyzable
 {_x setFuel 1} Foreach thislist;
 {_x setVehicleAmmo 1} Foreach thislist;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-{if (speed _x < 300) then{_x setDamage 0; playSound "Hint"; systemChat "Repaired. You fucked up - we unfuck it. Also you owe us 29 toasters.";}else{systemChat "Too fast for resupply. Move below 300km/h";};} Foreach thislist;
-{if (speed _x < 300) then{_x setFuel 1; playSound "Hint"; systemChat "Refueled. Did you know that your fuel can be used as alcohol?";}else{systemChat "Too fast for resupply. Move below 300km/h";};} Foreach thislist;
-{if (speed _x < 300) then{_x setVehicleAmmo 1; playSound "Hint"; systemChat "Rearmed. Deliver these shells on enemies of the imperium.";}else{systemChat "Too fast for resupply. Move below 300km/h";};} Foreach thislist;
+{if (speed _x < 300) then{_x setDamage 0; playSound "Hint"; systemChat "Repaired.";}else{systemChat "Too fast for resupply. Move below 300km/h";};} Foreach thislist;
+{if (speed _x < 300) then{_x setFuel 1; playSound "Hint"; systemChat "Refueled.";}else{systemChat "Too fast for resupply. Move below 300km/h";};} Foreach thislist;
+{if (speed _x < 300) then{_x setVehicleAmmo 1; playSound "Hint"; systemChat "Rearmed.";}else{systemChat "Too fast for resupply. Move below 300km/h";};} Foreach thislist;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,6 +143,91 @@ waitUntil {!alive player};
 onEachFrame {};
 };
 }];
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//---Guided bullets for specific rifle and rounds.
+//Code:
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+this addEventHandler ["Fired", {
+WeaponType = _this select 1;
+AmmoType = _this select 4;
+ProjectileType = _this select 6;
+
+if ((WeaponType == "srifle_GM6_F") or (WeaponType == "srifle_GM6_camo_F") or (WeaponType == "srifle_GM6_ghex_F") and (AmmoType == "ACE_127x99_Ball_AMAX")) then {
+
+_MCSTarget = cursorTarget;
+
+if (isNull _MCSTarget) exitWith {Hint "No target.";};
+
+MCSOrdStartPos = (getPosASL (ProjectileType));
+
+_MCSOffset = if (_MCSTarget isKindOf "MAN") then {_MCSTarget selectionPosition "pelvis";} else {getCenterOfMass _MCSTarget;};
+
+_MCSAmmoSpeed = 900;
+
+[MCSOrdStartPos, "B_127x108_Ball", _MCSTarget, _MCSAmmoSpeed, false, _MCSOffset, 10, "", false] remoteExec ["BIS_fnc_EXP_camp_guidedProjectile", 2]; 
+
+deleteVehicle ProjectileType;
+};
+}];
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//---Global Radio
+//Code:
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+this addAction ["Cheeki Breeki", {{FunkyRadio say3D [ "Cheeki", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, true, "", "true", 5, false, "", ""];
+this addAction ["Epic song", {{FunkyRadio say3D [ "RickRoll", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, true, "", "true", 5, false, "", ""];
+this addAction ["Number 1", {{FunkyRadio say3D [ "NumOne", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, true, "", "true", 5, false, "", ""];
+this addAction ["SUS", {{FunkyRadio say3D [ "Sus", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, true, "", "true", 5, false, "", ""];
+this addAction [">>STOP RADIO", {deleteVehicle FunkyRadio; ; uiSleep 0.1; FunkyRadio = "Land_SurvivalRadio_F" createVehicle [0, 0, 0]; FunkyRadio attachTo [FunkyRadioControl,[0,0,0]]; [FunkyRadio] remoteExec["hideobject",0];}, nil, 1.5, true, true, "", "true", 5, false, "", ""];
+//~~~~~~~~~~~~~~~Mission description file must be created~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Description.ext~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class CfgSounds
+{
+ sounds[] = {};
+ 
+ class Cheeki
+ {
+  //how the sound is refferd to in the game
+  name = "Cheeki";
+  //filename volume and pitch levels
+  sound[] = {"GBR.ogg", 1.5,1};
+  //subtitle delay in seconds, subtitle text
+  titles[] = {};
+ };
+ 
+ class RickRoll
+ {
+  //how the sound is refferd to in the game
+  name = "RickRoll";
+  //filename volume and pitch levels
+  sound[] = {"Roll.ogg", 1.5,1};
+  //subtitle delay in seconds, subtitle text
+  titles[] = {};
+ };
+ class NumOne
+ {
+  //how the sound is refferd to in the game
+  name = "NumOne";
+  //filename volume and pitch levels
+  sound[] = {"n1.ogg", 1.5,1};
+  //subtitle delay in seconds, subtitle text
+  titles[] = {};
+ };
+ class Sus
+ {
+  //how the sound is refferd to in the game
+  name = "Sus";
+  //filename volume and pitch levels
+  sound[] = {"Sus.ogg", 1.5,1};
+  //subtitle delay in seconds, subtitle text
+  titles[] = {};
+ };
+};
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
