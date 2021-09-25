@@ -79,7 +79,6 @@ ASLToAGL (aimPos player);
 screenToWorld [0.5, 0.5];
 
 //inventoty
-//inventoty
 _unit addMagazine "magazineName";
 _unit addMagazines ["magazineName", number];
 clearItemCargoGlobal cursorTarget;
@@ -119,17 +118,6 @@ triggerAmmo bomb1;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~workplace1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//--recon
-
-//--gunner
-
-//--medic
-
-//--coordinator
-
-//--tactician
-
-//--demolisher
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,8 +245,8 @@ removeallactions player;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 removeallactions player;
 player addAction ["<t>List current loadout</t>", {hintSilent format ["Current loadout: %1", getPylonMagazines (vehicle player)  joinString ", "];}];
-player addAction ["<t>Copy all available ordinance names to clipboard</t>", {_string = ((vehicle player) getCompatiblePylonMagazines 1) joinString ", "; copyToClipboard _string;}];
-player addAction ["<t>list all options for all pylons</t>", {hintSilent format ["All ordinance for plane: %1", (vehicle player) getCompatiblePylonMagazines 0 joinString ", "];}];
+player addAction ["<t>Copy all available ordnance names to clipboard</t>", {_string = ((vehicle player) getCompatiblePylonMagazines 1) joinString ", "; copyToClipboard _string;}];
+player addAction ["<t>list all options for all pylons</t>", {hintSilent format ["All ordnance for plane: %1", (vehicle player) getCompatiblePylonMagazines 0 joinString ", "];}];
 player addAction ["<t>1</t>",  {hintSilent format ["Pylon1:  %1", (vehicle player) getCompatiblePylonMagazines 1  joinString ", "];}];
 player addAction ["<t>2</t>",  {hintSilent format ["Pylon2:  %1", (vehicle player) getCompatiblePylonMagazines 2  joinString ", "];}];
 player addAction ["<t>3</t>",  {hintSilent format ["Pylon3:  %1", (vehicle player) getCompatiblePylonMagazines 3  joinString ", "];}];
@@ -319,6 +307,18 @@ EH_ShotsFired = player addEventHandler ["FiredMan", {
 //Code:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 copyToClipboard (str diag_activeSQFScripts);
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+//---Health check tool
+//Used mostly to test weapon damage
+//Code:
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+onEachFrame {
+hint formatText ["Vehicle integrigy: %1 %2", 100-((damage (cursorTarget))*100), "%"];
+};
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
