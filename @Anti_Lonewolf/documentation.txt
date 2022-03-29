@@ -1,0 +1,9 @@
+
+Global Variables (Used by CBA Options):
+//activate or deactive the script
+eta_activate_lonewolf
+standard = true
+
+//Distance you can be away from your leader before you get the popup (in meters)
+varname = eta_distance_to_leader
+standard = 50
