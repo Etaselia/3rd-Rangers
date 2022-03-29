@@ -1,8 +1,6 @@
 //---Nanosuit powers v2 electric boogaloo /w power system [COMPLICATED].
 //This version is complicated but have a lot more features like abilities disengagement to save energy, using several abilities at the same time, active recharge, invisibility that can be broken on shot and can drain all energy. Just look at the settings section. While doing this script i heavily focused on flexibility and customization by mission maker. So script ended up a bit of clusterfuck of "if" statements. And there's a lot of variables that connect different parts of script. That makes it farley hard to modify so please stick to settings if you not sure what you doing.
-//todo:
-//Add visual effects? Radial blur - fuck blur. Chromatic aberration - taken by ACE pain, will confuse people. Wet distortion - maybe on activation. Color correction - maybe. Dynamic blur - fuck blur. Film grain - meh. Color inversion - maybe with color correction.
-//Add crysis sounds? Possible coryright issues if loaded to workshop.
+
 //Code:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                        comment "Activation by static Eden object.";

@@ -1,4 +1,4 @@
-//--- Spawn and Mission Control System.
+//---Mission Control System.
 //Menu layout can be changed relatively easy and if you have issues you can contact SLE for explanation.
 //Squads can be changed in corresponding functions.
 //MCStemp menu meant to be used in SLE's operations and can be fully rewritten or deleted.
@@ -6,12 +6,16 @@
 //WARNING Global (all players) do not influence players with access to Zeus interface. To make sure there's only one Zeus use "List curators [Debug]" option in switch menu. And punch Eta if he'll give himself Zeus and blow players cover.
 //Now features most useful parts (SLE's opinion) of J-Wolf Admin menu. Unfortunately, he was banned and script was removed from public access because apparently some fucks wreaked havoc on official Zeus servers with that menu (when official servers had debug console). I added only utilities that duplicate and expand Zeus features so you won't need to switch between player and Zeus menu constantly for some common interactions. Some things were overlooked. For example, serverwide draw distance because we already have CH view distance. Also if you want original script you may try to google it or ask me to send you a copy. JAM part not meant to be edited because of complexity nor it need to be because of universality. If you only need MCS - copy code until JAM PORT section.
 
+//Before using custom squad spawn system you'll need several units placed in editor and named accordingly. If that step is overlooked spawned AI won't have custom gear. Name of reference soldiers used by default is:
+//RefSL | RefMED | RefDAKKA | RefMARKSMAN | RefQCB | RefGRENADER | RefAT | RefAA | RefHMG | RefM32 | RefAA12 | RefM107
+
+
 //todo:
 //make target vehicle remote control.
 //Code:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 comment "Activation by static Eden object.";
-this addAction ["<t>Activate MCS+JAM v1.9 (Zeus access only)</t>", {
+this addAction ["<t>Activate MCS+JAM v2.1 (Zeus access only)</t>", {
 
 comment "If zeus check.";
 if (player in call BIS_fnc_listCuratorPlayers) then {
@@ -35,7 +39,6 @@ player addAction ["<t>TP</t>", {(vehicle player) setPos (screenToWorld [0.5, 0.5
 player addAction ["<t color='#FF0000'>Go UP</t>", {_z = getpos player select 2; player setpos [getpos player select 0,getpos player select 1,_z+2000];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t color='#808080'>Disable menu</t>", {removeallactions player; player addAction ["<t color='#808080'>>>Enable</t>", {[] call SLE_menu;}];}];
 player addAction ["<t>>>AI spawn LOS</t>", {[] call LOS_menu;}];
-player addAction ["<t>>>AI spawn Beacon</t>", {[] call BCL_menu;}];
 player addAction ["<t>>>Switches (God,AI-ignore,Wraith)</t>", {[] call SWC_menu;}];
 player addAction [">>JAM: <t color='#42D6FC'>Ported </t><t color='#ff6600'>scripts</t>", {[] call JAM_fusion_menu;}];
 player addAction ["<t>>>Ordinance support</t>", {[] call Support_Menu;}];
@@ -54,27 +57,12 @@ player addAction ["<t>TP</t>", {(vehicle player) setPos (screenToWorld [0.5, 0.5
 player addAction ["<t color='#FF0000'>Go UP</t>", {_z = getpos player select 2; player setpos [getpos player select 0,getpos player select 1,_z+2000];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>Rifelman x3 Spawn(L)</t>", {[] call LOS_MEAT3;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>Rifelman x6 Spawn(L)</t>", {[] call LOS_MEAT6;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>Shotgun team Spawn(L)</t>", {[] call LOS_SHT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>Weapon squad Spawn(L)</t>", {[] call LOS_ULT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>AT team Spawn(L)</t>", {[] call LOS_AT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>MG team Spawn(L)</t>", {[] call LOS_AR;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>AA team Spawn(L)</t>", {[] call LOS_AA;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>Devastators Spawn(L)</t>", {[] call LOS_DEV;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>Germans x5 Spawn(L)</t>", {[] call LOS_Germans;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>Soviet x10 Spawn(L)</t>", {[] call LOS_Soviet;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>Glorious T-34-85 Spawn(L)</t>", {[] call LOS_Soviet_Tonk;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-};
-
-comment "---------------------------------------------------------------------------------";
-comment "-----------------------------=-Beacon spawn menu-=-------------------------------";
-comment "---------------------------------------------------------------------------------";
-BCL_menu = {
-removeallactions player;
-player addAction ["<t>>>Back</t>", {[] call SLE_menu;}];
-player addAction ["<t>Rifelman x3 Spawn(B)</t>", {[] call BCN_MEAT3;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>Rifelman x6 Spawn(B)</t>", {[] call BCN_MEAT6;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>Weapon squad Spawn(B)</t>", {[] call BCN_ULT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>AT team Spawn(B)</t>", {[] call BCN_AT;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>MG team Spawn(B)</t>", {[] call BCN_AR;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>Devastators Spawn(B)</t>", {[] call BCN_DEV;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 };
 
 comment "---------------------------------------------------------------------------------";
@@ -93,8 +81,8 @@ player addAction ["<t color='#e7ffc9'>Players AI ignore on [debug for late joine
 player addAction ["<t color='#e7ffc9'>Players Godmode on [debug for late joiners]</t>", {GodMDMP = 1; {{if(!(_x in call BIS_fnc_listCuratorPlayers)) then {_x allowDamage false;}} forEach allPlayers;} remoteExec ["bis_fnc_call", 0]; hintSilent "Players Godmode force ON";}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>Fast movement multiplier (setting)</t>", {[] call FAF_setting_menu;}];
 player addAction ["<t>List curators [Debug]</t>", {hintSilent formatText ["Curators: %1", call BIS_fnc_listCuratorPlayers joinString ", "];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
- player addAction ["<t>NoSway on/off</t>", {if(isNil "NoSway") then {NoSway = 0}; if (NoSway == 0) then{NoSway = 1; removeMissionEventHandler ["EachFrame", MEH_NoSwayZeus]; MEH_NoSwayZeus = addMissionEventHandler ["EachFrame", {player setCustomAimCoef 0;}]; hintSilent "NoSway ON";}else{NoSway = 0; removeMissionEventHandler ["EachFrame", MEH_NoSwayZeus]; player setCustomAimCoef 1; hintSilent "NoSway OFF";};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["<t>NoRecoil on/off</t>", {if(isNil "NoRecoil") then {NoRecoil = 0}; if (NoRecoil == 0) then{NoRecoil = 1; player setUnitRecoilCoefficient 0; hintSilent "NoRecoil ON";}else{NoRecoil = 0; player setUnitRecoilCoefficient 1; hintSilent "NoRecoil OFF";};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>ZeusNoSway on/off</t>", {if(isNil "NoSway") then {NoSway = 0}; if (NoSway == 0) then{NoSway = 1; removeMissionEventHandler ["EachFrame", MEH_NoSwayZeus]; MEH_NoSwayZeus = addMissionEventHandler ["EachFrame", {player setCustomAimCoef 0;}]; hintSilent "NoSway ON";}else{NoSway = 0; removeMissionEventHandler ["EachFrame", MEH_NoSwayZeus]; player setCustomAimCoef 1; hintSilent "NoSway OFF";};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>ZeusNoRecoil on/off</t>", {if(isNil "NoRecoil") then {NoRecoil = 0}; if (NoRecoil == 0) then{NoRecoil = 1; player setUnitRecoilCoefficient 0; hintSilent "NoRecoil ON";}else{NoRecoil = 0; player setUnitRecoilCoefficient 1; hintSilent "NoRecoil OFF";};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t color='#e7ffc9'>Players screen blackout</t>", {[] call PlayersBlackout;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t color='#e7ffc9'>Players NoSway on/off [For very HI-tech operations]</t>", {[] call PlayersNoSway;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 };
@@ -105,7 +93,7 @@ comment "-----------------------------------------------------------------------
 FAF_setting_menu = {
 removeallactions player;
 player addAction ["<t>>>Back</t>", {[] call SWC_menu;}];
-player addAction ["<t>3X[55]</t>", {ZeusSpeedBoost = 3;}];
+player addAction ["<t>3X[55 km/h]</t>", {ZeusSpeedBoost = 3;}];
 player addAction ["<t>5X[90]</t>", {ZeusSpeedBoost = 5;}];
 player addAction ["<t>10X[180](default)</t>", {ZeusSpeedBoost = 10;}];
 player addAction ["<t>15X[270]</t>", {ZeusSpeedBoost = 15;;}];
@@ -166,13 +154,14 @@ _MCSAutoCAS2 = (player modelToWorld [0,5000,400]);
 [_MCSAutoCAS1, _MCSAutoCAS2, 1000, "FULL", "B_UAV_05_F", west] call BIS_fnc_ambientFlyby;
 };
 
-[MCSOrdStartPos, _MCSAmmoClass, _MCSTarget, _MCSAmmoSpeed, _IsOneshot, _MCSOffset, 10, "", false] remoteExec ["BIS_fnc_EXP_camp_guidedProjectile", 2];
+[MCSOrdStartPos, _MCSAmmoClass, _MCSTarget, _MCSAmmoSpeed, _IsOneshot, _MCSOffset, 10, "", false] remoteExec ["BIS_fnc_EXP_camp_guidedProjectile", 2]; 
 };
 
 comment "---------------------------------------------------------------------------------";
 comment "---------------------------=-Artillery control menu-=----------------------------";
 comment "---------------------------------------------------------------------------------";
 Support_Arty_Submenu = {
+removeallactions player;
 player addAction ["<t>>>Back</t>", {[] call Support_Menu;}];
 player addAction ["<t>[Arty grp 1] Fire at viewpoint.</t>", {[ArtyGroup1] call Arty_Fire_Menu;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["<t>[Arty grp 1] Add artillery to group.</t>", {ArtyGroup1 pushBackUnique cursorTarget; Hint format ["[%1] (%2) added to arty group 1", (name cursorTarget), (typeOf cursorTarget)];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
@@ -265,15 +254,19 @@ player addAction ["[Target] Disable turret disassembly.", {cursorTarget enableWe
 player addAction ["[Target] Set AI to convoy mode.", {cursorTarget forceFollowRoad true; cursorTarget setConvoySeparation 20;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["[Target] Make AI trigger happy for 10 sec.", {cursorTarget suppressFor 10;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["[Target] Clear vehicle/box inventory.", {clearItemCargoGlobal cursorTarget; clearWeaponCargoGlobal cursorTarget; clearMagazineCargoGlobal cursorTarget; clearBackpackCargoGlobal cursorTarget; }, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["[Car] Set car plate.", {vehicle player setPlateNumber (selectRandom ["SLE was here","Goddammit Eta","Awi=Edgelord","CatgirlsisLove","CatgirlsisLife","Purge heretics","2FAST4U","Git gud"]);}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["[Car] Set car plate.", {vehicle player setPlateNumber (selectRandom ["SLE was here","Goddammit Eta","Awi=Edgelord","Catgirl is Love","Catgirl is Life","Purge heretics","2FAST4U","Git gud"]);}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["[Target] Freeze player input. [Very evil]", {[name cursorTarget] call JAM_fnc_freezePlayer;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["[Target] Drop target.", {_z = getpos cursorTarget select 2; cursorTarget setpos [getpos cursorTarget select 0,getpos cursorTarget select 1,_z+20];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["[Target] You can't aim. [test]", {[name cursorTarget] call JAM_fusion_offence_inhibitor;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["[Target] You can't aim. [fixed by rejoining]", {[name cursorTarget] call JAM_fusion_offence_inhibitor;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["Open splendid camera.", {["Init"] call BIS_fnc_camera;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["Get resupply beacon.", {player additem "HandGrenade_Stone";}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["[Local] Disable ambient animals.", {enableEnvironment [false, true];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 player addAction ["[Local] Disable camera shake.", {enableCamShake false;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
-player addAction ["[Global] Rekt compass for everyone.", {if (hasInterface) then {{setCompassOscillation [rad 360, 0.1, 0.2];} remoteExec ["bis_fnc_call", 0];};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["[Global] Rekt compass for everyone.", {if (hasInterface) then {{setCompassOscillation [rad 360, 0.5, 1.0];} remoteExec ["bis_fnc_call", 0];};}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>Say: Nope</t>", {["Nope"] call fnc_StoryMessage;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>Say: Yes</t>", {["Yes"] call fnc_StoryMessage;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>Say: Yesn't</t>", {["Yesn't"] call fnc_StoryMessage;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>Say: Now you fucked up</t>", {["Now you fucked up!"] call fnc_StoryMessage;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>Say: Fuck you</t>", {["Fuck you!"] call fnc_StoryMessage;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 };
 
 comment "---------------------------------------------------------------------------------";
@@ -282,90 +275,148 @@ comment "-----------------------------------------------------------------------
 MCS_temp_menu = {
 removeallactions player;
 player addAction ["<t>>>Back</t>", {[] call SLE_menu;}];
-
+player addAction ["<t>SelSay: Test</t>", {["Test."] call fnc_SelectiveStoryMessage;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["<t>SelSay: Plot</t>", {["You feel unease about the chains but you can't tell why."] call fnc_SelectiveStoryMessage;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["[Target] Make him chosen one (500m rad)", {[name cursorTarget] call MCS_fnc_TheChosenOne;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["[Target] You weren't supposed to be the chosen one! (500m rad)", {[name cursorTarget] call MCS_fnc_NotTheChosenOne;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["[Target] Make him pathfinder (4000m rad)", {[name cursorTarget] call MCS_fnc_ThePathfinder;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["[Target] UnMake him pathfinder (4000m rad)", {[name cursorTarget] call MCS_fnc_NotThePathfinder;}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["Cheeki Breeki", {{cursorTarget say3D [ "Cheeki", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["Epic song", {{cursorTarget say3D [ "RickRoll", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["Number 1", {{cursorTarget say3D [ "NumOne", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
+player addAction ["SUS", {{cursorTarget say3D [ "Sus", 50, 1];} remoteExec ["bis_fnc_call", 0];}, nil, 1.5, true, false, "", "true", 50, false, "", ""];
 };
 
-comment "---------------------------------------------------------------------------------";
-comment "------------------------------=-Resupply script-=--------------------------------";
-comment "---------------------------------------------------------------------------------";
-if(isNil "MCSResupply") then {MCSResupply = 0;};
-if (MCSResupply == 0) then {
-EH_ShotsFiredResupply = player addEventHandler ["FiredMan", {
-AmmoType = _this select 4;
-  if (AmmoType == "GrenadeHand_stone") then {
-_Projectile = _this select 6;
-_Airdrop1 = (player modelToWorld [0,-1500,1000]);
-_Airdrop2 = (player modelToWorld [0,5000,1000]);
-    [_Projectile, _Airdrop1, _Airdrop2] spawn {
-
-_Projectile = _this select 0;
-_Airdrop1 = _this select 1;
-_Airdrop2 = _this select 2;
-
-Sleep 1;
-
-_Pos = [getpos _Projectile select 0, getpos _Projectile select 1, (getpos _Projectile select 2)+200];
-Hint "Position locked in. Airdrop ETA: 60 seconds.";
-[_Airdrop1, _Airdrop2, 1000, "FULL", "B_T_VTOL_01_infantry_F", west] call BIS_fnc_ambientFlyby;
-
-sleep 15;
-
-_parachute = createVehicle ["B_Parachute_02_F", _Pos, [], 0, ""];
-_AirCrate = createVehicle ["Box_NATO_Equip_F", [0,0,100], [], 0, "FLY"];
-_AirCrate attachTo [_parachute,[0,0,0]];
-WaitUntil {((((position _AirCrate) select 2) < 0.6) || (isNil "_parachute"))};
-detach _AirCrate;
-_AirCrate setPos [(position _AirCrate) select 0, (position _AirCrate) select 1, 1];
-
-clearItemCargoGlobal _AirCrate;
-
-[_AirCrate, ["Take primary magazine.", {
-  if ((primaryWeapon player) != "") then {
-    if ((count (primaryWeaponMagazine player)) != 0) then {
-      player addMagazine ((primaryWeaponMagazine player)select 0);
-    } else {Hint "You don't have magazine in your primary. Please don't eject empty magazines.";};
-  } else {Hint "You don't have primary. What chain of decisions led you to this?";};
-}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take UGL round.", {
-  if ((primaryWeapon player) != "") then {
-    if ((count (primaryWeaponMagazine player)) != 0) then {
-      player addMagazine ((primaryWeaponMagazine player)select 1);
-    } else {Hint "You don't have round in your GL. Please don't eject empty magazines.";};
-  } else {Hint "You don't have primary. What chain of decisions led you to this?";};
-}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take AT round.", {
-  if ((secondaryWeapon player) != "") then {
-    if ((count (secondaryWeaponMagazine player)) != 0) then {
-      player addMagazine ((secondaryWeaponMagazine player)select 0);
-    } else {Hint "You don't have round in your AT laucher. Please use one of static options to get your first.";};
-  } else {Hint "You don't have AT laucher. Too bad.";};
-}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take sidearm magazine.", {
-  if ((handgunWeapon player) != "") then {
-    if ((count (handgunMagazine player)) != 0) then {
-      player addMagazine ((handgunMagazine player)select 0);
-    } else {Hint "You don't have magazine in your sidearm. Please don't eject empty magazines.";};
-  } else {Hint "You don't have sidearm. SLE approves.";};
-}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-
-[_AirCrate, ["Take MAAWS AT 55.", {player addMagazine "MRAWS_HEAT55_F";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take MAAWS AT 75.", {player addMagazine "MRAWS_HEAT_F";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take MAAWS HE.", {player addMagazine "MRAWS_HE_F";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take Titan AT.", {player addMagazine "Titan_AT";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take Titan AP.", {player addMagazine "Titan_AP";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take Titan AA.", {player addMagazine "Titan_AA";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take Vorona HEAT.", {player addMagazine "Vorona_HEAT";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take Vorona HE.", {player addMagazine "Vorona_HE";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take RPG 32 AT.", {player addMagazine "RPG32_F";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
-[_AirCrate, ["Take RPG 32 HE.", {player addMagazine "RPG32_HE_F";}, nil, 1.5, true, false, "", "true", 5, false, "", ""]] remoteExec ["addAction"];
+    MCS_fnc_TheChosenOne =
+    {
+        params["_playerName"];
+        _playerName = _this select 0;
+        if (_playerName == JAM_myName) exitWith
+        {
+            hint "HOW?"
+        };
+        {
+            if ( ( name _x ) == _playerName ) then
+            {
+                [[( name _x )],
+                {
+                    {
+                        if ((_x isKindOf "Static") and !(_x isKindOf "Land_VehicleTrack_01_base_F")) then { _x hideObject false;};
+                    } Foreach (nearestObjects [player, [], 500]);
+                    VarTrueSight = 1;
+                }] remoteExec ["spawn",_x];
+            };
+        } forEach allPlayers;
     };
-  };
-}];
-MCSResupply = 1;
-};
+
+    MCS_fnc_NotTheChosenOne =
+    {
+        params["_playerName"];
+        _playerName = _this select 0;
+        if (_playerName == JAM_myName) exitWith
+        {
+            hint "HOW?"
+        };
+        {
+            if ( ( name _x ) == _playerName ) then
+            {
+                [[( name _x )],
+                {
+                    {
+                        if (_x isKindOf "Blood_01_Base_F") then { _x hideObject true;};
+                    } Foreach (nearestObjects [player, [], 500]);
+                    VarTrueSight = 0;
+                }] remoteExec ["spawn",_x];
+            };
+        } forEach allPlayers;
+    };
+
+
+    MCS_fnc_ThePathfinder =
+    {
+        params["_playerName"];
+        _playerName = _this select 0;
+        if (_playerName == JAM_myName) exitWith
+        {
+            hint "HOW?"
+        };
+        {
+            if ( ( name _x ) == _playerName ) then
+            {
+                [[( name _x )],
+                {
+                    {
+                        if (_x isKindOf "Land_VehicleTrack_01_base_F") then { _x hideObject false;};
+                    } Foreach (nearestObjects [player, [], 4000]);
+                }] remoteExec ["spawn",_x];
+            };
+        } forEach allPlayers;
+    };
+
+    MCS_fnc_NotThePathfinder =
+    {
+        params["_playerName"];
+        _playerName = _this select 0;
+        if (_playerName == JAM_myName) exitWith
+        {
+            hint "HOW?"
+        };
+        {
+            if ( ( name _x ) == _playerName ) then
+            {
+                [[( name _x )],
+                {
+                    {
+                        if (_x isKindOf "Land_VehicleTrack_01_base_F") then { _x hideObject true;};
+                    } Foreach (nearestObjects [player, [], 4000]);
+                }] remoteExec ["spawn",_x];
+            };
+        } forEach allPlayers;
+    };
+
+            fnc_SelectiveStoryMessage = {
+            params ["_input_text"];
+                disableSerialization;
+                if(isNil "VarTrueSight") then {VarTrueSight = 0};
+                if (VarTrueSight == 1) then {
+                run_SelectiveStoryMessage = {
+                params ["_input_text"];
+                     params ["_input_text"];
+                        _fadeTime = 1.75;
+                        _msg = ("<t font='PuristaSemiBold' size='1.5'>"+_input_text+"</t><br/>");
+                        
+                        [1,[_msg, "PLAIN", _fadeTime, true, true]] remoteExec ["cutText"];
+                        "hint" remoteExec["playSound"];
+                };
+                    [_input_text] call run_SelectiveStoryMessage;
+                    };
+            }; findDisplay 0 setVariable ["fnc_SelectiveStoryMessage",fnc_SelectiveStoryMessage];
 
 comment "---------------------------------------------------------------------------------";
-comment "------------------------------=-Squad functions.-=-------------------------------";
+comment "-------------------------------=-Storry message-=--------------------------------";
+comment "---------------------------------------------------------------------------------";
+
+            fnc_StoryMessage = {
+            params ["_input_text"];
+                disableSerialization;
+                
+                
+                run_StoryMessage = {
+                params ["_input_text"];
+                     params ["_input_text"];
+                        _fadeTime = 1.75;
+                        _msg = ("<t font='PuristaSemiBold' size='1.5'>"+_input_text+"</t><br/>");
+                        
+                        [1,[_msg, "PLAIN", _fadeTime, true, true]] remoteExec ["cutText"];
+                        "hint" remoteExec["playSound"];
+                };
+                    [_input_text] call run_StoryMessage;
+                    
+            }; findDisplay 0 setVariable ["fnc_StoryMessage",fnc_StoryMessage];
+
+
+comment "---------------------------------------------------------------------------------";
+comment "---------------------------=-Squad spawn functions.-=----------------------------";
 comment "---------------------------------------------------------------------------------";
 LOS_MEAT3 = {
 _spawnPosition = screenToWorld [0.5, 0.5];
@@ -377,7 +428,7 @@ Squad = createGroup [east,true];
     this setUnitLoadout (getUnitLoadout RefQCB);
     sleep 0.1;
       _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-      this setUnitLoadout (getUnitLoadout RefQCB);
+      this setUnitLoadout (getUnitLoadout RefMED);
 };
 LOS_MEAT6 = {
 _spawnPosition = screenToWorld [0.5, 0.5];
@@ -398,7 +449,34 @@ _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
 this setUnitLoadout (getUnitLoadout RefQCB);
 sleep 0.1;
 _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
+this setUnitLoadout (getUnitLoadout RefMED);
+};
+LOS_SHT = {
+_spawnPosition = screenToWorld [0.5, 0.5];
+Squad = createGroup [east,true];
+_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
+this setUnitLoadout (getUnitLoadout RefSL);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA12);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA12);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA12);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA12);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA12);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA12);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefMED);
 };
 LOS_ULT = {
 _spawnPosition = screenToWorld [0.5, 0.5];
@@ -451,6 +529,21 @@ sleep 0.1;
 _newUnit = "O_Soldier_AR_F" createUnit [_spawnPosition,Squad,"this=this"];
 this setUnitLoadout (getUnitLoadout RefDAKKA);
 };
+LOS_AA = {
+_spawnPosition = screenToWorld [0.5, 0.5];
+Squad = createGroup [east,true];
+_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
+this setUnitLoadout (getUnitLoadout RefSL);
+sleep 0.1;
+_newUnit = "O_Medic_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefMED);
+sleep 0.1;
+_newUnit = "O_Soldier_AA_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA);
+sleep 0.1;
+_newUnit = "O_Soldier_AA_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA);
+};
 LOS_DEV = {
 _spawnPosition = screenToWorld [0.5, 0.5];
 Squad = createGroup [east,true];
@@ -458,115 +551,15 @@ _newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
 this setUnitLoadout (getUnitLoadout RefHMG);
 sleep 0.1;
 _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefAA12);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefM107);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefM107);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefM32);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefM32);
-};
-
-BCN_MEAT3 = {
-_spawnPosition = getPosASL AISpawn;
-Squad = createGroup [east,true];
-_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-};
-BCN_MEAT6 = {
-_spawnPosition = getPosASL AISpawn;
-Squad = createGroup [east,true];
-_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefQCB);
-};
-BCN_ULT = {
-_spawnPosition = getPosASL AISpawn;
-Squad = createGroup [east,true];
-_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
-this setUnitLoadout (getUnitLoadout RefSL);
-sleep 0.1;
-_newUnit = "O_Medic_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefMED);
-sleep 0.1;
-_newUnit = "O_Soldier_AR_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefDAKKA);
-sleep 0.1;
-_newUnit = "O_Soldier_M_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefMARKSMAN);
-sleep 0.1;
-_newUnit = "O_Soldier_GL_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefGRENADER);
-sleep 0.1;
-_newUnit = "O_Soldier_AT_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefAT);
-};
-BCN_AT = {
-_spawnPosition = getPosASL AISpawn;
-Squad = createGroup [east,true];
-_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
-this setUnitLoadout (getUnitLoadout RefSL);
-sleep 0.1;
-_newUnit = "O_Medic_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefMED);
-sleep 0.1;
-_newUnit = "O_Soldier_AT_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefAT);
-sleep 0.1;
-_newUnit = "O_Soldier_AT_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefAT);
-};
-BCN_AR = {
-_spawnPosition = getPosASL AISpawn;
-Squad = createGroup [east,true];
-_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
-this setUnitLoadout (getUnitLoadout RefSL);
-sleep 0.1;
-_newUnit = "O_Medic_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefMED);
-sleep 0.1;
-_newUnit = "O_Soldier_AR_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefDAKKA);
-sleep 0.1;
-_newUnit = "O_Soldier_AR_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefDAKKA);
-};
-BCN_DEV = {
-_spawnPosition = getPosASL AISpawn;
-Squad = createGroup [east,true];
-_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
 this setUnitLoadout (getUnitLoadout RefHMG);
 sleep 0.1;
 _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
 this setUnitLoadout (getUnitLoadout RefAA12);
 sleep 0.1;
 _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
+this setUnitLoadout (getUnitLoadout RefAA12);
+sleep 0.1;
+_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
 this setUnitLoadout (getUnitLoadout RefM107);
 sleep 0.1;
 _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
@@ -577,60 +570,6 @@ this setUnitLoadout (getUnitLoadout RefM32);
 sleep 0.1;
 _newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
 this setUnitLoadout (getUnitLoadout RefM32);
-};
-LOS_Germans = {
-_spawnPosition = screenToWorld [0.5, 0.5];
-Squad = createGroup [east,true];
-_newLeader = "O_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
-this setUnitLoadout (getUnitLoadout RefGermSTG);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefGermSTG);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefGermMG);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefGermAT);
-sleep 0.1;
-_newUnit = "O_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefGermAT);
-};
-LOS_Soviet = {
-_spawnPosition = screenToWorld [0.5, 0.5];
-Squad = createGroup [Independent,true];
-_newLeader = "I_Soldier_SL_F" createUnit [_spawnPosition, Squad, "this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSov);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSovFlame);
-sleep 0.1;
-_newUnit = "I_Soldier_F" createUnit [_spawnPosition,Squad,"this=this"];
-this setUnitLoadout (getUnitLoadout RefSovFlame);
-};
-LOS_Soviet_Tonk = {
-[screenToWorld [0.5, 0.5], 0, "LOP_AFR_OPF_T34", Independent] call BIS_fnc_spawnVehicle;
 };
 
 comment "----------------------------------------------------------------------------------------------------------------";
@@ -1145,7 +1084,7 @@ JAM_myName = name player;
             [("re"+"moveMiss"+"ionEven"+"tHandler['Dr"+"a"+"w3D',jamEsp];")] call jam_fini_fnc_compile;
         };
     };
-
+ 
     jam_mesp = {
         if (isNil "mespTggle") then {mespTggle = 1};
         if (mespTggle == 1) then {
@@ -1183,7 +1122,7 @@ JAM_myName = name player;
             ")] call jam_fini_fnc_compile;
         };
     };
-
+ 
     jam_hostileAIEsp =
     {
         if (isNil 'jamhostileAIESPTggle') then {jamhostileAIESPTggle = 1};
@@ -1191,7 +1130,7 @@ JAM_myName = name player;
             jamhostileAIESPTggle = 0;
             titleText ["<t color='#42D6FC'>ENEMY AI ESP </t><t color='#FFFFFF'>[ON]</t>", "PLAIN DOWN", -1, true, true];
             playSound "Hint";
-
+           
             jamhostileAIEsp = addMissionEventHandler ['Draw3D',{
                 {
                     if ((side _x != side player) && ((player distance _x) < 1500)) then {
@@ -1203,7 +1142,7 @@ JAM_myName = name player;
                     };
                 } forEach call jam_fini_fnc_hostileAI;
             }];
-
+           
         } else {
             jamhostileAIESPTggle = 1;
             titleText ["<t color='#42D6FC'>ENEMY AI ESP </t><t color='#FFFFFF'>[OFF]</t>", "PLAIN DOWN", -1, true, true];
@@ -1211,9 +1150,9 @@ JAM_myName = name player;
             removeMissionEventHandler['Draw3D',jamhostileAIEsp];
         };
     };
-
+ 
 comment "ammoSelectMenu";
-
+ 
     JAM_open_ammoSelectMenu = {
         removeAllActions player;
 player addAction ["<t>>>Back</t>", {[] call JAM_cheatMenu;}];
@@ -1454,6 +1393,3 @@ comment "If zeus check bracket.";
 
 comment "Activation by object bracket.";
 }, nil, 1.5, true, true, "", "true", 5, false, "", ""];
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
