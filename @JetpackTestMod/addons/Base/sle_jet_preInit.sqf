@@ -52,7 +52,7 @@
     ["Smart Jet", "1. Features"], // Category name
     [["Const", "InAir", "Off"], ["Always ON", "Only in air", "OFF"], 1], // ValueInfo
     0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -62,7 +62,7 @@
     ["Smart Jet", "1. Features"], // Category name
     true, // ValueInfo
     0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -72,7 +72,7 @@
     ["Smart Jet", "1. Features"], // Category name
     true, // ValueInfo
     0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -82,15 +82,15 @@
     ["Smart Jet", "1. Features"], // Category name
     false, // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
 [   "SLE_JET_base_acceleration_CBAS", // Variable tag
     "SLIDER", // setting type
-    ["Base acceleration", "Number in meters per second. Directly changes jetpack agility and maximum speed."], // [Name, Tooltip]
+    ["Base acceleration", "Number in meters per second. Directly changes jetpack agility and maximum speed. Note that most of finetuning was done on default 30. Setting it below 10 or above 60 is not recommend."], // [Name, Tooltip]
     ["Smart Jet", "1. Features"], // Category name
-    [0, 100, 30, 1, false], // ValueInfo
+    [5, 90, 30, 1, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {}, // OnChage code
     false // Show mission restart nedded warning
@@ -207,7 +207,7 @@
 
 [   "SLE_JET_fuel_bar_color_CBAS", // Variable tag
     "COLOR", // setting type
-    ["Fuel bar color", "If dynamic color is disabled this color will be used instead. Note that last 10% will always be red."], // [Name, Tooltip]
+    ["Fuel bar color", "If dynamic color is disabled this color will be used instead."], // [Name, Tooltip]
     ["Smart Jet", "4. UI and controls"], // Category name
     [1, 0.58, 0, 1], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable

@@ -1,14 +1,54 @@
-//Non-local stuff used:
-//functions
+/*
+Non-local stuff used:
 
+  Playerbound variables.
+SLE_JET_Fuel_counter (also propogated throught network)
+SLE_JET_Jetpak_activation_state
+SLE_JET_Jetpak_ui_activation_state
+SLE_JET_Semi_auto_hover_counter
+SLE_JET_Sway_fix_on
 
-//TODO
-//Make setting actually do shit.
-//Fix bug when entering arsenal (virtual arsenal sets to ground level or arsenal in general?) in autohover autohover mode is stuck.
-//Conditional sounds.
-//Visual effects. Maybe create placeholder rocket without damage and long time to life. Or just straight up change backpack model.
-//Maybe actually do ballistic formula for AT rockets in CCIP.
-//Animation and modelling - that's beyond me for now.
+  functions
+fnc_SLE_JET_item_check
+fnc_SLE_JET_setting_change_reboot
+fnc_SLE_JET_Jetpack_activation
+fnc_SLE_JET_Jetpack_ui_activation
+fnc_SLE_JET_on_key_item_check
+fnc_SLE_JET_fuel_core
+fnc_SLE_JET_up
+fnc_SLE_JET_forw
+fnc_SLE_JET_backw
+fnc_SLE_JET_left
+fnc_SLE_JET_right
+fnc_SLE_JET_brake
+fnc_SLE_JET_autobrake
+fnc_SLE_JET_engine_sound_core
+fnc_SLE_JET_event_sound_core
+fnc_SLE_JET_Disable_Jetpack
+fnc_SLE_JET_Disable_Jetpack_ui
+
+  Spawn handles
+SLE_JET_up_spawn_handle
+SLE_JET_forw_spawn_handle
+SLE_JET_backw_spawn_handle
+SLE_JET_left_spawn_handle
+SLE_JET_right_spawn_handle
+SLE_JET_brake_spawn_handle
+SLE_JET_autobrake_spawn_handle
+SLE_JET_sound_repeater_spawn_handle
+SLE_JET_stop_sound_repeater_spawn_handle
+SLE_JET_fuel_generation_spawn_handle
+SLE_JET_height_limiter_spawn_handle
+SLE_JET_autohover_over_water_spawn_handle
+SLE_JET_unconscious_detector_spawn_handle
+
+  Eventhandler handles
+MEH_SLE_JET_autobrake_system
+PEH_SLE_JET_In_air_no_sway
+MEH_SLE_JET_In_air_no_sway_repeater
+MEH_JET_FPV
+MEH_JET_CCIP
+*/
 
 /*
 CBA Settings:
@@ -18,7 +58,6 @@ Autobrake mode | SLE_JET_autobrake_mode_CBAS | bool
 Height limiter | SLE_JET_height_limiter_CBAS | bool
 Over water hover | SLE_JET_water_hover_CBAS | bool
 Typical Acceleration | SLE_JET_base_acceleration_CBAS | val 30 m/s
-                                                                                      DONE marker (stuff below is done.)
   2. Fuel
 Typical fuel consumption | SLE_JET_fuel_consumption_CBAS | val 1
 Hover fuel consumption | SLE_JET_hover_fuel_consumption_CBAS | 0.5
@@ -40,6 +79,12 @@ UI facewear check | SLE_JET_facewear_check_CBAS | bool
 Jetpack UI compatable facewear | SLE_JET_jetpack_HUD_capable_items_CBAS | str
 */
 
+//TODO
+//Conditional sounds like alarms and maybe voicelines.
+//Visual effects. Maybe create placeholder rocket without damage and long time to life. Or just straight up change backpack model.
+//Maybe actually do CCIP ballistic formula for AT rockets.
+//Animation and modelling - that's beyond me for now.
+
 
 
 //Var
@@ -49,14 +94,15 @@ player setVariable ["SLE_JET_Jetpak_ui_activation_state", false, false]; //Same 
 player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //Used for autohover feature.
 player setVariable ["SLE_JET_Sway_fix_on", false, false]; //Used for sway fix.
 //Initializng spawn handles because it's far easier than accounting for isNil with each check later or setting spawn handles to nil after each terminate.
-SLE_JET_up_spawn_handle = [] spawn {};
-SLE_JET_forw_spawn_handle = [] spawn {};
-SLE_JET_backw_spawn_handle = [] spawn {};
-SLE_JET_left_spawn_handle = [] spawn {};
-SLE_JET_right_spawn_handle = [] spawn {};
-SLE_JET_brake_spawn_handle = [] spawn {};
-SLE_JET_autobrake_spawn_handle = [] spawn {};
-SLE_JET_sound_repeater_spawn_handle = [] spawn {};
+SLE_JET_up_spawn_handle
+SLE_JET_forw_spawn_handle
+SLE_JET_backw_spawn_handle
+SLE_JET_left_spawn_handle
+SLE_JET_right_spawn_handle
+SLE_JET_brake_spawn_handle
+SLE_JET_autobrake_spawn_handle
+SLE_JET_sound_repeater_spawn_handle
+SLE_JET_stop_sound_repeater_spawn_handle
 //Oh and variables that end with _CBAS dictated by CBA settings.
 
 //Item check on exiting vanilla arsenal. Either activates or deactivates jetpack systems. Also resets fuel level to 100.
@@ -129,6 +175,7 @@ fnc_SLE_JET_setting_change_reboot = {
     if (player getVariable "SLE_JET_Jetpak_activation_state") then {
         [] call fnc_SLE_JET_Disable_Jetpack;
         [] call fnc_SLE_JET_Jetpack_activation;
+        [false] call fnc_SLE_JET_autobrake;
     };
     if (player getVariable "SLE_JET_Jetpak_ui_activation_state") then {
         [] call fnc_SLE_JET_Disable_Jetpack_ui;
@@ -168,7 +215,7 @@ fnc_SLE_JET_Jetpack_activation = {
             if (surfaceIsWater (_LiInSu select 0 select 0)) then {
               private _velocity_to_gravity_angle = acos ((vectorNormalized (velocity player)) vectorDotProduct [0, 0, -1]);
               if (_velocity_to_gravity_angle < 90) then {
-                  _FPV_distance = (getPosASL player select 2) / (cos _velocity_to_gravity_angle);
+                  _FPV_distance = ((getPosASL player select 2) / (cos _velocity_to_gravity_angle) min ((_LiInSu select 0 select 0) vectorDistance _legs_pos));
               } else {
                   _FPV_distance = 5000;
               };
@@ -183,12 +230,13 @@ fnc_SLE_JET_Jetpack_activation = {
 
         private _velocity_norm = vectorNormalized (velocityModelSpace player);
         private _one_tick_acceleraton = (vectorMagnitude [
-            -((_velocity_norm select 0) * 2.25),
-            -((_velocity_norm select 1) * 2.25),
-            -((_velocity_norm select 2) * 2.25) + 0.6
+            -((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13.3)),
+            -((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13.3)),
+            -((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13.3)) + 0.6
         ]);
         private _brake_time = _velocity / (_one_tick_acceleraton * 40);
         player setVariable ["SLE_JET_Brake_time", _brake_time, false];
+        if (!SLE_JET_autobrake_mode_CBAS) exitWith {};
         private _estimated_time_to_splat = _FPV_distance / _velocity;
         //So anyway do we need to panic?
         if (((_estimated_time_to_splat - _brake_time) < 0.1) and (vectorMagnitude velocity player > 5)) then {
@@ -240,26 +288,30 @@ fnc_SLE_JET_Jetpack_activation = {
         };
     };
     //Height limiter. Jetpack will automatically accelerate player towards ground to avoid 100m ceiling that triggers annoying halojump mode.
-    SLE_JET_height_limiter_spawn_handle = [] spawn {
-        while {true} do {
-            if (((animationState player) find "halofreefall" == -1) and ((ASLToAGL getPosASL player) select 2 > 80)) then {
-                private _velocity = velocity player;
-                private _concrete_shoes = (1 max (((_velocity select 2) / 3) min 10) + (0 max (((ASLToAGL getPosASL player) select 2) - 90)));
-                player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) - _concrete_shoes];
+    if (SLE_JET_height_limiter_CBAS) then {
+        SLE_JET_height_limiter_spawn_handle = [] spawn {
+            while {true} do {
+                if (((animationState player) find "halofreefall" == -1) and ((ASLToAGL getPosASL player) select 2 > 80)) then {
+                    private _velocity = velocity player;
+                    private _concrete_shoes = (1 max (((_velocity select 2) / 3) min (SLE_JET_base_acceleration_CBAS / 3)) + (0 max (((ASLToAGL getPosASL player) select 2) - 90)));
+                    player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) - _concrete_shoes];
+                };
+                sleep 0.05;
             };
-            sleep 0.05;
         };
     };
     //Hover over water. Autobrake does not work over water so it should stop player from checking water/concrete hardness ratio with face on 80 meter drop. Also jetpack does not work in water. It would be unfortunate to get stuck in the lake.
-    SLE_JET_autohover_over_water_spawn_handle = [] spawn {
-        while {true} do {
-            if ((surfaceIsWater position player) and ((getPosASL player select 2) < 5)) then {
-                private _velocity = velocity player;
-                private _hover_propulsion = 0.8 max (((-(_velocity select 2)) / 1.5) min 5);
-                player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) + _hover_propulsion];
-                [true] call fnc_SLE_JET_engine_sound_core;
+    if (SLE_JET_water_hover_CBAS) then {
+        SLE_JET_autohover_over_water_spawn_handle = [] spawn {
+            while {true} do {
+                if ((surfaceIsWater position player) and ((getPosASL player select 2) < 5)) then {
+                    private _velocity = velocity player;
+                    private _hover_propulsion = 0.8 max (((-(_velocity select 2)) / 1.5) min 5);
+                    player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) + _hover_propulsion];
+                    [true] call fnc_SLE_JET_engine_sound_core;
+                };
+                sleep 0.05;
             };
-            sleep 0.05;
         };
     };
     //Automatically stops propulsion when player decides to take a nap.
@@ -330,86 +382,88 @@ fnc_SLE_JET_Jetpack_ui_activation = {
         };
     }];
     //Continiously(Constantly) calculated(computed) impact point.
-    MEH_JET_CCIP = addMissionEventHandler ["Draw3D", {
-        //TODO CBA settings thingie for later.
-        if ((isTouchingGround player) or (!true)) exitWith {};
-        //Exclusion for swimming.
-        if (((animationState player) find "aswm" != -1) or
-            ((animationState player) find "absw" != -1) or
-            ((animationState player) find "adve" != -1) or
-            ((animationState player) find "asdv" != -1) or
-            ((animationState player) find "assw" != -1)
-            ) exitWith {};
+    if (SLE_JET_CCIP_mode_CBAS != "OFF") then {
+        MEH_JET_CCIP = addMissionEventHandler ["Draw3D", {
+            //TODO CBA settings thingie for later.
+            if ((isTouchingGround player) and (SLE_JET_CCIP_mode_CBAS == "InAir")) exitWith {};
+            //Exclusion for swimming.
+            if (((animationState player) find "aswm" != -1) or
+                ((animationState player) find "absw" != -1) or
+                ((animationState player) find "adve" != -1) or
+                ((animationState player) find "asdv" != -1) or
+                ((animationState player) find "assw" != -1)
+                ) exitWith {};
 
-        private _ammo_speed = 0;
-        //Player have primary weapon in hands
-        if (currentWeapon player == primaryWeapon player) then {
-            if (currentMuzzle player == primaryWeapon player) then {
-                //Pull ammo initial ammo speed. Arma doing it a bit convoluted way for some weapons so...
+            private _ammo_speed = 0;
+            //Player have primary weapon in hands
+            if (currentWeapon player == primaryWeapon player) then {
+                if (currentMuzzle player == primaryWeapon player) then {
+                    //Pull ammo initial ammo speed. Arma doing it a bit convoluted way for some weapons so...
+                    _ammo_speed = getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed");
+                    if (_ammo_speed < 0) then {
+                        //... if weapon have bullet speed of -1.x you need to search for ammo speed and use weapon speed (absolute) value as multiplier. And it gets worse...
+                        _ammo_speed = (abs (getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed"))) *
+                        (getNumber (configFile >> "CfgMagazines" >> currentMagazine player >> "initSpeed"));
+                    };
+                    //Exception for GL weapons like M32 and M320 sidearm from RHS. And you know... Steam workshop is BIG.
+                    if (_ammo_speed == 0) then {
+                        _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
+                    };
+                } else {
+                    //... when player have UGL on his gun. This bit here pulls ammo speed for GL.
+                    _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
+                };
+            };
+            //Player have pistol in hands.
+            if (currentWeapon player == handgunWeapon player) then {
                 _ammo_speed = getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed");
                 if (_ammo_speed < 0) then {
-                    //... if weapon have bullet speed of -1.x you need to search for ammo speed and use weapon speed (absolute) value as multiplier. And it gets worse...
                     _ammo_speed = (abs (getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed"))) *
                     (getNumber (configFile >> "CfgMagazines" >> currentMagazine player >> "initSpeed"));
                 };
-                //Exception for GL weapons like M32 and M320 sidearm from RHS. And you know... Steam workshop is BIG.
                 if (_ammo_speed == 0) then {
                     _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
                 };
+            };
+            //Player have AT in hands.
+            if (currentWeapon player == secondaryWeapon player) then {
+                //This is ridicuosly oversimplified formula that does not requre to calculate distance to target and air friction. Still should be fine for very short range.
+                _ammo_speed = (
+                              getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed") +
+                                  (
+                                  getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrust") *
+                                  getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrustTime")
+                                  )
+                              );
+            };
+
+            //When it comes to math it's pretty straightforward when you realize that vectors and coordinates are not so different in their nature. MATH, BITCH. IT JUST WORKS.
+            private _weapon_dir = ((player weaponDirection currentWeapon player) vectorMultiply _ammo_speed);
+            private _CCIP_pos = (((eyePos player) vectorAdd  _weapon_dir) vectorAdd (velocity player));
+            //Changes CCIP colo(u)r based on hover state.
+            private _CCIP_color = [];
+            if ((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) then {
+                _CCIP_color = SLE_JET_CCIP_color_normal_CBAS;
             } else {
-                //... when player have UGL on his gun. This bit here pulls ammo speed for GL.
-                _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
+                _CCIP_color = SLE_JET_CCIP_color_autohover_CBAS;
             };
-        };
-        //Player have pistol in hands.
-        if (currentWeapon player == handgunWeapon player) then {
-            _ammo_speed = getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed");
-            if (_ammo_speed < 0) then {
-                _ammo_speed = (abs (getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed"))) *
-                (getNumber (configFile >> "CfgMagazines" >> currentMagazine player >> "initSpeed"));
-            };
-            if (_ammo_speed == 0) then {
-                _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
-            };
-        };
-        //Player have AT in hands.
-        if (currentWeapon player == secondaryWeapon player) then {
-            //This is ridicuosly oversimplified formula that does not requre to calculate distance to target and air friction. Still should be fine for very short range.
-            _ammo_speed = (
-                          getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed") +
-                              (
-                              getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrust") *
-                              getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrustTime")
-                              )
-                          );
-        };
 
-        //When it comes to math it's pretty straightforward when you realize that vectors and coordinates are not so different in their nature. MATH, BITCH. IT JUST WORKS.
-        private _weapon_dir = ((player weaponDirection currentWeapon player) vectorMultiply _ammo_speed);
-        private _CCIP_pos = (((eyePos player) vectorAdd  _weapon_dir) vectorAdd (velocity player));
-        //Changes CCIP colo(u)r based on hover state.
-        private _CCIP_color = [];
-        if ((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) then {
-            _CCIP_color = SLE_JET_CCIP_color_normal_CBAS;
-        } else {
-            _CCIP_color = SLE_JET_CCIP_color_autohover_CBAS;
-        };
-
-        drawIcon3D [
-            "sle_jetpack_core\UI\sle_jet_ccip.paa", //icon
-            _CCIP_color, //color
-            ASLToAGL (_CCIP_pos), //draw position
-            1, //icon width
-            1, //icon height
-            0, //icon angle
-            "", //text
-            2, //text shadow
-            0.05, //text size
-            'PuristaMedium', //font
-            'center', //text allignment
-            true //off-screen arrows
-        ];
-    }];
+            drawIcon3D [
+                "sle_jetpack_core\UI\sle_jet_ccip.paa", //icon
+                _CCIP_color, //color
+                ASLToAGL (_CCIP_pos), //draw position
+                1, //icon width
+                1, //icon height
+                0, //icon angle
+                "", //text
+                2, //text shadow
+                0.05, //text size
+                'PuristaMedium', //font
+                'center', //text allignment
+                true //off-screen arrows
+            ];
+        }];
+    };
     //Variable tied to jetpack UI state.
     player setVariable ["SLE_JET_Jetpak_ui_activation_state", true, false];
     //Enable fuel bar.
@@ -508,7 +562,7 @@ fnc_SLE_JET_up = {
                     //Acceleration will work only below 80 meters. From 80 to 100 meters player will be accelerated downwards. However if player breaks 100m ceeling and enter halojump animation this barrier is lifted. That way actuall jumps from aircraft will be seamless.
                     if (((animationState player) find "halofreefall" != -1) or ((ASLToAGL getPosASL player) select 2 < 80)) then {
                         private _velocity = velocity player;
-                        player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) + 2.5];
+                        player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) + ((SLE_JET_base_acceleration_CBAS / 20) + 1)];
                         ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
                     };
                     sleep 0.05;
@@ -536,7 +590,7 @@ fnc_SLE_JET_forw = {
                 SLE_JET_forw_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
                         private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) + 1.5, (_velocity select 2)];
+                        player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) + (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 2)];
                         ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
                         sleep 0.05;
                     };
@@ -559,7 +613,7 @@ fnc_SLE_JET_backw = {
                 SLE_JET_backw_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
                         private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) - 1.5, (_velocity select 2)];
+                        player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) - (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 2)];
                         ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
                         sleep 0.05;
                     };
@@ -582,7 +636,7 @@ fnc_SLE_JET_left = {
                 SLE_JET_left_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
                         private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0) - 1.5, (_velocity select 1), (_velocity select 2)];
+                        player setVelocityModelSpace [(_velocity select 0) - (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 1), (_velocity select 2)];
                         ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
                         sleep 0.05;
                     };
@@ -605,7 +659,7 @@ fnc_SLE_JET_right = {
                 SLE_JET_right_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
                         private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0) + 1.5, (_velocity select 1), (_velocity select 2)];
+                        player setVelocityModelSpace [(_velocity select 0) + (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 1), (_velocity select 2)];
                         ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
                         sleep 0.05;
                     };
@@ -632,9 +686,9 @@ fnc_SLE_JET_brake = {
                             private _velocity_norm = vectorNormalized _velocity; //Normalize it (Basically vector with same direction but length of one.)
                             if (vectorMagnitude velocity player > 2) then { //Dependant on player speed we slow him down...
                                 player setVelocityModelSpace [ //Slowing player by changing his speed.
-                                    (_velocity select 0) - ((_velocity_norm select 0) * 2.25),
-                                    (_velocity select 1) - ((_velocity_norm select 1) * 2.25),
-                                    (_velocity select 2) - ((_velocity_norm select 2) * 2.25) + 0.6
+                                    (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13.3)),
+                                    (_velocity select 1) - ((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13.3)),
+                                    (_velocity select 2) - ((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13.3)) + 0.6
                                   ];
                                 ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core; //And deducting fuel.
                                 player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //reset autohover counter.
@@ -645,6 +699,7 @@ fnc_SLE_JET_brake = {
                             };
                             sleep 0.05; // repeat this 20 times per second
                         };
+                        player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //Exit autohover mode if player somehow ends up on the ground.
                     };
                 };
             } else { //if autohover counter is high enough we swap functionality and keyDown will terminate code.
@@ -680,9 +735,9 @@ fnc_SLE_JET_autobrake =
                           private _velocity = velocityModelSpace player;
                           private _velocity_norm = vectorNormalized _velocity;
                           player setVelocityModelSpace [
-                              (_velocity select 0) - ((_velocity_norm select 0) * 2.25),
-                              (_velocity select 1) - ((_velocity_norm select 1) * 2.25),
-                              (_velocity select 2) - ((_velocity_norm select 2) * 2.25) + 0.6
+                              (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13.3)),
+                              (_velocity select 1) - ((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13.3)),
+                              (_velocity select 2) - ((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13.3)) + 0.6
                           ];
                           ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, true] call fnc_SLE_JET_fuel_core;
                           sleep 0.05;
@@ -724,19 +779,31 @@ fnc_SLE_JET_engine_sound_core = {
             SLE_JET_sound_repeater_spawn_handle = [] spawn {
                 [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_start", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
                 uiSleep 1.4;
-                while {!isTouchingGround player} do {
+                while {(!isTouchingGround player) and
+                      (!(((animationState player) find "aswm" != -1) or
+                      ((animationState player) find "absw" != -1) or
+                      ((animationState player) find "adve" != -1) or
+                      ((animationState player) find "asdv" != -1) or
+                      ((animationState player) find "assw" != -1)
+                      ))} do {
                     waitUntil {!isGamePaused};
                     [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_run", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
                     for "_i" from 0 to 44 step 1 do {
                       uiSleep 0.1;
-                      if (isTouchingGround player) exitWith {};
+                      if ((isTouchingGround player) or
+                      ((animationState player) find "aswm" != -1) or
+                      ((animationState player) find "absw" != -1) or
+                      ((animationState player) find "adve" != -1) or
+                      ((animationState player) find "asdv" != -1) or
+                      ((animationState player) find "assw" != -1)
+                      ) exitWith {};
                     };
                 };
                 [false] call fnc_SLE_JET_engine_sound_core;
             };
         };
     } else {
-        if ((!isNull SLE_JET_sound_repeater_spawn_handle) and (!((surfaceIsWater position player) and ((getPosASL player select 2) < 10)))) then {
+        if (!isNull SLE_JET_sound_repeater_spawn_handle) then {
             terminate SLE_JET_sound_repeater_spawn_handle;
             deleteVehicle SLE_JET_engine_sound_emitter;
             if (!isNull SLE_JET_stop_sound_repeater_spawn_handle) then {
@@ -744,7 +811,6 @@ fnc_SLE_JET_engine_sound_core = {
                 deleteVehicle SLE_JET_engine_stop_sound_emitter;
             };
             SLE_JET_stop_sound_repeater_spawn_handle = [] spawn {
-                deleteVehicle SLE_JET_engine_stop_sound_emitter;
                 SLE_JET_engine_stop_sound_emitter = "Sign_Arrow_Green_F" createVehicle position player;
                 SLE_JET_engine_stop_sound_emitter attachTo [player, [0, -0.1, 1.2]];
                 [SLE_JET_engine_stop_sound_emitter, true] remoteExec ["hideObjectGlobal", 2];
@@ -800,11 +866,11 @@ fnc_SLE_JET_Disable_Jetpack = {
 
 //Jetpack UI deactivation function.
 fnc_SLE_JET_Disable_Jetpack_ui = {
-    if (!isNil "PEH_SLE_JET_In_air_no_sway") then {
+    if (!isNil "MEH_JET_FPV") then {
         removeMissionEventHandler ["Draw3D", MEH_JET_FPV];
         MEH_JET_FPV = nil;
     };
-    if (!isNil "PEH_SLE_JET_In_air_no_sway") then {
+    if (!isNil "MEH_JET_CCIP") then {
         removeMissionEventHandler ["Draw3D", MEH_JET_CCIP];
         MEH_JET_CCIP = nil;
     };

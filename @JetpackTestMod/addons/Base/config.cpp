@@ -16,6 +16,7 @@ class cfgPatches
     };
 };
 
+/*
 class CfgMods
 {
     class Mod_Base;
@@ -36,6 +37,7 @@ class CfgMods
         dir="SLE_Smart_jet";
     };
 };
+*/
 
 class Extended_PreInit_EventHandlers
 {
@@ -74,8 +76,9 @@ class RscTitles
             "(profilenamespace getvariable ['GUI_BCG_RGB_A',0.8])"
         };
         texture = "sle_jetpack_core\UI\sle_jet_fuel_bar.paa";
-        w = 0.4;
-        h = 0.03;
+
+        w = 0.165 * safezoneW;
+        h = 0.015 * safezoneH;
     };
 
     class SLE_JET_Fuel_Bar
@@ -92,8 +95,9 @@ class RscTitles
                 colorFrame[] = {0,0,0,1};
                 colorBar[] = {1, 0.58, 0, 1};
                 colorBackground[] = {0,0,0,0};
-                x = 1.28;
-                y = -0.2;
+
+                x = 0.825 * safezoneW + safezoneX;
+                y = 0.112 * safezoneH + safezoneY;
             };
         };
     };
