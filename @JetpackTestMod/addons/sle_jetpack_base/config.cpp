@@ -43,7 +43,7 @@ class Extended_PreInit_EventHandlers
 {
     class sle_jet_preInit
     {
-        init = "call compile preProcessFileLineNumbers 'Base\sle_jet_preInit.sqf'";
+        init = "call compile preProcessFileLineNumbers 'sle_jetpack_base\sle_jet_preInit.sqf'";
     };
 };
 

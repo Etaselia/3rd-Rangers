@@ -94,15 +94,15 @@ player setVariable ["SLE_JET_Jetpak_ui_activation_state", false, false]; //Same 
 player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //Used for autohover feature.
 player setVariable ["SLE_JET_Sway_fix_on", false, false]; //Used for sway fix.
 //Initializng spawn handles because it's far easier than accounting for isNil with each check later or setting spawn handles to nil after each terminate.
-SLE_JET_up_spawn_handle
-SLE_JET_forw_spawn_handle
-SLE_JET_backw_spawn_handle
-SLE_JET_left_spawn_handle
-SLE_JET_right_spawn_handle
-SLE_JET_brake_spawn_handle
-SLE_JET_autobrake_spawn_handle
-SLE_JET_sound_repeater_spawn_handle
-SLE_JET_stop_sound_repeater_spawn_handle
+SLE_JET_up_spawn_handle = [] spawn {};
+SLE_JET_forw_spawn_handle = [] spawn {};
+SLE_JET_backw_spawn_handle = [] spawn {};
+SLE_JET_left_spawn_handle = [] spawn {};
+SLE_JET_right_spawn_handle = [] spawn {};
+SLE_JET_brake_spawn_handle = [] spawn {};
+SLE_JET_autobrake_spawn_handle = [] spawn {};
+SLE_JET_sound_repeater_spawn_handle = [] spawn {};
+SLE_JET_stop_sound_repeater_spawn_handle = [] spawn {};
 //Oh and variables that end with _CBAS dictated by CBA settings.
 
 //Item check on exiting vanilla arsenal. Either activates or deactivates jetpack systems. Also resets fuel level to 100.
