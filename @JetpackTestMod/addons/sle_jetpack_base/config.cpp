@@ -13,8 +13,12 @@ class cfgPatches
         requiredAddons[] = {
             "cba_jr"
         };
+        units[] = {};
+        weapons[] = {};
     };
 };
+
+//No entry 'bin\config.bin/CfgPatches/SLE_Smart_jet.units'.
 
 /*
 class CfgMods
