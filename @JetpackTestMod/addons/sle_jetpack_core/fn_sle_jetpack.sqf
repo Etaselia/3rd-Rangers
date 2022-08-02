@@ -7,11 +7,15 @@ SLE_JET_Jetpak_activation_state
 SLE_JET_Jetpak_ui_activation_state
 SLE_JET_Semi_auto_hover_counter
 SLE_JET_Sway_fix_on
+SLE_JET_LiInSu
+SLE_JET_FPV_distance
+SLE_JET_Brake_time
 
   functions
 fnc_SLE_JET_item_check
 fnc_SLE_JET_setting_change_reboot
 fnc_SLE_JET_Jetpack_activation
+fnc_SLE_JET_Brake_calculator_iteration
 fnc_SLE_JET_Jetpack_ui_activation
 fnc_SLE_JET_on_key_item_check
 fnc_SLE_JET_fuel_core
@@ -28,6 +32,7 @@ fnc_SLE_JET_Disable_Jetpack
 fnc_SLE_JET_Disable_Jetpack_ui
 
   Spawn handles
+SLE_JET_auto_brake_spawn_handle
 SLE_JET_up_spawn_handle
 SLE_JET_forw_spawn_handle
 SLE_JET_backw_spawn_handle
@@ -37,13 +42,13 @@ SLE_JET_brake_spawn_handle
 SLE_JET_autobrake_spawn_handle
 SLE_JET_sound_repeater_spawn_handle
 SLE_JET_stop_sound_repeater_spawn_handle
+SLE_JET_autobrake_physic_calculator_spawn_handle
 SLE_JET_fuel_generation_spawn_handle
 SLE_JET_height_limiter_spawn_handle
 SLE_JET_autohover_over_water_spawn_handle
 SLE_JET_unconscious_detector_spawn_handle
 
   Eventhandler handles
-MEH_SLE_JET_autobrake_system
 PEH_SLE_JET_In_air_no_sway
 MEH_SLE_JET_In_air_no_sway_repeater
 MEH_JET_FPV
@@ -52,39 +57,40 @@ MEH_JET_CCIP
 
 /*
 CBA Settings:
+Setting | Global variable name | data type | default value
   1. Features
-CCIP mode constant, only in air, off | SLE_JET_CCIP_mode_CBAS | ["Const", "InAir", "Off"]
-Autobrake mode | SLE_JET_autobrake_mode_CBAS | bool
-Height limiter | SLE_JET_height_limiter_CBAS | bool
-Over water hover | SLE_JET_water_hover_CBAS | bool
-Typical Acceleration | SLE_JET_base_acceleration_CBAS | val 30 m/s
+CCIP mode constant, only in air, off | SLE_JET_CCIP_mode_CBAS | str | "Const", "InAir", "Off"
+Autobrake mode | SLE_JET_autobrake_mode_CBAS | bool | true
+Height limiter | SLE_JET_height_limiter_CBAS | bool | true
+Over water hover | SLE_JET_water_hover_CBAS | bool | false
+Typical Acceleration | SLE_JET_base_acceleration_CBAS | val | 30 (m/s)
   2. Fuel
-Typical fuel consumption | SLE_JET_fuel_consumption_CBAS | val 1
-Hover fuel consumption | SLE_JET_hover_fuel_consumption_CBAS | 0.5
-Fuel regen | SLE_JET_fuel_recharge_CBAS | bool
-Fuel regen rate | SLE_JET_fuel_recharge_rate_CBAS |0.1
+Typical fuel consumption | SLE_JET_fuel_consumption_CBAS | val | 1
+Hover fuel consumption | SLE_JET_hover_fuel_consumption_CBAS | val | 0.5
+Fuel regen | SLE_JET_fuel_recharge_CBAS | bool | true
+Fuel regen in air/in use | SLE_JET_fuel_air_recharge_CBAS | bool | true
+Fuel regen rate | SLE_JET_fuel_recharge_rate_CBAS | val | 0.1
   3. Hover fix
-Hover aim fix | SLE_JET_hover_aim_fix_CBAS | bool
-Hover Sway | SLE_JET_hover_sway_CBAS | 0.4
-Hover anim speed | SLE_JET_hover_anim_speed_CBAS | 0
+Hover aim fix | SLE_JET_hover_aim_fix_CBAS | bool | true
+Hover Sway | SLE_JET_hover_sway_CBAS | val | 0.4
+Hover anim speed | SLE_JET_hover_anim_speed_CBAS | val | 0
   4. UI and controls
-Autohover mode delay | SLE_JET_autohover_delay_CBAS | val 1
-Fuel bar dynamic of fixed color | SLE_JET_fuel_bar_mode_CBAS | bool
-color of fixed fuel bar | SLE_JET_fuel_bar_color_CBAS | color
-colors FPV | SLE_JET_FPV_color_normal_CBAS, SLE_JET_FPV_color_warning_CBAS, SLE_JET_FPV_color_danger_CBAS | color
-colors CCIP | SLE_JET_CCIP_color_normal_CBAS, SLE_JET_CCIP_color_autohover_CBAS | color
+Autohover mode delay | SLE_JET_autohover_delay_CBAS | val | 1
+Fuel bar dynamic of fixed color | SLE_JET_fuel_bar_mode_CBAS | bool | false
+color of fixed fuel bar | SLE_JET_fuel_bar_color_CBAS | color array
+colors FPV | SLE_JET_FPV_color_normal_CBAS, SLE_JET_FPV_color_warning_CBAS, SLE_JET_FPV_color_danger_CBAS | color array
+colors CCIP | SLE_JET_CCIP_color_normal_CBAS, SLE_JET_CCIP_color_autohover_CBAS | color array
   5. Advanced
 Jetpack compatable backpacks | SLE_JET_jetpack_capable_items_CBAS  | str
-UI facewear check | SLE_JET_facewear_check_CBAS | bool
+UI facewear check | SLE_JET_facewear_check_CBAS | bool | true
 Jetpack UI compatable facewear | SLE_JET_jetpack_HUD_capable_items_CBAS | str
 */
 
 //TODO
-//Conditional sounds like alarms and maybe voicelines.
-//Visual effects. Maybe create placeholder rocket without damage and long time to life. Or just straight up change backpack model.
-//Maybe actually do CCIP ballistic formula for AT rockets.
 //Animation and modelling - that's beyond me for now.
-
+//Visual effects. Maybe create placeholder rocket without damage and long time to life. Or just straight up change backpack model.
+//Conditional sounds like alarms and maybe voicelines.
+//Maybe actually do CCIP ballistic formula for AT rockets.
 
 
 //Var
@@ -174,8 +180,8 @@ fnc_SLE_JET_item_check = {
 fnc_SLE_JET_setting_change_reboot = {
     if (player getVariable "SLE_JET_Jetpak_activation_state") then {
         [] call fnc_SLE_JET_Disable_Jetpack;
-        [] call fnc_SLE_JET_Jetpack_activation;
         [false] call fnc_SLE_JET_autobrake;
+        [] call fnc_SLE_JET_Jetpack_activation;
     };
     if (player getVariable "SLE_JET_Jetpak_ui_activation_state") then {
         [] call fnc_SLE_JET_Disable_Jetpack_ui;
@@ -194,11 +200,18 @@ player addEventHandler ["Respawn", {
 
 //Jetpack activation function. Contains all things that can't run in background unnoticed by player. Called in by item check function.
 fnc_SLE_JET_Jetpack_activation = {
-    //Autobrake system
-    MEH_SLE_JET_autobrake_system = addMissionEventHandler ["EachFrame", {
+    //Autobrake system repeater.
+    SLE_JET_autobrake_physic_calculator_spawn_handle = [] spawn {
+        while {true} do {
+            [] call fnc_SLE_JET_Brake_calculator_iteration;
+            sleep 0.05;
+        };
+    };
+    //Autobrake system physical calculator.
+    fnc_SLE_JET_Brake_calculator_iteration = {
         //That whole thing really only useful when player actually flying. Also player can and will have zero speed sometimes. And computers can't handle division by zero. Only we humans can.
         if ((isTouchingGround player) or ((vectorMagnitude velocity player) == 0)) exitWith {};
-        //Same goes for swimming.
+        //Same goes for swimming. I am well aware how this looks but it's not really worth doing forEach just for 5 fixed instances.
         if (((animationState player) find "aswm" != -1) or
             ((animationState player) find "absw" != -1) or
             ((animationState player) find "adve" != -1) or
@@ -211,19 +224,24 @@ fnc_SLE_JET_Jetpack_activation = {
         player setVariable ["SLE_JET_LiInSu", _LiInSu, false];
         private _FPV_distance = 5000;
 
+        //Get distance to impact point.
         if (count _LiInSu > 0) then {
             if (surfaceIsWater (_LiInSu select 0 select 0)) then {
+              //If impact point is over water it's a bit complicated. First we get angle between two vectors.
               private _velocity_to_gravity_angle = acos ((vectorNormalized (velocity player)) vectorDotProduct [0, 0, -1]);
+              //And if it's less that 90 proceed to caluculations since we kinda falling. Otherwise just set it to 5000.
               if (_velocity_to_gravity_angle < 90) then {
+                  //Select minimal result between geometric approximation and lineIntersectsSurfaces (Needed for landing on structures over water like piers and so on).
                   _FPV_distance = ((getPosASL player select 2) / (cos _velocity_to_gravity_angle) min ((_LiInSu select 0 select 0) vectorDistance _legs_pos));
               } else {
                   _FPV_distance = 5000;
               };
             } else {
+                //And if impact point is not over water it's more straightforward.
                 _FPV_distance = (_LiInSu select 0 select 0) vectorDistance _legs_pos;
             };
         };
-
+        //Sending some data to UI eventhandler.
         player setVariable ["SLE_JET_FPV_distance", _FPV_distance, false];
 
         private _velocity = vectorMagnitude (velocityModelSpace player);
@@ -236,15 +254,18 @@ fnc_SLE_JET_Jetpack_activation = {
         ]);
         private _brake_time = _velocity / (_one_tick_acceleraton * 40);
         player setVariable ["SLE_JET_Brake_time", _brake_time, false];
+        //If autobrake disabled in settings we are stoping right here. Calculations above will go to FPV in UI section.
         if (!SLE_JET_autobrake_mode_CBAS) exitWith {};
         private _estimated_time_to_splat = _FPV_distance / _velocity;
-        //So anyway do we need to panic?
+        //So anyway do we need to panic? Also breaking on low speed isn't necessary and can leave player bouncing over the ground.
         if (((_estimated_time_to_splat - _brake_time) < 0.1) and (vectorMagnitude velocity player > 5)) then {
-            [true] call fnc_SLE_JET_autobrake; //Yes
+            [true] call fnc_SLE_JET_autobrake; //Yes but actually no
         } else {
             [false] call fnc_SLE_JET_autobrake; //No
         };
-    }];
+    };
+
+
     //Makes aimed shots possible. Stops huge sway from falling animation. Even if you fly a kilometer game stil thinks that you moved a kilometer and increases sway. So it needs to be ajusted. Also you don't get to use bipod in air.
     if (SLE_JET_hover_aim_fix_CBAS) then {
         PEH_SLE_JET_In_air_no_sway = player addEventHandler ["AnimChanged", {
@@ -254,12 +275,12 @@ fnc_SLE_JET_Jetpack_activation = {
             private _Fall_animations = ["afalpercmstpsnonwnondnon", "afalpercmstpsraswlnrdnon", "afalpercmstpsraswpstdnon", "afalpercmstpsraswrfldnon", "afalpknlmstpsnonwnondnon",
             "afalpknlmstpsraswlnrdnon", "afalpknlmstpsraswpstdnon", "afalpknlmstpsraswrfldnon", "afalppnemstpsnonwnondnon", "afalppnemstpsraswpstdnon",
             "afalppnemstpsraswrfldnon"];
-            //["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ]
-            //Check if player entered fall animation. Also cycles it to prevent override by ACE.
+            //Check if player entered fall animation. Also cycles override commands to prevent override by ACE.
             if (_anim in _Fall_animations) then {
                 if (!(player getVariable "SLE_JET_Sway_fix_on")) then {
                     MEH_SLE_JET_In_air_no_sway_repeater = addMissionEventHandler ["EachFrame", {
                         player setanimspeedcoef SLE_JET_hover_anim_speed_CBAS;
+                        //Negative values allowed in this setting will make script to not override sway at all.
                         if (SLE_JET_hover_sway_CBAS >= 0) then {
                             player setCustomAimCoef SLE_JET_hover_sway_CBAS;
                         };
@@ -276,14 +297,14 @@ fnc_SLE_JET_Jetpack_activation = {
             };
         }];
     };
-    //Slow fuel generation.
+    //Slow? fuel (re)generation.
     if (SLE_JET_fuel_recharge_CBAS) then {
         SLE_JET_fuel_generation_spawn_handle = [] spawn {
             while {true} do {
                 if ((player getVariable "SLE_JET_Fuel_counter" < 100) and ((SLE_JET_fuel_air_recharge_CBAS) or (isTouchingGround player))) then {
                     ["", false, SLE_JET_fuel_recharge_rate_CBAS / 10, false, false] call fnc_SLE_JET_fuel_core;
                 };
-                Sleep 0.1;
+                sleep 0.1;
             }
         };
     };
@@ -300,7 +321,8 @@ fnc_SLE_JET_Jetpack_activation = {
             };
         };
     };
-    //Hover over water. Autobrake does not work over water so it should stop player from checking water/concrete hardness ratio with face on 80 meter drop. Also jetpack does not work in water. It would be unfortunate to get stuck in the lake.
+    //Hover over water. Jetpack does not work in water. like at all. Game engine says flyswim is a no no. And it would be unfortunate to get stuck in the lake.
+    //Autobrake wasn't working over water at first so it was used to stop player from checking water/concrete hardness ratio with face on 80 meter drop. Now it's fine. I mean brake, not testing water hardnes.
     if (SLE_JET_water_hover_CBAS) then {
         SLE_JET_autohover_over_water_spawn_handle = [] spawn {
             while {true} do {
@@ -314,7 +336,7 @@ fnc_SLE_JET_Jetpack_activation = {
             };
         };
     };
-    //Automatically stops propulsion when player decides to take a nap.
+    //Automatically stops propulsion when player decides to take a nap. Autobrake will handle the rest.
     SLE_JET_unconscious_detector_spawn_handle = [] spawn {
         while {true} do {
             if ((incapacitatedState player == "UNCONSCIOUS") or (player getVariable ["ACE_isUnconscious", false])) then {
@@ -329,6 +351,24 @@ fnc_SLE_JET_Jetpack_activation = {
             sleep 0.5;
         };
     };
+    //Deletes jet sound emmiter on death. Get it? KILLswitch!
+    PEH_SLE_JET_Sound_KILLswitch = player addEventHandler ["Killed", {
+            if (!isNull SLE_JET_sound_repeater_spawn_handle) then {
+                terminate SLE_JET_sound_repeater_spawn_handle;
+            };
+            if (!isNull SLE_JET_stop_sound_repeater_spawn_handle) then {
+                terminate SLE_JET_stop_sound_repeater_spawn_handle;
+            };
+
+            {
+                    if (typeOf _x == "SLE_JET_Sound_emitter") then {
+                        deleteVehicle _x;
+                    };
+            } forEach nearestObjects [player, ["all"], 2] - allUnits;
+
+            player removeEventHandler ["Killed", PEH_SLE_JET_Sound_KILLswitch];
+            PEH_SLE_JET_Sound_KILLswitch = nil;
+    }];
 
     //Variable tied to jetpack state.
     player setVariable ["SLE_JET_Jetpak_activation_state", true, false];
@@ -338,7 +378,7 @@ fnc_SLE_JET_Jetpack_activation = {
 fnc_SLE_JET_Jetpack_ui_activation = {
     //Flight path vector.
     MEH_JET_FPV = addMissionEventHandler ["Draw3D", {
-        //That whole thing really only useful when player actually flying with jetpack
+        //That whole thing really only useful when player actually flying with jetpack.
         if ((isTouchingGround player) or (abs (vectorMagnitude velocity player) < 1)) exitWith {};
         //Same goes for swimming.
         if (((animationState player) find "aswm" != -1) or
@@ -347,7 +387,7 @@ fnc_SLE_JET_Jetpack_ui_activation = {
             ((animationState player) find "asdv" != -1) or
             ((animationState player) find "assw" != -1)
             ) exitWith {};
-        //This UI eventhandler gets some values from autobrake eventhandler
+        //This UI eventhandler gets some values from autobrake calculator.
         private _LiInSuUI = player getVariable "SLE_JET_LiInSu";
         private _estimated_time_to_splat = 0;
         private _brake_time = player getVariable "SLE_JET_Brake_time";
@@ -381,10 +421,11 @@ fnc_SLE_JET_Jetpack_ui_activation = {
             ];
         };
     }];
-    //Continiously(Constantly) calculated(computed) impact point.
+    //Continiously(Constantly) calculated(computed) impact point. Damn definition ambiguity.
+    //CCIP only initialized if it's actually not off in settings.
     if (SLE_JET_CCIP_mode_CBAS != "OFF") then {
         MEH_JET_CCIP = addMissionEventHandler ["Draw3D", {
-            //TODO CBA settings thingie for later.
+            //Stops drawing if player on the ground and CBA setting set to only in air.
             if ((isTouchingGround player) and (SLE_JET_CCIP_mode_CBAS == "InAir")) exitWith {};
             //Exclusion for swimming.
             if (((animationState player) find "aswm" != -1) or
@@ -398,7 +439,7 @@ fnc_SLE_JET_Jetpack_ui_activation = {
             //Player have primary weapon in hands
             if (currentWeapon player == primaryWeapon player) then {
                 if (currentMuzzle player == primaryWeapon player) then {
-                    //Pull ammo initial ammo speed. Arma doing it a bit convoluted way for some weapons so...
+                    //Pull initial ammo speed from gun config. Arma doing it a bit convoluted way for some weapons so...
                     _ammo_speed = getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed");
                     if (_ammo_speed < 0) then {
                         //... if weapon have bullet speed of -1.x you need to search for ammo speed and use weapon speed (absolute) value as multiplier. And it gets worse...
@@ -427,7 +468,8 @@ fnc_SLE_JET_Jetpack_ui_activation = {
             };
             //Player have AT in hands.
             if (currentWeapon player == secondaryWeapon player) then {
-                //This is ridicuosly oversimplified formula that does not requre to calculate distance to target and air friction. Still should be fine for very short range.
+                //This is ridicuosly oversimplified formula that does not requre to calculate distance to target and air friction. Still should be fine for VERY short range.
+                //Tested. Not fine at all for some AT like RPG 32/7 and alike. I'll probably rework it in the future.
                 _ammo_speed = (
                               getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed") +
                                   (
@@ -496,7 +538,7 @@ fnc_SLE_JET_on_key_item_check = {
     };
 };
 
-/*Fuel system core. Handles fuel duh. Can be called in manually to refuel or manual fuel adjustment. Refuel: ["", false, 0, true, false] call fnc_SLE_JET_fuel_core;
+/*Fuel system core. Handles fuel duh. Can be called in manually to refuel or manual fuel adjustment. Intended call to refuel: ["", false, 0, true, false] call fnc_SLE_JET_fuel_core;
 Called in by item check with respective key and key state and if player have fuel it sends signal to respective jetpack physic function.
 Called in by physic function with empty key identifier string to change fuel level and immediately checks fuel level.
 If or when player runs out of fuel it sends KeyUp signal to all keybound physic functions effectively shutting down all player controlled propulsion.*/
@@ -523,7 +565,7 @@ fnc_SLE_JET_fuel_core = {
     };
 
 
-    //If autobrake consumes fuel it will not trigger engine shutdown sound because of that.
+    //Even though autobrake consumes fuel it will not trigger engine shutdown.
     if (_autobrake) exitWith {};
     //Shut player propulsion when out of fuel
     if ((player getVariable "SLE_JET_Fuel_counter") <= 0) exitWith {
@@ -551,7 +593,7 @@ fnc_SLE_JET_fuel_core = {
 };
 
 //Jetpack control fucntions. Called by fuel system core.
-//I'll explain how these functions work in detail with brake function so proceed there (fnc_SLE_JET_brake) if you not sure what all of this means.
+//I'll explain how these functions work in detail with brake function so proceed there by searching: "fnc_SLE_JET_brake" if you not sure what all of this means.
 fnc_SLE_JET_up = {
   params["_UP_key_state"];
   private _UP_key_state = _this select 0;
@@ -675,12 +717,12 @@ fnc_SLE_JET_right = {
 //This one is a bit... overwhelming at first but i can explain.
 fnc_SLE_JET_brake = {
   private _brake_key_state = param [0, false, [true]];  //First we get variables. This is key state. It indicates if it called with keyDown or keyUp.
-  private _brake_key_override = param [1, false, [true]]; //This is override. It overrides semi auto hover and used by force ending condition like out of fuel or if player is unconscious.
+  private _brake_key_override = param [1, false, [true]]; //This is override. It overrides semi auto hover and used when we need to forcefuly end propulsion. Like when player is out of fuel or unconscious.
     if (!isTouchingGround player) then { //All physics functions check if player is in air. Only exception is go up function. This way player can use walking keybinds without conflicts.
         if (_brake_key_state) then { //Basically we spawning code on keyDown and...
-            if ((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) then { //This counter used to check if player hovering for certain time and hover will turn in autohover. With autohover player can release key and still hover without pressing or holding keys. Pressing brake/hover key again will disable autohover.
+            if ((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) then { //This counter used to check if player hovering for certain time and hover will turn on autohover. With autohover player can release key and still hover without pressing or holding keys. Pressing brake/hover key again will disable autohover.
                 if (isNull SLE_JET_brake_spawn_handle) then { //This check won't allow to spawn this code twice. Which would be bad for obvious reasons.
-                    SLE_JET_brake_spawn_handle = [] spawn { //Spawns code. Basically think of it as starting new thread.
+                    SLE_JET_brake_spawn_handle = [] spawn { //Spawns code. Basically think of it as starting new independant task.
                         while {!isTouchingGround player} do { //This check is basically redundant error correction.
                         private _velocity = velocityModelSpace player; //Get player velocity
                             private _velocity_norm = vectorNormalized _velocity; //Normalize it (Basically vector with same direction but length of one.)
@@ -692,8 +734,8 @@ fnc_SLE_JET_brake = {
                                   ];
                                 ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core; //And deducting fuel.
                                 player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //reset autohover counter.
-                            } else { //... or stopping him alltogether.
-                                player setVelocityModelSpace [0, 0, 0.2]; //Stop player and compensating for gravity.
+                            } else { //... or just stopping him alltogether.
+                                player setVelocityModelSpace [0, 0, 0.2]; //Stop player. Last number in vector/array isn't zero because we need to compensate for gravity.
                                 ["", false, -((SLE_JET_fuel_consumption_CBAS / 20) * SLE_JET_hover_fuel_consumption_CBAS), false, false] call fnc_SLE_JET_fuel_core; //And deducting LESS fuel because player not being slowed down drammatically.
                                 player setVariable ["SLE_JET_Semi_auto_hover_counter", (player getVariable "SLE_JET_Semi_auto_hover_counter") + 1, false]; //increase autohover counter by one.
                             };
@@ -708,7 +750,7 @@ fnc_SLE_JET_brake = {
                     player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //reset autohover counter.
                 };
             };
-        } else {  //... delete spawned code on keyUp...
+        } else {  //... delete spawned code on keyUp.
             if (!isNull SLE_JET_brake_spawn_handle) then {
                 if (((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) or (_brake_key_override)) then { //... but only if player wasn't hovering for certain time.
                     terminate SLE_JET_brake_spawn_handle;
@@ -720,7 +762,7 @@ fnc_SLE_JET_brake = {
 };
 
 /*Automatic brake. Unlike rest of physic functions it can't be directly called by player and not interrupted by lack of fuel.
-It gets called in by on each frame eventhandler when player about to cross point of no return and collide into something and only stops when the danger has passed.
+It gets called in by automatic brake calculator when player about to cross point of no return and collide into something and only stops when the danger has passed.
 Breaking still consumes fuel to avoid exploiting. This may get fuel below zero which is a normal condition.*/
 fnc_SLE_JET_autobrake =
 {
@@ -730,14 +772,13 @@ fnc_SLE_JET_autobrake =
         if (_autobrake_signal_state) then {
             if (isNull SLE_JET_autobrake_spawn_handle) then {
                 SLE_JET_autobrake_spawn_handle = [] spawn {
-                      //as it's essential function for jetpack user safety AKA player not dying it will only be disabled when jetpack dropped out of inventory.
                       while {!isTouchingGround player} do {
                           private _velocity = velocityModelSpace player;
                           private _velocity_norm = vectorNormalized _velocity;
                           player setVelocityModelSpace [
-                              (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13.3)),
-                              (_velocity select 1) - ((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13.3)),
-                              (_velocity select 2) - ((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13.3)) + 0.6
+                              (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))),
+                              (_velocity select 1) - ((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))),
+                              (_velocity select 2) - ((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))) + 0.6
                           ];
                           ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, true] call fnc_SLE_JET_fuel_core;
                           sleep 0.05;
@@ -765,6 +806,7 @@ FUCK IT. Create object. Attach object to player. Make object invisible with remo
 Remember that you still need to make logical function that will handle how sound behaves and all of this process need to be integrated into it and repeated multiple times.
 pepeSad
 */
+
 fnc_SLE_JET_engine_sound_core = {
   private _jet_sound_state = param [0, false, [true]];
     if (_jet_sound_state) then {
@@ -773,9 +815,8 @@ fnc_SLE_JET_engine_sound_core = {
             deleteVehicle SLE_JET_engine_stop_sound_emitter;
         };
         if (isNull SLE_JET_sound_repeater_spawn_handle) then {
-            SLE_JET_engine_sound_emitter = "Sign_Arrow_Green_F" createVehicle position player;
+            SLE_JET_engine_sound_emitter = "SLE_JET_Sound_emitter" createVehicle position player;
             SLE_JET_engine_sound_emitter attachTo [player, [0, -0.1, 1.2]];
-            [SLE_JET_engine_sound_emitter, true] remoteExec ["hideObjectGlobal", 2];
             SLE_JET_sound_repeater_spawn_handle = [] spawn {
                 [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_start", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
                 uiSleep 1.4;
@@ -811,9 +852,8 @@ fnc_SLE_JET_engine_sound_core = {
                 deleteVehicle SLE_JET_engine_stop_sound_emitter;
             };
             SLE_JET_stop_sound_repeater_spawn_handle = [] spawn {
-                SLE_JET_engine_stop_sound_emitter = "Sign_Arrow_Green_F" createVehicle position player;
+                SLE_JET_engine_stop_sound_emitter = "SLE_JET_Sound_emitter" createVehicle position player;
                 SLE_JET_engine_stop_sound_emitter attachTo [player, [0, -0.1, 1.2]];
-                [SLE_JET_engine_stop_sound_emitter, true] remoteExec ["hideObjectGlobal", 2];
                 [SLE_JET_engine_stop_sound_emitter, ["SLE_JET_engine_shutdown", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
                 uiSleep 3.5;
                 deleteVehicle SLE_JET_engine_stop_sound_emitter;
@@ -828,13 +868,18 @@ fnc_SLE_JET_event_sound_core = {
 
 //Jetpack deactivation function. Terminates all things that can't run in background unnoticed by player.
 fnc_SLE_JET_Disable_Jetpack = {
-    if (!isNil "MEH_SLE_JET_autobrake_system") then {
-        removeMissionEventHandler ["EachFrame", MEH_SLE_JET_autobrake_system];
-        MEH_SLE_JET_autobrake_system = nil;
-    };
     if (!isNil "PEH_SLE_JET_In_air_no_sway") then {
         player removeEventHandler ["AnimChanged", PEH_SLE_JET_In_air_no_sway];
         PEH_SLE_JET_In_air_no_sway = nil;
+    };
+    if (!isNil "PEH_SLE_JET_Sound_KILLswitch") then {
+        player removeEventHandler ["Killed", PEH_SLE_JET_Sound_KILLswitch];
+        PEH_SLE_JET_Sound_KILLswitch = nil;
+    };
+
+    if (!isNil "SLE_JET_autobrake_physic_calculator_spawn_handle") then {
+        terminate SLE_JET_autobrake_physic_calculator_spawn_handle;
+        SLE_JET_autobrake_physic_calculator_spawn_handle = nil;
     };
 
     if (!isNil "SLE_JET_fuel_generation_spawn_handle") then {
@@ -860,6 +905,19 @@ fnc_SLE_JET_Disable_Jetpack = {
         removeMissionEventHandler ["EachFrame", MEH_SLE_JET_In_air_no_sway_repeater];
         player setVariable ["SLE_JET_Sway_fix_on", false, false];
     };
+
+    if (!isNull SLE_JET_sound_repeater_spawn_handle) then {
+        terminate SLE_JET_sound_repeater_spawn_handle;
+    };
+    if (!isNull SLE_JET_stop_sound_repeater_spawn_handle) then {
+        terminate SLE_JET_stop_sound_repeater_spawn_handle;
+    };
+
+    {
+            if (typeOf _x == "SLE_JET_Sound_emitter") then {
+                deleteVehicle _x;
+            };
+    } forEach nearestObjects [player, ["all"], 2] - allUnits;
 
     player setVariable ["SLE_JET_Jetpak_activation_state", false, false];
 };

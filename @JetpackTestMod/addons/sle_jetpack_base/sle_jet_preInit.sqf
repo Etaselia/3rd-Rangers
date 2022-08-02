@@ -272,7 +272,7 @@
     "EDITBOX", // setting type
     ["Jetpack compatable backpacks", "Classes of jetpack compatable backpacks. Format: class1,class2,class3"], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
-    "B_CombinationUnitRespirator_01_F,B_Parachute,B_JETPACK_01_SLE,B_JETPACK_02_SLE", // ValueInfo
+    "B_JETPACK_01_SLE,B_JETPACK_02_SLE", // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
@@ -292,7 +292,7 @@
     "EDITBOX", // setting type
     ["Jetpack UI compatable facewear", "Classes of jetpack UI compatable facewear. Format: class1,class2,class3"], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
-    "G_Tactical_Clear,G_Tactical_Black,G_Goggles_VR,G_Jet_UI_Clear,G_Jet_UI_Shade,G_Jet_UI_VR", // ValueInfo
+    "G_Jet_UI_Clear,G_Jet_UI_Shade,G_Jet_UI_VR", // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning

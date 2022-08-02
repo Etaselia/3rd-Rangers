@@ -13,31 +13,10 @@ class cfgPatches
         requiredAddons[] = {
             "cba_jr"
         };
+        units[] = {};
+        weapons[] = {};
     };
 };
-
-/*
-class CfgMods
-{
-    class Mod_Base;
-    class SLE_Smart_jet: Mod_Base
-    {
-        name="Smart Jetpack";
-        author="SLE/klockhov";
-        logo=""; // Logo displayed in the main menu
-        logoOver=""; // When the mouse is over, in the main menu
-        logoSmall=""; // Display in creative lists, next to the entities added by the mod
-        picture=""; // Picture displayed from the expansions menu. Optimal size is 2048x1024
-        tooltip="Smart Jetpack";
-        tooltipOwned="Smart Jetpack";
-        hideName="true";
-        actionName="GitHub";
-        action="https://github.com/klockhov";
-        dlcColor[]={0,1,0,1};
-        dir="SLE_Smart_jet";
-    };
-};
-*/
 
 class Extended_PreInit_EventHandlers
 {
@@ -148,6 +127,14 @@ class CfgVehicles
         displayName = "Jetpack";
         maximumLoad = 100;
         mass = 120;
+    };
+
+    class Sign_Arrow_Green_F;
+    class SLE_JET_Sound_emitter: Sign_Arrow_Green_F
+    {
+        author = "SLE";
+        displayName = "Jetpack sound emitter";
+        model = "\A3\Weapons_F\empty.p3d";
     };
 };
 
