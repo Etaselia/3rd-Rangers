@@ -1,5 +1,5 @@
-this addEventHandler ["Fired",{_this select 0 turretUnit [0] setAmmo ["rhs_weap_yakB", 5000];}];
-
+this removeAllEventHandlers "HitPart";
+this removeAllEventHandlers "HandleDamage";
 this addEventHandler ["HandleDamage", {
 	params ["_unit", "_selection", "_damage", "_source", "_projectile", "_hitIndex", "_instigator", "_hitPoint"];
 	_var_hit_selection = _this select 1;
@@ -22,7 +22,7 @@ this addEventHandler ["HandleDamage", {
 			_var_damage = 0.75;
 		};
 	};
-	if (_this select 7 in ["hitvrotor","hitengine","hitengine1","hitengine2","hitrfwheel","hitlfwheel","hitrf2wheel","hitlf2wheel"]) then {
+	if (_this select 7 in ["hitvrotor","hitengine","hitengine1","hitengine2","hitrfwheel","hitlfwheel","hitrf2wheel","hitlf2wheel","hitltrack","hitrtrack","hitturret","hitgun","hitturretcom"]) then {
 		if (_var_damage - _var_damage_temp <=0.1) then {
 			_var_damage = _damage;
 		};
