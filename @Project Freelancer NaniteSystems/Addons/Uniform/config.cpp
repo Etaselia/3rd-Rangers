@@ -303,7 +303,7 @@ class RscTitles
             "(profilenamespace getvariable ['GUI_BCG_RGB_B',0.5])",
             "(profilenamespace getvariable ['GUI_BCG_RGB_A',0.8])"
         };
-        texture = "sle_jetpack_core\UI\sle_jet_fuel_bar.paa";
+        texture = "textures\eta_nanite_energy_bar.paa";
 
         w = 0.165 * safezoneW;
         h = 0.015 * safezoneH;
