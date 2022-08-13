@@ -286,3 +286,47 @@ class CfgSounds
          titles[] = {0, ""};
    };
 };
+
+class RscTitles
+{
+    class RscProgress;
+    class eta_energy_bar_progess:RscProgress
+    {
+        type = 8;
+        style = 0;
+        shadow = 0;
+        colorFrame[] = {0,0,0,1};
+        colorBar[] =
+        {
+            "(profilenamespace getvariable ['GUI_BCG_RGB_R',0.69])",
+            "(profilenamespace getvariable ['GUI_BCG_RGB_G',0.75])",
+            "(profilenamespace getvariable ['GUI_BCG_RGB_B',0.5])",
+            "(profilenamespace getvariable ['GUI_BCG_RGB_A',0.8])"
+        };
+        texture = "sle_jetpack_core\UI\sle_jet_fuel_bar.paa";
+
+        w = 0.165 * safezoneW;
+        h = 0.015 * safezoneH;
+    };
+
+    class eta_nanite_energy_bar
+    {
+        idd = 430099;
+        onload = "uiNamespace setVariable ['eta_energy_bar_progess',_this select 0]";
+        duration = 1e+6;
+        class Controls
+        {
+            class eta_energy_bar_progress: eta_energy_bar_progess
+            {
+                idc = 629211;
+                color[] = {0,0,0,0};
+                colorFrame[] = {0,0,0,1};
+                colorBar[] = {1, 0.58, 0, 1};
+                colorBackground[] = {0,0,0,0};
+
+                x = 0.825 * safezoneW + safezoneX;
+                y = 0.112 * safezoneH + safezoneY;
+            };
+        };
+    };
+};
