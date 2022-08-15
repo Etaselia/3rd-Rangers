@@ -57,6 +57,10 @@ class Extended_PostInit_EventHandlers
   {
     init="execVM 'functions\spartan_suit_v2.sqf';"
   };
+  class eta_medical_nanitesuit
+  {
+    init="execVM 'functions\medical_suit.sqf';"
+  };
   class tts_active_cloak_particles
   {
     init="execVM 'functions\active_camo\fn_cloakParticles.sqf';"
@@ -186,6 +190,20 @@ class cfgFactionClasses
         displayName = "Activate NaniteSuitv2";
         statement = "[ [], 'Nano_Suit_SPARTAN_V2', player ] call BIS_fnc_MP;";
       };
+      class activate_suit_MEDICAL
+      {
+        condition = "uniform _player == 'NaniteSuitMEDICAL' or uniform _player == 'MJOLNIR_MKVI_Undersuit_v3'";
+        displayName = "Activate Medical NaniteSuit";
+        statement = "[ [], 'fnc_Nano_Suit_MEDICAL', player ] call BIS_fnc_MP;";
+      };
+
+      class deactivate_suit_medical
+      {
+      condition = "uniform _player == 'NaniteSuitMEDICAL' or uniform _player == 'MJOLNIR_MKVI_Undersuit_v3'";
+      displayName = "Deactivate medical NaniteSuit";
+      statement = "[ [], 'fnc_nanite_deactivation_MEDICAL', player ] call BIS_fnc_MP;";
+      };
+
 			class deactivate_suit
 			{
 			condition = "uniform _player == 'NaniteSuit' or uniform _player == 'MJOLNIR_MKVI_Undersuit'";
@@ -243,6 +261,20 @@ class cfgWeapons
         };
     };
 
+
+    class MJOLNIR_MKVI_Undersuit_v3: MJOLNIR_MKVI_Undersuit
+    {
+      scope = 2;
+      author = "Eta";
+      displayName = "MJOLNIR MKVI Undersuit v1.Medical";
+      class ItemInfo: UniformItem
+        {
+          uniformClass="MJOLNIR_Mark_VI_Undersuit";
+          containerClass="Supply300";
+          mass=10;
+        };
+    };
+
 	class NaniteSuit: Uniform_Base
     {
         scope = 2;
@@ -258,7 +290,23 @@ class cfgWeapons
             allowedSlots[] = {"701","801","901"};
 		    };
 	  };
-};
+    class NaniteSuitMEDICAL: Uniform_Base
+    {
+      scope = 2;
+      author = "Eta";
+      displayName = "Medical NaniteSuit";
+      model = "\A3\Characters_F\Common\Suitpacks\suitpack_blufor_diver";
+      class ItemInfo: ItemInfo
+      {
+          uniformModel = "-";
+          uniformClass = "NANITE_ACTIVE";
+          containerClass = "Supply80";
+          mass = 100;
+          allowedSlots[] = {"701","801","901"};
+      };
+    };
+  };
+
 
 class cfgGlasses
 {
@@ -287,15 +335,57 @@ class CfgSounds
    };
 };
 
+class eta_nanite_hud_energy_percentage_base
+{
+idc = -1;
+type = CT_STRUCTURED_TEXT;
+style = ST_CENTER;
+moving = true;
+colorBackground[] = {0,0,0,0};
+colorText[]={1,2,1,1};
+font = "PuristaMedium";
+w=0.2;
+h=0.1;
+sizeEx = 0.04;
+text = "-not set-";
+};
+
+
 class RscTitles
 {
+  class eta_nanite_hud_energy_percentage
+  {
+  	idd = 629216;
+  	onLoad = "uiNamespace setVariable ['eta_nanite_hud_energy_percentage_idd', _this select 0]";
+  	movingEnable = 1;
+  	fadeIn  = 0;
+  	fadeOut = 0;
+  	duration = 10e10;
+
+  	class controls
+  	{
+  		class eta_nanite_hud_energy_percentage: eta_nanite_hud_energy_percentage_base
+  		{
+  			idc = 629216;
+        style = ST_CENTER;
+        colorText[]={0,0,1,1};
+        colorBackground[] = {0,0,0,0};
+        //["0.898589 * safezoneW + safezoneX","0.1205 * safezoneH + safezoneY","0.04125 * safezoneW","0.022 * safezoneH"]
+        x = 0.898589 * safezoneW + safezoneX;
+        y = 0.1205 * safezoneH + safezoneY;
+        w = 0.04125 * safezoneW;
+        h = 0.022 * safezoneH;
+  		};
+  	};
+  };
+
     class RscProgress;
     class eta_energy_bar_progess:RscProgress
     {
         type = 8;
         style = 0;
         shadow = 0;
-        colorFrame[] = {0,0,0,1};
+        colorFrame[] = {0,0,0,0};
         colorBar[] =
         {
             "(profilenamespace getvariable ['GUI_BCG_RGB_R',0.69])",
@@ -303,30 +393,144 @@ class RscTitles
             "(profilenamespace getvariable ['GUI_BCG_RGB_B',0.5])",
             "(profilenamespace getvariable ['GUI_BCG_RGB_A',0.8])"
         };
-        texture = "textures\eta_nanite_energy_bar.paa";
-
+        texture = "textures\fuel_bar_test.paa";
+        //["0.83 * safezoneW + safezoneX","0.115 * safezoneH + safezoneY","0.165 * safezoneW","0.033 * safezoneH"]
+        x = 0.83 * safezoneW + safezoneX;
+        y = 0.115 * safezoneH + safezoneY;
         w = 0.165 * safezoneW;
-        h = 0.015 * safezoneH;
+        h = 0.033 * safezoneH;
     };
 
     class eta_nanite_energy_bar
     {
         idd = 430099;
-        onload = "uiNamespace setVariable ['eta_energy_bar_progess',_this select 0]";
+        onload = "uiNamespace setVariable ['eta_nanite_energy_bar',_this select 0]";
         duration = 1e+6;
         class Controls
         {
-            class eta_energy_bar_progress: eta_energy_bar_progess
+            class eta_energy_bar_progress_v2: eta_energy_bar_progess
             {
                 idc = 629211;
                 color[] = {0,0,0,0};
-                colorFrame[] = {0,0,0,1};
-                colorBar[] = {1, 0.58, 0, 1};
+                colorFrame[] = {0,0,0,0};
+                colorBar[] = {0.53, 0.83, 0.90, 1};
                 colorBackground[] = {0,0,0,0};
 
-                x = 0.825 * safezoneW + safezoneX;
-                y = 0.112 * safezoneH + safezoneY;
+                x = 0.83 * safezoneW + safezoneX;
+                y = 0.115 * safezoneH + safezoneY;
+                w = 0.165 * safezoneW;
+                h = 0.033 * safezoneH;
             };
         };
     };
+    class RscPicture;
+    class eta_rsc_nanite_hud
+    {
+      duration = 1e+6;
+  		fadeIn = 0;
+  		fadeOut = 0;
+  		movingEnable = false;
+  		idd = -1;
+      class controls
+		  {
+  			class eta_nanite_hud_rsc_picture : RscPicture
+  			{
+  				text = "textures\eta_nanite_activity_bar_v2.paa";
+  				x = "SafeZoneX + (495 / 1920) * SafeZoneW";
+  				y = "SafeZoneY + (855 / 1080) * SafeZoneH";
+  				w = "(120 / 1920) * SafeZoneW";
+  				h = "(135 / 1080) * SafeZoneH";
+  			};
+      };
+    };
+
+    class eta_rsc_nanite_hud_fuel_bar_empty
+    {
+      duration = 1e+6;
+      fadeIn = 0;
+      fadeOut = 0;
+      movingEnable = false;
+      idd = -1;
+      class controls
+      {
+        class eta_nanite_hud_rsc_SYSTEM_STATUS_picture : RscPicture
+        {
+          text = "textures\fuel_bar_empty.paa";
+          idd = -1;
+          //["0.83 * safezoneW + safezoneX","0.159 * safezoneH + safezoneY","0.170156 * safezoneW","0.033 * safezoneH"]
+          x = 0.83 * safezoneW + safezoneX;
+          y = 0.115 * safezoneH + safezoneY;
+          w = 0.165 * safezoneW;
+          h = 0.033 * safezoneH;
+        };
+      };
+    };
+
+    class eta_rsc_nanite_hud_SYSTEM_STATUS_READY
+    {
+      duration = 1e+6;
+      fadeIn = 0;
+      fadeOut = 0;
+      movingEnable = false;
+      idd = -1;
+      class controls
+      {
+        class eta_nanite_hud_rsc_SYSTEM_STATUS_picture : RscPicture
+        {
+          text = "textures\system_status_ready.paa";
+          idd = -1;
+          //["0.83 * safezoneW + safezoneX","0.159 * safezoneH + safezoneY","0.170156 * safezoneW","0.033 * safezoneH"]
+          x = "0.83 * safezoneW + safezoneX";
+          y = "0.159 * safezoneH + safezoneY";
+          w = "0.170156 * safezoneW";
+          h = "0.033 * safezoneH";
+        };
+      };
+    };
+
+    class eta_rsc_nanite_hud_SYSTEM_STATUS_CHARGING
+    {
+      duration = 1e+6;
+      fadeIn = 0;
+      fadeOut = 0;
+      movingEnable = false;
+      idd = -1;
+      class controls
+      {
+        class eta_nanite_hud_rsc_SYSTEM_STATUS_picture : RscPicture
+        {
+          text = "textures\system_status_charging.paa";
+          idd = -1;
+          //["0.83 * safezoneW + safezoneX","0.159 * safezoneH + safezoneY","0.170156 * safezoneW","0.033 * safezoneH"]
+          x = "0.83 * safezoneW + safezoneX";
+          y = "0.159 * safezoneH + safezoneY";
+          w = "0.170156 * safezoneW";
+          h = "0.033 * safezoneH";
+        };
+      };
+    };
+
+
+
+    class eta_rsc_nanite_energy_bar_static
+    {
+      duration = 1e+6;
+      fadeIn = 0;
+      fadeOut = 0;
+      movingEnable = false;
+      idd = -1;
+      class controls
+      {
+        class eta_nanite_hud_rsc_picture : RscPicture
+        {
+          colorBackground[] = {0,0,0,0};
+          text = "textures\eta_nanite_energy_bar.paa";
+          x = 0.825 * safezoneW + safezoneX;
+          y = 0.112 * safezoneH + safezoneY;
+          w = 0.165 * safezoneW;
+          h = 0.015 * safezoneH;
+        };
+      };
+    };
+
 };

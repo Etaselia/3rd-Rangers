@@ -1675,3 +1675,188 @@
     nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
     {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
+
+////////////////////////////////
+//MEDICAL SUIT SECTION//////////
+////////////////////////////////
+
+
+[   "nanite_energy_default_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Starting Energy", "The amount of Energy your suit will have on initial activation"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "1. Energy Generation"], // Category name
+    [0, 100, 100, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_energy_gain_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Gain", "How much energy is added per tick, defined by the next setting"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "1. Energy Generation"], // Category name
+    [0, 10, 1, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_energy_tick_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Tick", "How long in between updates of the suit energy"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "1. Energy Generation"], // Category name
+    [0, 120, 1, 1, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_selfheal_cost_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Cost", "How much energy is needed to activate this feature"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "2. Self Healing"], // Category name
+    [0, 100, 50, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_selfheal_cooldown_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Cooldown time", "How long until another feature is usable in seconds"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "2. Self Healing"], // Category name
+    [0, 120, 5, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_targetheal_cost_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Cost", "How much energy is needed to activate this feature"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "3. Target Healing"], // Category name
+    [0, 100, 25, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_targetheal_area_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Area of Effect", "How far away from the initial target does the effect reach in meters"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "3. Target Healing"], // Category name
+    [0, 50, 1, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_targetheal_cooldown_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Cooldown time", "How long until another feature is usable in seconds"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "3. Target Healing"], // Category name
+    [0, 120, 10, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_groupheal_cost_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Cost", "How much energy is needed to activate this feature"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "4. Group Healing"], // Category name
+    [0, 100, 100, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_groupheal_area_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Area of Effect", "How far away from the activating unit does the effect reach in meters"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "4. Group Healing"], // Category name
+    [0, 50, 5, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_groupheal_cooldown_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Cooldown time", "How long until another feature is usable in seconds"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "4. Group Healing"], // Category name
+    [0, 120, 10, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_shieldrecharge_cost_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Cost", "How much energy is needed to activate this feature"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "5. Shield Booster"], // Category name
+    [0, 100, 20, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_shieldrecharge_area_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Area of Effect", "How far away from the activator does the effect reach in meters"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "5. Shield Booster"], // Category name
+    [0, 50, 5, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_shieldrecharge_amount_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Recharge Amount", "How many Spartan shield points does the ability grant per activation (100% is maximum)"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "5. Shield Booster"], // Category name
+    [0, 100, 20, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_shieldrecharge_cooldown_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Cooldown time", "How long until another feature is usable in seconds"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "5. Shield Booster"], // Category name
+    [0, 120, 60, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_shieldrecharge_duration_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Effect Duration", "How long will the effect be active !!NOTE THAT THE AMOUNT OF ACTIVATION IS A SEPERATE SETTING!!)"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "5. Shield Booster"], // Category name
+    [0, 120, 10, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_shieldrecharge_frequency_MEDICAL", // Variable tag
+    "SLIDER", // setting type
+    ["Effect Frequency", "How often will the effect activates !!!THIS IS A DIVISOR, IT IS CALCULATED BY DURATION / FREQUENCY!!!"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "5. Shield Booster"], // Category name
+    [0, 20, 5, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_GUI_HidePercentage_MEDICAL", // Variable tag
+    "CHECKBOX", // setting type
+    ["Hide energy percentage", "Show a numeric representation of the remaining energy above the energy bar"], // [Name, Tooltip]
+    ["MEDICAL NANITE SUIT", "6. GUI"], // Category name
+    true, // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
