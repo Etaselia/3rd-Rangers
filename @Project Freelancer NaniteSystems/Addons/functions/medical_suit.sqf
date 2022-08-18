@@ -175,22 +175,24 @@ fnc_Nano_Suit_MEDICAL ={
         {
           //CREATE COOLDOWN
           [player] spawn {
-            player setVariable ["nanite_cooldown", true, false];
+            params ["_player"];
+            _player setVariable ["nanite_cooldown", true, false];
             sleep nanite_selfheal_cooldown_MEDICAL;
-            player setVariable ["nanite_cooldown", false, false];
+            _player setVariable ["nanite_cooldown", false, false];
+
+            if (isClass(configFile >> "CfgPatches" >> "ace_main")) then
+            {
+              [_player] call ace_medical_treatment_fnc_fullHealLocal;
+              //This might make issues
+            }
+            else
+            {
+              _player setDamage 0;
+            };
           };
           player setVariable ["nanite_energy", _nanite_energy - nanite_selfheal_cost_MEDICAL, false];
 
           //CHECK FOR ACE
-          if (isClass(configFile >> "CfgPatches" >> "ace_main")) then
-          {
-            [player] call ace_medical_treatment_fnc_fullHealLocal;
-            //This might make issues
-          }
-          else
-          {
-            player setDamage 0;
-          };
         }
         else
         {
@@ -213,22 +215,26 @@ fnc_Nano_Suit_MEDICAL ={
             if (cursorTarget isKindOf "Man") then {
               //REMOVE ENERGY
               player setVariable ["nanite_energy", (_nanite_energy - nanite_targetheal_cost_MEDICAL), false];
-              [player] spawn {
-                player setVariable ["nanite_cooldown", true, true];
+              [player,cursorTarget] spawn {
+                params ["_player", "_cursortarget"];
+
+                _player setVariable ["nanite_cooldown", true, true];
                 sleep nanite_selfheal_cooldown_MEDICAL;
-                player setVariable ["nanite_cooldown", false, true];
+                _player setVariable ["nanite_cooldown", false, true];
+
+                //Execution
+                _healing_array = nearestObjects [_cursorTarget, ["Man"], nanite_targetheal_area_MEDICAL];
+                {
+                    if (isClass(configFile >> "CfgPatches" >> "ace_main")) then {
+                      [_x] remoteExec ["ace_medical_treatment_fnc_fullHealLocal"];
+                    }
+                    else {
+                      _x setDamage 0;
+                    };
+                } forEach _healing_array;
                 //TODO implement in UI
               };
               //Creating Healing Area + Healing
-              _healing_array = nearestObjects [cursorTarget, ["Man"], nanite_targetheal_area_MEDICAL];
-              {
-                  if (isClass(configFile >> "CfgPatches" >> "ace_main")) then {
-                    [_x] call ace_medical_treatment_fnc_fullHealLocal;
-                  }
-                  else {
-                    _x setDamage 0;
-                  };
-              } forEach _healing_array;
             }
             else {
               systemChat "cannot target inorganic matter";
@@ -257,27 +263,29 @@ fnc_Nano_Suit_MEDICAL ={
         {
           //CREATE COOLDOWN + REMOVE ENERGY
           [player] spawn {
-            player setVariable ["nanite_cooldown", true, true];
+            params ["_player"];
+            _player setVariable ["nanite_cooldown", true, true];
             sleep nanite_groupheal_cooldown_MEDICAL;
-            player setVariable ["nanite_cooldown", false, true];
+            _player setVariable ["nanite_cooldown", false, true];
             //TODO implement in UI
+
+            _healing_array = nearestObjects [_player, ["Man"], nanite_groupheal_area_MEDICAL];
+            {
+              //CHECK FOR ACE
+              if (isClass(configFile >> "CfgPatches" >> "ace_main")) then
+              {
+                [_x] remoteExec ["ace_medical_treatment_fnc_fullHealLocal"];
+                //This might make issues
+              }
+              else
+              {
+                _x setDamage 0;
+              };
+            } forEach _healing_array;
           };
           player setVariable ["nanite_energy",(_nanite_energy - nanite_groupheal_cost_MEDICAL), true];
 
           //CREATE HEALING ARRAY
-          _healing_array = nearestObjects [player, ["Man"], nanite_groupheal_area_MEDICAL];
-          {
-            //CHECK FOR ACE
-            if (isClass(configFile >> "CfgPatches" >> "ace_main")) then
-            {
-              [_x] call ace_medical_treatment_fnc_fullHealLocal;
-              //This might make issues
-            }
-            else
-            {
-              _x setDamage 0;
-            };
-          } forEach _healing_array;
         }
         else
         {
@@ -300,23 +308,24 @@ fnc_Nano_Suit_MEDICAL ={
         {
           //CREATE COOLDOWN + Drain energy
           [player] spawn {
-            player setVariable ["nanite_cooldown", true, false];
+            params ["_player"];
+            _player setVariable ["nanite_cooldown", true, false];
             sleep nanite_shieldrecharge_cooldown_MEDICAL;
-            player setVariable ["nanite_cooldown", false, false];
+            _player setVariable ["nanite_cooldown", false, false];
           };
           player setVariable ["nanite_energy", (_nanite_energy - nanite_shieldrecharge_cost_MEDICAL), true];
 
           [player] spawn {
+            params ["_player"];
             //REMOVING PLAYER SHIELDS FOR THE DURATION
-            _current_suit_energy = player getVariable ["optre_suit_energy", 100];
-            while {player getVariable ["nanite_shieldrecharge_active",true]} do {
-              player setVariable ["optre_suit_energy", 0, true];
-
-
-              _shield_buff_array = nearestObjects [player, ["Man"], nanite_shieldrecharge_area_MEDICAL];
+            _current_suit_energy = _player getVariable ["optre_suit_energy", 100];
+            _player setVariable ["nanite_shieldrecharge_active", true, true];
+            while {_player getVariable ["nanite_shieldrecharge_active",true]} do {
+              _player setVariable ["optre_suit_energy", 0, true];
+              _shield_buff_array = nearestObjects [_player, ["Man"], nanite_shieldrecharge_area_MEDICAL];
               {
                 fnc_add_nanite_shield = {player setVariable ["optre_suit_energy", player getVariable ["optre_suit_energy", 100], true]};
-                  if (player != _x) then {
+                  if (_player != _x) then {
                     //THIS WILL LIKELY MAKE ISSUES --> DEBUG <--
                     [] remoteExec ["fnc_add_nanite_shield", owner _x, false];
                     _new_shield = (_x getVariable ["optre_suit_energy", 100]);
@@ -330,11 +339,12 @@ fnc_Nano_Suit_MEDICAL ={
                   };
               } forEach _shield_buff_array;
               sleep nanite_shieldrecharge_duration_MEDICAL / nanite_shieldrecharge_frequency_MEDICAL;
-              _counter = player getVariable ["nanite_shield_counter", 0];
+              _counter = _player getVariable ["nanite_shield_counter", 0];
               _counter = _counter + 1;
-              player setVariable ["nanite_shield_counter", _counter, true];
+              _player setVariable ["nanite_shield_counter", _counter, true];
               if (_counter >= nanite_shieldrecharge_frequency_MEDICAL) then {
-                player setVariable ["nanite_shieldrecharge_active", false, true];
+                _player setVariable ["nanite_shieldrecharge_active", false, true];
+                _player setVariable ["nanite_shield_counter", 0, true];
               };
             };
           };
