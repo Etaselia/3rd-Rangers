@@ -125,12 +125,13 @@ fnc_Nano_Suit_MEDICAL ={
               private _set_bar = _display displayCtrl 629211;
               _set_bar progressSetPosition (player getVariable "nanite_energy") / 100;
 
-              if (!nanite_GUI_HidePercentage_MEDICAL) then {
+              if (!nanite_GUI_HidePercentage_speed) then {
                 _display_percentage = uiNamespace getVariable "eta_nanite_hud_energy_percentage_idd";
                 _control = _display_percentage displayCtrl 629216;
-                private _percentage = player getVariable ["nanite_energy", nanite_energy_default_MEDICAL];
-                _percentage = formatText ["%1%2", str(_percentage),"%"];
-                _control ctrlSetText str [_percentage];
+                private _percentage = player getVariable ["nanite_energy", nanite_energy_default_speed];
+                _percentage = [_percentage, 0] call BIS_fnc_cutDecimals;
+                _percentage = format ["<t valign='middle' align='center' size='2' fonts='Zeppelin33' color='#3bb7f3'>%1%2</t>", _percentage,"%"];
+                _control ctrlSetStructuredText parseText _percentage;
               };
 
               private _nanite_cooldown = player getVariable ["nanite_cooldown", false];

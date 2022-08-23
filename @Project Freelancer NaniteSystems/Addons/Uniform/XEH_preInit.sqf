@@ -1860,3 +1860,177 @@
     {}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
+
+
+////////////////////////SPEED SUIT///////////////////////
+
+
+[   "nanite_energy_default_speed", // Variable tag
+    "SLIDER", // setting type
+    ["Default Energy", "How much power does the suit start with"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "1. Power Management"], // Category name
+    [0, 100, 100, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_energy_gain_speed", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Gain", "How much Power is restored per tick"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "1. Power Management"], // Category name
+    [0, 20, 1, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_energy_tick_speed", // Variable tag
+    "SLIDER", // setting type
+    ["Energy Tick", "How often does the power circle update (this affects energy drain) RECOMMEND TO STAY BELOW 5"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "1. Power Management"], // Category name
+    [0, 20, 1, 1, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_energy_activation_energy", // Variable tag
+    "SLIDER", // setting type
+    ["Minimum Power Activation", "How much power is required to activate speed mode"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "1. Power Management"], // Category name
+    [0, 100, 20, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_speed_default_mult", // Variable tag
+    "SLIDER", // setting type
+    ["Default Speed Multiplier", "What speed does the suit start out with"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    [0, 100, 5, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_speed_redline", // Variable tag
+    "SLIDER", // setting type
+    ["Redline Speed Multiplier", "What speed is considered the *Redline* Speed, this also acts as the maximum speed"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    [0, 100, 20, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_speed_half_redline", // Variable tag
+    "CHECKBOX", // setting type
+    ["Normal Speed Limiter", "Should the normaly achievable speed be 1/2 of redline speed?"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    true, // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_redline_pain", // Variable tag
+    "SLIDER", // setting type
+    ["ACE Redline Pain / Damage", "How much pain / damage gets caused per tick by using redline"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    [0, 1, 0.5, 1, false], // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_redline_player_none_ace_damage", // Variable tag
+    "SLIDER", // setting type
+    ["NONE ACE Redline Damage", "How much damage does the player receive per tick *(1 damage  = dead)*"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    [0, 1, 0.01, 2, false], // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_redline_knockout", // Variable tag
+    "SLIDER", // setting type
+    ["Redline Knockout Timer", "How long until redline knocks the user out *REQUIRES ACE*"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    [0, 120, 10, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_speed_redline_no_power", // Variable tag
+    "CHECKBOX", // setting type
+    ["Redline Power Override", "If ticked Redline speed requires no energy"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    true, // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_speed_tick", // Variable tag
+    "SLIDER", // setting type
+    ["Speed Change Tick", "How long until speed change registers"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "2. Speed Mode"], // Category name
+    [0, 120, 1, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_maximum_energy_drain_speed", // Variable tag
+    "SLIDER", // setting type
+    ["Maximum Speed Power Drain", "How much Power Redline Draws *(LOGISTICAL EXPONENT, so not fully accurate)*"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "3. Speed Power Management"], // Category name
+    [0, 100, 5, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_minimum_energy_drain_speed", // Variable tag
+    "SLIDER", // setting type
+    ["Minimim Speed Power Drain", "How much Power 0x Speed Draws *(LOGISTICAL EXPONENT, so not fully accurate)*"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "3. Speed Power Management"], // Category name
+    [0, 100, 1, 0, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_speed_lamda", // Variable tag
+    "SLIDER", // setting type
+    ["Exponent Lamda", "How quickly the function exponites, the lower this number the slower it does *DEFAULT 0.18*"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "3. Speed Power Management"], // Category name
+    [0, 1, 0.18, 2, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_GUI_HidePercentage_speed", // Variable tag
+    "CHECKBOX", // setting type
+    ["Hide Energy Percentage", "Should the Energy Percentage be shown on the energy bar"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "4. Misc"], // Category name
+    true, // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "nanite_spartan_compat_speed", // Variable tag
+    "CHECKBOX", // setting type
+    ["Spartan Speed COMPAT", "Uses an overwrite of a function necessery for speed to work for spartans *TAKES A LOT OF PROCESSING POWER*"], // [Name, Tooltip]
+    ["SPEED NANITE SUIT", "4. Misc"], // Category name
+    false, // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
