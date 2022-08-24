@@ -592,6 +592,26 @@
     {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
+[
+   "nanite_new_UI_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "CHECKBOX", // setting type
+   "Use new UI", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   true, // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "nanite_GUI_HidePercentage_ONI", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "CHECKBOX", // setting type
+   "Show Energy Percentage", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "ONI NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   true, // data for this setting: [min, max, default, number of shown trailing decimals]
+   0, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
 //SPARTAN NanoSuit
 [
     "shield_switch_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
@@ -1134,6 +1154,26 @@
     {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
+[
+   "nanite_new_UI_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "CHECKBOX", // setting type
+   "Use new UI", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   true, // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "nanite_GUI_HidePercentage_SPARTAN", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "CHECKBOX", // setting type
+   "Show Energy Percentage", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   true, // data for this setting: [min, max, default, number of shown trailing decimals]
+   0, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
 //SPARTAN_V2
 [
     "shield_switch_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
@@ -1674,6 +1714,26 @@
     [0, 1, 0.01, 2], // data for this setting: [min, max, default, number of shown trailing decimals]
     nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
     {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "nanite_new_UI_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "CHECKBOX", // setting type
+   "Use new UI", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   true, // data for this setting: [min, max, default, number of shown trailing decimals]
+   nil, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
+] call cba_settings_fnc_init;
+
+[
+   "nanite_GUI_HidePercentage_SPARTAN_V2", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+   "CHECKBOX", // setting type
+   "Show Energy Percentage", // Pretty name shown inside the ingame settings menu. Can be stringtable entry.
+   "SPARTAN_V2 NanoSuit", // Pretty name of the category where the setting can be found. Can be stringtable entry.
+   true, // data for this setting: [min, max, default, number of shown trailing decimals]
+   0, // "_isGlobal" flag. Set this to true to always have this setting synchronized between all clients in multiplayer
+   {} // function that will be executed once on mission start and every time the setting is changed.
 ] call cba_settings_fnc_init;
 
 ////////////////////////////////

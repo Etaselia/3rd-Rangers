@@ -328,14 +328,63 @@ MEH_HUD = addMissionEventHandler ["EachFrame", {
     if (SuitPower_SPARTAN < -0.01) then {UISuitPower = "Reboot"} else {UISuitPower = (selectMin [100,SuitPower_SPARTAN]) toFixed 1;};
 
   comment "Information output.";
-  if ((!NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4", UISuitPower, "%", lineBreak,ChargeGraph];};
-  if ((!NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m", UISuitPower, "%", lineBreak ,ChargeGraph, DisMes];};
-  if ((!NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3User health: %5 %2", UISuitPower, "%", lineBreak, ChargeGraph, Health];};
-  if ((!NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m%3User health: %6 %2", UISuitPower, "%", lineBreak, ChargeGraph, DisMes, Health];};
-  if ((NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hint "Something really went wrong if you see this. That shouldn't be possible.";};
-  if ((NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m%3Airburst: %6 m", UISuitPower, "%", lineBreak ,ChargeGraph, DisMes,DisLockedUI];};
-  if ((NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hint "Something really went wrong if you see this. That shouldn't be possible.";};
-  if ((NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m%3Airburst: %6 m%3User health: %7 %2", UISuitPower, "%", lineBreak, ChargeGraph, DisMes, DisLockedUI, Health];};
+  if (nanite_new_UI_SPARTAN) then {
+
+    //UI VALUES SET
+    if (!NanoAirburst_SPARTAN) then {
+      DisLockedUI = "DISABLED";
+    };
+    if (!ConstantRangefinder_SPARTAN) then {
+      DisMes = "DISABLED";
+    };
+
+    _suit_status = "INACTIVE";
+    if(AbiliyActive == 1) then {
+      _suit_status = "ACTIVE";
+    };
+
+    _weapon_handling = "INACTIVE";
+    if (NanoAIMSW == 1) then {
+      _weapon_handling = "ACTIVE";
+    };
+
+    //INITIALIZATION
+    disableSerialization;
+    ("layer_eta_nanite_hud_menu" call BIS_fnc_rscLayer) cutRsc ["eta_nanite_hud_additional_information", "plain", -1, false];
+    ("layer_eta_nanite_energy_bar_empty" call BIS_fnc_rscLayer) cutRsc ["eta_rsc_nanite_hud_fuel_bar_empty", "plain",-1,false];
+    ("layer_eta_nanite_energy_bar" call BIS_fnc_rscLayer) cutRsc ["eta_nanite_energy_bar", "plain", -1, false];
+    ("layer_eta_nanite_HUD" call BIS_fnc_rscLayer) cutRsc ["eta_rsc_nanite_hud_menu_background", "plain", -1, false];
+    ("layer_eta_nanite_active" call BIS_fnc_rscLayer) cutText ["", "plain"];
+
+    //UPDATE POWER BAR
+    private _display = uiNamespace getVariable "eta_nanite_energy_bar";
+    private _set_bar = _display displayCtrl 629211;
+    _set_bar progressSetPosition (SuitPower_SPARTAN/100);
+
+    if (!nanite_GUI_HidePercentage_SPARTAN) then {
+      ("layer_eta_nanite_display_percentage" call BIS_fnc_rscLayer) cutRsc ["eta_nanite_hud_energy_percentage", "plain", -1, false];
+      _display_percentage = uiNamespace getVariable "eta_nanite_hud_energy_percentage_idd";
+      _control = _display_percentage displayCtrl 629216;
+      private _percentage = UISuitPower;
+      _percentage = format ["<t valign='middle' align='center' size='2' fonts='Zeppelin33' color='#3bb7f3'>%1%2</t>", _percentage,"%"];
+      _control ctrlSetStructuredText parseText _percentage;
+    };
+
+    _display_percentage = uiNamespace getVariable "eta_nanite_hud_menu_idd";
+    _control = _display_percentage displayCtrl 629217;
+    _updated_text = format["<t valign='middle' align='left' size='0.75' fonts='Zeppelin33' color='#3bb7f3'>Suit Status:  <t align='right'>%1%2</t><br/><br/>Distance to Target: <t align='right'>%3</t><br/><br/>Airburst: <t align='right'>%4</t><br/><br/>Gun Handling: <t align='right'>%5</t><br/><br/></t>",_suit_status,"",DisMes,DisLockedUI,_weapon_handling];
+    _control ctrlSetStructuredText parseText _updated_text;
+  }
+  else {
+    if ((!NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4", UISuitPower, "%", lineBreak,ChargeGraph];};
+    if ((!NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m", UISuitPower, "%", lineBreak ,ChargeGraph, DisMes];};
+    if ((!NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3User health: %5 %2", UISuitPower, "%", lineBreak, ChargeGraph, Health];};
+    if ((!NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m%3User health: %6 %2", UISuitPower, "%", lineBreak, ChargeGraph, DisMes, Health];};
+    if ((NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hint "Something really went wrong if you see this. That shouldn't be possible.";};
+    if ((NanoAirburst_SPARTAN)and(!NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m%3Airburst: %6 m", UISuitPower, "%", lineBreak ,ChargeGraph, DisMes,DisLockedUI];};
+    if ((NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(!ConstantRangefinder_SPARTAN)) then {hint "Something really went wrong if you see this. That shouldn't be possible.";};
+    if ((NanoAirburst_SPARTAN)and(NanoHeal_SPARTAN)and(ConstantRangefinder_SPARTAN)) then {hintSilent formatText ["Power: %1 %2%3%4%3Distance: %5 m%3Airburst: %6 m%3User health: %7 %2", UISuitPower, "%", lineBreak, ChargeGraph, DisMes, DisLockedUI, Health];};
+  };
 
   comment "Rebreather module.";
   if (NanoRebreather_SPARTAN) then {player setOxygenRemaining 1;};

@@ -584,6 +584,8 @@ class RscTitles
         idd = 430099;
         onload = "uiNamespace setVariable ['eta_nanite_energy_bar',_this select 0]";
         duration = 1e+6;
+        fadeIn = 0;
+        fadeOut = 0;
         class Controls
         {
             class eta_energy_bar_progress_v2: eta_energy_bar_progess

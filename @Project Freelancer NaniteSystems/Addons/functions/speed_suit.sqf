@@ -15,27 +15,6 @@
 /*
 GLOBAL Variables
 
-nanite_GUI_HidePercentage_speed
-
-nanite_energy_default_speed --> 100
-nanite_energy_gain_speed    --> 1
-nanite_energy_tick_speed    --> 1
-nanite_energy_activation_energy --> 20
-
-nanite_speed_default_mult   --> 5
-nanite_speed_redline        --> 20
-nanite_speed_tick           --> 1
-nanite_maximum_energy_drain_speed --> 20
-nanite_minimum_energy_drain_speed --> 1
-nanite_speed_lamda --> 0.18
-
-nanite_redline_pain         --> 0.5
-nanite_redline_player_none_ace_damage --> 0.1
-
-nanite_spartan_compat_speed --> true
-
-*/
-/*
 nanite_GUI_HidePercentage_speed = false;
 
 nanite_energy_default_speed = 100;
