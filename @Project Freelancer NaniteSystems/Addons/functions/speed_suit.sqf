@@ -248,6 +248,22 @@ fnc_Nano_Suit_SPEED ={
       _active_user setVariable ["nanite_speed_energy_cost_active", _nanite_energy_drain_actual, true];
     };
 
+    fnc_nanite_key_speed_up = {
+      [player,1] call fnc_nanite_speed_mulpt_set;
+    };
+
+    fnc_nanite_key_speed_down = {
+      [player,-1] call fnc_nanite_speed_mulpt_set;
+    };
+
+    fnc_nanite_key_speed_right = {
+      [player,5] call fnc_nanite_speed_mulpt_set;
+    };
+
+    fnc_nanite_key_speed_left = {
+      [player,-5] call fnc_nanite_speed_mulpt_set;
+    };
+
     fnc_speed_mode_menu = {
       player addAction ["ACTIVATE SPEED MODE", {call fnc_nanite_speed_activation}];
       player addAction ["DEACTIVATE SPEED MODE", {call fnc_nanite_speed_deactivation}];

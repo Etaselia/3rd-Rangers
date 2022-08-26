@@ -19,6 +19,12 @@
 //SpartanShieldCharge
 ["NaniteKeys","eta_nanite_shield_core_id", "ShieldOveride Key", {_this call fnc_ShieldKey}, "", [DIK_2, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
 
+//NANITE_SPEED_ADJUST
+["NaniteKeys","eta_nanite_speed_adjust_up_id", "Speed Adjust +1 (Speed Suit ONLY)", {_this call fnc_nanite_key_speed_up}, "", [DIK_UP, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
+["NaniteKeys","eta_nanite_speed_adjust_down_id", "Speed Adjust -1 (Speed Suit ONLY)", {_this call fnc_nanite_key_speed_down}, "", [DIK_DOWN, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
+["NaniteKeys","eta_nanite_speed_adjust_right_id", "Speed Adjust +5 (Speed Suit ONLY)", {_this call fnc_nanite_key_speed_right}, "", [DIK_RIGHT, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
+["NaniteKeys","eta_nanite_speed_adjust_left_id", "Speed Adjust -5 (Speed Suit ONLY)", {_this call fnc_nanite_key_speed_left}, "", [DIK_LEFT, [false, false, false]],false,0,false] call CBA_fnc_addKeybind;
+
 //CATS
 [
     "distance_fail", // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.

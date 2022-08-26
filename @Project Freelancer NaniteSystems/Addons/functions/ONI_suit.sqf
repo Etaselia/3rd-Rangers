@@ -687,7 +687,8 @@ Nano_Suit_ONI ={
         if (SuitPower_ONI > 0) then {
             if (!ActiveRecharge_ONI) then {AbiliyActive = 1;};
             if (ShotBreakInvis_ONI) then {InvisBreakRDY = 1;};
-            [player] remoteExec["hideobject",0,true];
+            [player, true] remoteExec ["hideObject", 0, false];
+            [player, false] remoteExec ["hideObject", player, false];
             if ((vehicle player) != player) then{
               if (eta_cloak_vehicles_ONI) then {
                 if (InvisActive == 0) then {
@@ -700,7 +701,7 @@ Nano_Suit_ONI ={
                      [_vehicle] call fnc_remove_vehicle_stealth;
                      if (eta_nanite_cloak_particles_ONI) then {
                        player setVariable ["tts_cloak_isCloaked", true,true];
-                       [player] spawn eta_cloak_fnc_cloakParticles;
+                       [player] remoteExec ["eta_cloak_fnc_cloakParticles",0,false];
                        _unit removeEventHandler ["GetOutMan", _thisEventHandler];
                      };
                   }];
@@ -726,8 +727,8 @@ Nano_Suit_ONI ={
               systemChat "STEALTH ACTIVATED";
               if (eta_nanite_cloak_particles_ONI) then {
                 player setVariable ["tts_cloak_isCloaked", true,true];
-                [player] spawn eta_cloak_fnc_cloakParticles;
-                [player] call eta_cloak_fnc_transition;
+                [player] remoteExec ["eta_cloak_fnc_cloakParticles",0,false];
+                [player] remoteExec ["eta_cloak_fnc_transition",0,false];
               };
               player setCaptive true;
             };
