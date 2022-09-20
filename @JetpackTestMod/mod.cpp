@@ -1,7 +1,7 @@
-name 			= "Smart Jetpack"; // Name of your mod
-author 		= "SLE / klockhov"; // Affects Arma 3 Launcher, when the mod are loaded as local
+name 			= "Smart Jetpack"; // Mod name
+author 		= "SLE / klockhov"; // Affects Arma 3 Launcher, when the mod loaded as local
 logo 			= "modicons\sle_jet_logo.paa"; // Logo displayed in the main menu
-logoOver 		= "modicons\sle_jet_logo_hover.paa"; // When the mouse is over, in the main menu
+logoOver 		= "modicons\sle_jet_logo_hover.paa"; // Logo displayed in the main menu when cursor hovers over it
 tooltip 		= "Smart Jetpack";
 tooltipOwned 	= "Smart Jetpack"; // Tool tip displayed when the mouse is left over, in the main menu
 picture 		= "modicons\sle_jet_picture.paa"; // Picture displayed from the expansions menu. Optimal size is 2048x1024

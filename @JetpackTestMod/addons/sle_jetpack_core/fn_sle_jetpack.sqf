@@ -119,7 +119,7 @@ SLE_JET_stop_sound_repeater_spawn_handle = [] spawn {};
 player addEventHandler ["InventoryClosed", {
     [false] call fnc_SLE_JET_item_check;
 }];
-//Actual item check function. Called by inventory and arsenal check and hotkey input. Either activates or deactivates jetpack systems.
+//Item check function. Called by inventory check, arsenal check and hotkey input. Either activates or deactivates jetpack systems.
 fnc_SLE_JET_item_check = {
   private _with_refuel = param [0, false, [true]];
     private _return_val = true;
@@ -237,7 +237,7 @@ fnc_SLE_JET_Jetpack_activation = {
                   _FPV_distance = 5000;
               };
             } else {
-                //And if impact point is not over water it's more straightforward.
+                //And if impact point is not over water it's far more straightforward.
                 _FPV_distance = (_LiInSu select 0 select 0) vectorDistance _legs_pos;
             };
         };
@@ -257,7 +257,7 @@ fnc_SLE_JET_Jetpack_activation = {
         //If autobrake disabled in settings we are stoping right here. Calculations above will go to FPV in UI section.
         if (!SLE_JET_autobrake_mode_CBAS) exitWith {};
         private _estimated_time_to_splat = _FPV_distance / _velocity;
-        //So anyway do we need to panic? Also breaking on low speed isn't necessary and can leave player bouncing over the ground.
+        //So anyway do we need to panic? Also breaking on low speed isn't necessary and can leave player bouncing over the ground so we'll fix that with extra check.
         if (((_estimated_time_to_splat - _brake_time) < 0.1) and (vectorMagnitude velocity player > 5)) then {
             [true] call fnc_SLE_JET_autobrake; //Yes but actually no
         } else {
@@ -266,7 +266,7 @@ fnc_SLE_JET_Jetpack_activation = {
     };
 
 
-    //Makes aimed shots possible. Stops huge sway from falling animation. Even if you fly a kilometer game stil thinks that you moved a kilometer and increases sway. So it needs to be ajusted. Also you don't get to use bipod in air.
+    //Makes aimed shots possible. Stops huge sway from falling animation. Even if you fly a kilometer game stil thinks that you moved a kilometer and increases sway without decreasing stamina. So it needs to be ajusted. Also you don't get to use bipod in air.
     if (SLE_JET_hover_aim_fix_CBAS) then {
         PEH_SLE_JET_In_air_no_sway = player addEventHandler ["AnimChanged", {
           params ["_unit", "_anim"];
@@ -297,7 +297,7 @@ fnc_SLE_JET_Jetpack_activation = {
             };
         }];
     };
-    //Slow? fuel (re)generation.
+    //Fuel (re)generation.
     if (SLE_JET_fuel_recharge_CBAS) then {
         SLE_JET_fuel_generation_spawn_handle = [] spawn {
             while {true} do {
@@ -336,7 +336,7 @@ fnc_SLE_JET_Jetpack_activation = {
             };
         };
     };
-    //Automatically stops propulsion when player decides to take a nap. Autobrake will handle the rest.
+    //Automatically stops propulsion when player decides to take a nap. Autobrake will handle the rest. And if autobrake is off in CBA settings... well... F
     SLE_JET_unconscious_detector_spawn_handle = [] spawn {
         while {true} do {
             if ((incapacitatedState player == "UNCONSCIOUS") or (player getVariable ["ACE_isUnconscious", false])) then {
@@ -351,7 +351,7 @@ fnc_SLE_JET_Jetpack_activation = {
             sleep 0.5;
         };
     };
-    //Deletes jet sound emmiter on death. Get it? KILLswitch!
+    //Deletes jet sound emmiter on death.
     PEH_SLE_JET_Sound_KILLswitch = player addEventHandler ["Killed", {
             if (!isNull SLE_JET_sound_repeater_spawn_handle) then {
                 terminate SLE_JET_sound_repeater_spawn_handle;
@@ -716,17 +716,17 @@ fnc_SLE_JET_right = {
 };
 //This one is a bit... overwhelming at first but i can explain.
 fnc_SLE_JET_brake = {
-  private _brake_key_state = param [0, false, [true]];  //First we get variables. This is key state. It indicates if it called with keyDown or keyUp.
+  private _brake_key_state = param [0, false, [true]];  //First we get variables. This is key state. It indicates if function was called by keyDown or keyUp event.
   private _brake_key_override = param [1, false, [true]]; //This is override. It overrides semi auto hover and used when we need to forcefuly end propulsion. Like when player is out of fuel or unconscious.
     if (!isTouchingGround player) then { //All physics functions check if player is in air. Only exception is go up function. This way player can use walking keybinds without conflicts.
-        if (_brake_key_state) then { //Basically we spawning code on keyDown and...
-            if ((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) then { //This counter used to check if player hovering for certain time and hover will turn on autohover. With autohover player can release key and still hover without pressing or holding keys. Pressing brake/hover key again will disable autohover.
+        if (_brake_key_state) then { //Basically we spawning code on keyDown and... (1)
+            if ((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) then { //This counter used to check if player hovering for certain time and hover will turn on autohover. With autohover player can release key and still hover without pressing or holding keys. Pressing brake/hover key again will disable autohover. (2)
                 if (isNull SLE_JET_brake_spawn_handle) then { //This check won't allow to spawn this code twice. Which would be bad for obvious reasons.
                     SLE_JET_brake_spawn_handle = [] spawn { //Spawns code. Basically think of it as starting new independant task.
-                        while {!isTouchingGround player} do { //This check is basically redundant error correction.
+                        while {!isTouchingGround player} do { //This loop repeats code while player is in the air.
                         private _velocity = velocityModelSpace player; //Get player velocity
                             private _velocity_norm = vectorNormalized _velocity; //Normalize it (Basically vector with same direction but length of one.)
-                            if (vectorMagnitude velocity player > 2) then { //Dependant on player speed we slow him down...
+                            if (vectorMagnitude velocity player > 2) then { //Dependant on player speed we slow him down... (3)
                                 player setVelocityModelSpace [ //Slowing player by changing his speed.
                                     (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13.3)),
                                     (_velocity select 1) - ((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13.3)),
@@ -734,23 +734,23 @@ fnc_SLE_JET_brake = {
                                   ];
                                 ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core; //And deducting fuel.
                                 player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //reset autohover counter.
-                            } else { //... or just stopping him alltogether.
+                            } else { //(3) ... or just stopping him alltogether.
                                 player setVelocityModelSpace [0, 0, 0.2]; //Stop player. Last number in vector/array isn't zero because we need to compensate for gravity.
                                 ["", false, -((SLE_JET_fuel_consumption_CBAS / 20) * SLE_JET_hover_fuel_consumption_CBAS), false, false] call fnc_SLE_JET_fuel_core; //And deducting LESS fuel because player not being slowed down drammatically.
                                 player setVariable ["SLE_JET_Semi_auto_hover_counter", (player getVariable "SLE_JET_Semi_auto_hover_counter") + 1, false]; //increase autohover counter by one.
                             };
-                            sleep 0.05; // repeat this 20 times per second
+                            sleep 0.05; // repeat this while {} do {} part 20 times per second
                         };
                         player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //Exit autohover mode if player somehow ends up on the ground.
                     };
                 };
-            } else { //if autohover counter is high enough we swap functionality and keyDown will terminate code.
+            } else { //(2) if autohover counter is high enough we swap functionality and keyDown will terminate code.
                 if (!isNull SLE_JET_brake_spawn_handle) then { //This check won't allow to delete spawned code that do not exist. Ths ain't that bad but will spam errors wherever errors are on.
                     terminate SLE_JET_brake_spawn_handle; //Delete spawned code effectivley stoping this function from changin player velocity further.
                     player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //reset autohover counter.
                 };
             };
-        } else {  //... delete spawned code on keyUp.
+        } else {  //(1) ... delete spawned code on keyUp.
             if (!isNull SLE_JET_brake_spawn_handle) then {
                 if (((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) or (_brake_key_override)) then { //... but only if player wasn't hovering for certain time.
                     terminate SLE_JET_brake_spawn_handle;

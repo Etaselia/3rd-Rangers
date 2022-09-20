@@ -1,5 +1,6 @@
 requiredAddons[] = {"cba_settings"};
 
+//cfgPatches supposed to contain mod description but apparently does not work as of 2022 summer due to bug. Description currently placed in mod.cpp
 class cfgPatches
 {
     class SLE_Smart_jet
@@ -18,6 +19,7 @@ class cfgPatches
     };
 };
 
+//PreInit currently contains CBA keybinds and settings.
 class Extended_PreInit_EventHandlers
 {
     class sle_jet_preInit
@@ -26,7 +28,7 @@ class Extended_PreInit_EventHandlers
     };
 };
 
-
+//Whole backend of this mod currently contained in one function.
 class CfgFunctions
 {
     class ADDON
@@ -39,6 +41,7 @@ class CfgFunctions
     };
 };
 
+//UI classes for fuel bar.
 class RscTitles
 {
     class RscProgress
@@ -82,6 +85,7 @@ class RscTitles
     };
 };
 
+//Facewear classes.
 class cfgGlasses
 {
     class G_Tactical_Clear;
@@ -109,24 +113,62 @@ class cfgGlasses
     };
 };
 
+//Backpack classes.
 class CfgVehicles
 {
-    class B_CombinationUnitRespirator_01_F;
-    class B_JETPACK_01_SLE: B_CombinationUnitRespirator_01_F
+  //Import base class.
+    class B_AssaultPack_blk;
+  //Simple 0 storage dynamic version.
+    class B_JETPACK_Nospace_off_SLE: B_AssaultPack_blk
     {
         author = "SLE";
-        displayName = "Jetpack";
-        maximumLoad = 100;
+        displayName = "Jetpack (No storage, Folding engines)";
+        maximumLoad = 0;
         mass = 120;
+        model = "sle_jetpack_core\model\JetPackPas.p3d";
+        picture = "sle_jetpack_core\model\sle_jet_logo.paa";
     };
 
-    class B_Parachute;
-    class B_JETPACK_02_SLE: B_Parachute
+    class B_JETPACK_Nospace_on_SLE: B_AssaultPack_blk
     {
         author = "SLE";
-        displayName = "Jetpack";
+        displayName = "I got my dollar store camera ON";
+        maximumLoad = 0;
+        mass = 120;
+        model = "sle_jetpack_core\model\JetPackAct.p3d";
+        picture = "sle_jetpack_core\model\sle_jet_logo.paa";
+        scopeArsenal = 0;
+    };
+  //Simple 100 storage static version.
+    class B_JETPACK_Yesspace_fixed_SLE: B_AssaultPack_blk
+    {
+        author = "SLE";
+        displayName = "Jetpack (Simple storage, Fixed engines)";
         maximumLoad = 100;
         mass = 120;
+        model = "sle_jetpack_core\model\JetPackAct.p3d";
+        picture = "sle_jetpack_core\model\sle_jet_logo.paa";
+    };
+  //Script-heavy 100 storage dynamic version.
+    class B_JETPACK_Yesspace_off_SLE: B_AssaultPack_blk
+    {
+        author = "SLE";
+        displayName = "Jetpack (Scriped storage, Folding engines)";
+        maximumLoad = 100;
+        mass = 120;
+        model = "sle_jetpack_core\model\JetPackPas.p3d";
+        picture = "sle_jetpack_core\model\sle_jet_logo.paa";
+    };
+
+    class B_JETPACK_Yesspace_on_SLE: B_AssaultPack_blk
+    {
+        author = "SLE";
+        displayName = "I got my dollar store camera ON";
+        maximumLoad = 100;
+        mass = 120;
+        model = "sle_jetpack_core\model\JetPackAct.p3d";
+        picture = "sle_jetpack_core\model\sle_jet_logo.paa";
+        scopeArsenal = 0;
     };
 
     class Sign_Arrow_Green_F;
@@ -138,6 +180,7 @@ class CfgVehicles
     };
 };
 
+//Sound classes.
 class CfgSounds
 {
     class SLE_JET_engine_start

@@ -272,7 +272,7 @@
     "EDITBOX", // setting type
     ["Jetpack compatable backpacks", "Classes of jetpack compatable backpacks. Format: class1,class2,class3"], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
-    "B_JETPACK_01_SLE,B_JETPACK_02_SLE", // ValueInfo
+    "B_JETPACK_Nospace_off_SLE,B_JETPACK_Nospace_on_SLE,B_JETPACK_Yesspace_fixed_SLE,B_JETPACK_Yesspace_off_SLE,B_JETPACK_Yesspace_on_SLE", // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
