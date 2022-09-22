@@ -1,4 +1,6 @@
 /*
+I tried to make this code beginner friendly. If you know what you doing - ignore comments to the right of the code. Comments that take separate lines should still be useful.
+
 Non-local stuff used:
 
   Playerbound variables.
@@ -10,6 +12,9 @@ SLE_JET_Sway_fix_on
 SLE_JET_LiInSu
 SLE_JET_FPV_distance
 SLE_JET_Brake_time
+SLE_JET_backpack_mags
+SLE_JET_backpack_guns
+SLE_JET_backpack_items
 
   functions
 fnc_SLE_JET_item_check
@@ -28,6 +33,8 @@ fnc_SLE_JET_brake
 fnc_SLE_JET_autobrake
 fnc_SLE_JET_engine_sound_core
 fnc_SLE_JET_event_sound_core
+fnc_SLE_JET_backpack_swapper
+fnc_SLE_JET_backpack_inventory_saver
 fnc_SLE_JET_Disable_Jetpack
 fnc_SLE_JET_Disable_Jetpack_ui
 
@@ -87,10 +94,9 @@ Jetpack UI compatable facewear | SLE_JET_jetpack_HUD_capable_items_CBAS | str
 */
 
 //TODO
-//Animation and modelling - that's beyond me for now.
-//Visual effects. Maybe create placeholder rocket without damage and long time to life. Or just straight up change backpack model.
 //Conditional sounds like alarms and maybe voicelines.
 //Maybe actually do CCIP ballistic formula for AT rockets.
+//Add better 3D model?
 
 
 //Var
@@ -99,6 +105,10 @@ player setVariable ["SLE_JET_Jetpak_activation_state", false, false]; //Is jetpa
 player setVariable ["SLE_JET_Jetpak_ui_activation_state", false, false]; //Same as previous but for UI elements. (FPV, CCIP, Fuel bar). Player still can use jetpack without UI. UI googles without jetpack will provide CCIP if it's set to always visible in CBA settings.
 player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //Used for autohover feature.
 player setVariable ["SLE_JET_Sway_fix_on", false, false]; //Used for sway fix.
+player setVariable ["SLE_JET_backpack_mags", [], false];//These three used to store backpack inventory on takeoff/land backpack swap.
+player setVariable ["SLE_JET_backpack_guns", [], false];//These three used to store backpack inventory on takeoff/land backpack swap.
+player setVariable ["SLE_JET_backpack_items", [], false];//These three used to store backpack inventory on takeoff/land backpack swap.
+
 //Initializng spawn handles because it's far easier than accounting for isNil with each check later or setting spawn handles to nil after each terminate.
 SLE_JET_up_spawn_handle = [] spawn {};
 SLE_JET_forw_spawn_handle = [] spawn {};
@@ -119,6 +129,7 @@ SLE_JET_stop_sound_repeater_spawn_handle = [] spawn {};
 player addEventHandler ["InventoryClosed", {
     [false] call fnc_SLE_JET_item_check;
 }];
+
 //Item check function. Called by inventory check, arsenal check and hotkey input. Either activates or deactivates jetpack systems.
 fnc_SLE_JET_item_check = {
   private _with_refuel = param [0, false, [true]];
@@ -127,8 +138,8 @@ fnc_SLE_JET_item_check = {
     if (player getVariable "SLE_JET_Jetpak_activation_state") then {
         //jetpack was active
         if (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ",")) then {
-            if (_with_refuel) then {["", false, 0, true, false] call fnc_SLE_JET_fuel_core;};
-            _return_val = true;
+            if (_with_refuel) then {["", false, 0, true, false] call fnc_SLE_JET_fuel_core;}; //Refuel backpack if fucntion called from arsenal (or just with parameter true)
+            _return_val = true; //Return value of this function is essentially used by fnc_SLE_JET_on_key_item_check to choose between proceeding or not doing anything with key input.
         } else {
             [] call fnc_SLE_JET_Disable_Jetpack;
             if (_with_refuel) then {["", false, 0, true, false] call fnc_SLE_JET_fuel_core;};
@@ -145,7 +156,7 @@ fnc_SLE_JET_item_check = {
         };
     };
     //UI elements
-    if (SLE_JET_facewear_check_CBAS) then { //Depending on "Facewear check" setting
+    if (SLE_JET_facewear_check_CBAS) then { //Depending on "Facewear check" setting we'll use one out of two algorythms.
         if (player getVariable "SLE_JET_Jetpak_ui_activation_state") then {
             //UI was active
             if (goggles player in (SLE_JET_jetpack_HUD_capable_items_CBAS splitString ",")) then {
@@ -174,7 +185,7 @@ fnc_SLE_JET_item_check = {
             };
         };
     };
-    _return_val;
+    _return_val; //And here we actually return value.
 };
 //Reboot jetpack. Called in on CBA setting changes. "Have you tried to tun it off and on?"
 fnc_SLE_JET_setting_change_reboot = {
@@ -200,7 +211,7 @@ player addEventHandler ["Respawn", {
 
 //Jetpack activation function. Contains all things that can't run in background unnoticed by player. Called in by item check function.
 fnc_SLE_JET_Jetpack_activation = {
-    //Autobrake system repeater.
+    //Autobrake calculator system repeater.
     SLE_JET_autobrake_physic_calculator_spawn_handle = [] spawn {
         while {true} do {
             [] call fnc_SLE_JET_Brake_calculator_iteration;
@@ -209,40 +220,34 @@ fnc_SLE_JET_Jetpack_activation = {
     };
     //Autobrake system physical calculator.
     fnc_SLE_JET_Brake_calculator_iteration = {
-        //That whole thing really only useful when player actually flying. Also player can and will have zero speed sometimes. And computers can't handle division by zero. Only we humans can.
-        if ((isTouchingGround player) or ((vectorMagnitude velocity player) == 0)) exitWith {};
-        //Same goes for swimming. I am well aware how this looks but it's not really worth doing forEach just for 5 fixed instances.
-        if (((animationState player) find "aswm" != -1) or
+        if ((isTouchingGround player) or ((vectorMagnitude velocity player) == 0)) exitWith {}; //That whole thing really only useful when player actually flying. Also player can and will have zero speed sometimes. And computers can't handle division by zero. Only we humans can.
+        if (((animationState player) find "aswm" != -1) or //Same goes for swimming. I am well aware how this looks but it's not really worth doing forEach just for 5 fixed instances.
             ((animationState player) find "absw" != -1) or
             ((animationState player) find "adve" != -1) or
             ((animationState player) find "asdv" != -1) or
             ((animationState player) find "assw" != -1)
             ) exitWith {};
         //Magic, math and middle school physics happening here.
-        private _legs_pos = [getPosASL player select 0, getPosASL player select 1, (getPosASL player select 2) - 1];
+        private _legs_pos = [getPosASL player select 0, getPosASL player select 1, (getPosASL player select 2) - 1]; //Gives player one meter of space for errors.
         private _LiInSu = lineIntersectsSurfaces [_legs_pos, AGLtoASL (player modelToWorld (velocityModelSpace player vectorMultiply 100)), vehicle player, objNull, true, 1, "FIRE", "NONE"];
-        player setVariable ["SLE_JET_LiInSu", _LiInSu, false];
+        player setVariable ["SLE_JET_LiInSu", _LiInSu, false]; //Sending some data to UI eventhandler.
         private _FPV_distance = 5000;
 
         //Get distance to impact point.
         if (count _LiInSu > 0) then {
-            if (surfaceIsWater (_LiInSu select 0 select 0)) then {
-              //If impact point is over water it's a bit complicated. First we get angle between two vectors.
-              private _velocity_to_gravity_angle = acos ((vectorNormalized (velocity player)) vectorDotProduct [0, 0, -1]);
-              //And if it's less that 90 proceed to caluculations since we kinda falling. Otherwise just set it to 5000.
-              if (_velocity_to_gravity_angle < 90) then {
-                  //Select minimal result between geometric approximation and lineIntersectsSurfaces (Needed for landing on structures over water like piers and so on).
-                  _FPV_distance = ((getPosASL player select 2) / (cos _velocity_to_gravity_angle) min ((_LiInSu select 0 select 0) vectorDistance _legs_pos));
+            if (surfaceIsWater (_LiInSu select 0 select 0)) then { //Check if impact point is over water.
+              private _velocity_to_gravity_angle = acos ((vectorNormalized (velocity player)) vectorDotProduct [0, 0, -1]); //If impact point is over water it's a bit complicated. First we get angle between two vectors. If you not sure how it works consult nearest geometry teacher.
+              if (_velocity_to_gravity_angle < 90) then { //And if it's less that 90 proceed to caluculations since we kinda falling. Otherwise just set it to 5000.
+                  _FPV_distance = ((getPosASL player select 2) / (cos _velocity_to_gravity_angle) min ((_LiInSu select 0 select 0) vectorDistance _legs_pos)); //Select minimal result between geometric approximation and lineIntersectsSurfaces (Needed for landing on structures over water like piers and so on).
               } else {
                   _FPV_distance = 5000;
               };
             } else {
-                //And if impact point is not over water it's far more straightforward.
-                _FPV_distance = (_LiInSu select 0 select 0) vectorDistance _legs_pos;
+                _FPV_distance = (_LiInSu select 0 select 0) vectorDistance _legs_pos; //And if impact point is not over water it's far more straightforward.
             };
         };
-        //Sending some data to UI eventhandler.
-        player setVariable ["SLE_JET_FPV_distance", _FPV_distance, false];
+
+        player setVariable ["SLE_JET_FPV_distance", _FPV_distance, false]; //Sending some data to UI eventhandler.
 
         private _velocity = vectorMagnitude (velocityModelSpace player);
 
@@ -251,7 +256,7 @@ fnc_SLE_JET_Jetpack_activation = {
             -((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13.3)),
             -((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13.3)),
             -((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13.3)) + 0.6
-        ]);
+        ]); //It's technically backwards acceleration aka deceleration but anyway.
         private _brake_time = _velocity / (_one_tick_acceleraton * 40);
         player setVariable ["SLE_JET_Brake_time", _brake_time, false];
         //If autobrake disabled in settings we are stoping right here. Calculations above will go to FPV in UI section.
@@ -272,9 +277,7 @@ fnc_SLE_JET_Jetpack_activation = {
           params ["_unit", "_anim"];
           private _anim = _this select 1;
           private _sway_fix_on = false;
-            private _Fall_animations = ["afalpercmstpsnonwnondnon", "afalpercmstpsraswlnrdnon", "afalpercmstpsraswpstdnon", "afalpercmstpsraswrfldnon", "afalpknlmstpsnonwnondnon",
-            "afalpknlmstpsraswlnrdnon", "afalpknlmstpsraswpstdnon", "afalpknlmstpsraswrfldnon", "afalppnemstpsnonwnondnon", "afalppnemstpsraswpstdnon",
-            "afalppnemstpsraswrfldnon"];
+            private _Fall_animations = ["afalpercmstpsnonwnondnon", "afalpercmstpsraswlnrdnon", "afalpercmstpsraswpstdnon", "afalpercmstpsraswrfldnon", "afalpknlmstpsnonwnondnon", "afalpknlmstpsraswlnrdnon", "afalpknlmstpsraswpstdnon", "afalpknlmstpsraswrfldnon", "afalppnemstpsnonwnondnon", "afalppnemstpsraswpstdnon", "afalppnemstpsraswrfldnon"];
             //Check if player entered fall animation. Also cycles override commands to prevent override by ACE.
             if (_anim in _Fall_animations) then {
                 if (!(player getVariable "SLE_JET_Sway_fix_on")) then {
@@ -297,6 +300,7 @@ fnc_SLE_JET_Jetpack_activation = {
             };
         }];
     };
+
     //Fuel (re)generation.
     if (SLE_JET_fuel_recharge_CBAS) then {
         SLE_JET_fuel_generation_spawn_handle = [] spawn {
@@ -323,6 +327,7 @@ fnc_SLE_JET_Jetpack_activation = {
     };
     //Hover over water. Jetpack does not work in water. like at all. Game engine says flyswim is a no no. And it would be unfortunate to get stuck in the lake.
     //Autobrake wasn't working over water at first so it was used to stop player from checking water/concrete hardness ratio with face on 80 meter drop. Now it's fine. I mean brake, not testing water hardnes.
+    //By default it's turned off in CBA settings but can be activated anytime.
     if (SLE_JET_water_hover_CBAS) then {
         SLE_JET_autohover_over_water_spawn_handle = [] spawn {
             while {true} do {
@@ -331,12 +336,13 @@ fnc_SLE_JET_Jetpack_activation = {
                     private _hover_propulsion = 0.8 max (((-(_velocity select 2)) / 1.5) min 5);
                     player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) + _hover_propulsion];
                     [true] call fnc_SLE_JET_engine_sound_core;
+                    [true] call fnc_SLE_JET_backpack_swapper;
                 };
                 sleep 0.05;
             };
         };
     };
-    //Automatically stops propulsion when player decides to take a nap. Autobrake will handle the rest. And if autobrake is off in CBA settings... well... F
+    //Automatically stops propulsion when player decides to take a nap. Autobrake will handle the rest. And if autobrake is off in CBA settings... well... F. ACE compatible.
     SLE_JET_unconscious_detector_spawn_handle = [] spawn {
         while {true} do {
             if ((incapacitatedState player == "UNCONSCIOUS") or (player getVariable ["ACE_isUnconscious", false])) then {
@@ -470,6 +476,7 @@ fnc_SLE_JET_Jetpack_ui_activation = {
             if (currentWeapon player == secondaryWeapon player) then {
                 //This is ridicuosly oversimplified formula that does not requre to calculate distance to target and air friction. Still should be fine for VERY short range.
                 //Tested. Not fine at all for some AT like RPG 32/7 and alike. I'll probably rework it in the future.
+                //For now use MAAWS instead. MAAWS is best universal AT anyway.
                 _ammo_speed = (
                               getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed") +
                                   (
@@ -538,7 +545,7 @@ fnc_SLE_JET_on_key_item_check = {
     };
 };
 
-/*Fuel system core. Handles fuel duh. Can be called in manually to refuel or manual fuel adjustment. Intended call to refuel: ["", false, 0, true, false] call fnc_SLE_JET_fuel_core;
+/*Fuel system core. Handles fuel duh. Can be called in manually for refuel or manual fuel adjustment. Intended call to refuel: ["", false, 0, true, false] call fnc_SLE_JET_fuel_core;
 Called in by item check with respective key and key state and if player have fuel it sends signal to respective jetpack physic function.
 Called in by physic function with empty key identifier string to change fuel level and immediately checks fuel level.
 If or when player runs out of fuel it sends KeyUp signal to all keybound physic functions effectively shutting down all player controlled propulsion.*/
@@ -613,6 +620,7 @@ fnc_SLE_JET_up = {
             [] spawn {
                 sleep 0.05;
                 [true] call fnc_SLE_JET_engine_sound_core;
+                [true] call fnc_SLE_JET_backpack_swapper;
             };
         };
     } else {
@@ -744,7 +752,7 @@ fnc_SLE_JET_brake = {
                         player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //Exit autohover mode if player somehow ends up on the ground.
                     };
                 };
-            } else { //(2) if autohover counter is high enough we swap functionality and keyDown will terminate code.
+            } else { //(2) if autohover counter is high enough we swap functionality and now keyDown will terminate code.
                 if (!isNull SLE_JET_brake_spawn_handle) then { //This check won't allow to delete spawned code that do not exist. Ths ain't that bad but will spam errors wherever errors are on.
                     terminate SLE_JET_brake_spawn_handle; //Delete spawned code effectivley stoping this function from changin player velocity further.
                     player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //reset autohover counter.
@@ -776,7 +784,7 @@ fnc_SLE_JET_autobrake =
                           private _velocity = velocityModelSpace player;
                           private _velocity_norm = vectorNormalized _velocity;
                           player setVelocityModelSpace [
-                              (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))),
+                              (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))), //Making something dependant on FPS is generraly a bad choice. But with lower framerate Arma slows down custom code. As i can't tap into game tick generator that's probably most elegant fix.
                               (_velocity select 1) - ((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))),
                               (_velocity select 2) - ((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))) + 0.6
                           ];
@@ -785,6 +793,7 @@ fnc_SLE_JET_autobrake =
                       };
                 };
                 [true] call fnc_SLE_JET_engine_sound_core;
+                [true] call fnc_SLE_JET_backpack_swapper;
             };
         } else {
             if (!isNull SLE_JET_autobrake_spawn_handle) then {
@@ -805,6 +814,7 @@ GET REALLY MAD MAD
 FUCK IT. Create object. Attach object to player. Make object invisible with remoteExec. Make it say3D with remoteExec again. Delete to make it STFU.
 Remember that you still need to make logical function that will handle how sound behaves and all of this process need to be integrated into it and repeated multiple times.
 pepeSad
+Usually called of takeoff and landings. It is horrendous chunk of code written in sadness in frustration. I'm defenetly not proud of it.
 */
 
 fnc_SLE_JET_engine_sound_core = {
@@ -857,13 +867,76 @@ fnc_SLE_JET_engine_sound_core = {
                 [SLE_JET_engine_stop_sound_emitter, ["SLE_JET_engine_shutdown", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
                 uiSleep 3.5;
                 deleteVehicle SLE_JET_engine_stop_sound_emitter;
+                [false] call fnc_SLE_JET_backpack_swapper;
             };
         };
     };
 };
+
 //Event sound system core. Handles all kinds of warnings and conditional voicelines.
 fnc_SLE_JET_event_sound_core = {
+//Placeholder. Implementation pending?
+};
 
+//Backpack swapper function. Swaps appropriate backpacks on takeoff and landing. Called in similarly to sound core.
+fnc_SLE_JET_backpack_swapper = {
+  private _backpack_state = param [0, false, [true]];
+    if (_backpack_state) then {
+        //Takeoff
+        if (backpack player == "B_JETPACK_Nospace_off_SLE") then {
+            removeBackpack player;
+            player addBackpack "B_JETPACK_Nospace_on_SLE";
+        };
+        if (backpack player == "B_JETPACK_Yesspace_off_SLE") then {
+            ["save"] call fnc_SLE_JET_backpack_inventory_saver;
+            removeBackpack player;
+            player addBackpack "B_JETPACK_Yesspace_on_SLE";
+            ["load"] call fnc_SLE_JET_backpack_inventory_saver;
+        };
+    } else {
+        //Landing
+        if (backpack player == "B_JETPACK_Nospace_on_SLE") then {
+            removeBackpack player;
+            player addBackpack "B_JETPACK_Nospace_off_SLE";
+        };
+        if (backpack player == "B_JETPACK_Yesspace_on_SLE") then {
+            ["save"] call fnc_SLE_JET_backpack_inventory_saver;
+            removeBackpack player;
+            player addBackpack "B_JETPACK_Yesspace_off_SLE";
+            ["load"] call fnc_SLE_JET_backpack_inventory_saver;
+        };
+    };
+};
+//Inventory saver. Stores inventory in several arrays and restores later. Due to potential wipe of items in player backpack it will perform actions only when called with specific argument. For that reason i used string instead of bool.
+fnc_SLE_JET_backpack_inventory_saver = {
+  private _backpack_inventory_direction = param [0, "", [""]];
+    //Save
+    if (_backpack_inventory_direction == "save") then {
+        player setVariable ["SLE_JET_backpack_mags", magazinesAmmo backpackContainer player, false];
+        player setVariable ["SLE_JET_backpack_guns", weaponsItems backpackContainer player, false];
+        player setVariable ["SLE_JET_backpack_items", getItemCargo  backpackContainer player, false];
+    };
+    //Load
+    if (_backpack_inventory_direction == "load") then {
+        private _backpack_mags = player getVariable "SLE_JET_backpack_mags";
+        private _backpack_guns = player getVariable "SLE_JET_backpack_guns";
+        private _backpack_items = player getVariable "SLE_JET_backpack_items";
+        if (count (_backpack_mags) > 0) then {
+            {
+                (backpackContainer player) addMagazineAmmoCargo [_x select 0, 1, _x select 1];
+            } forEach _backpack_mags;
+        };
+        if (count (_backpack_guns) > 0) then {
+            {
+                (backpackContainer player) addWeaponWithAttachmentsCargoGlobal [_x, 1];
+            } forEach _backpack_guns;
+        };
+        if (count (_backpack_items) > 0) then {
+            for "_i" from 0 to (count (_backpack_items select 0)-1) do {
+                (backpackContainer player) addItemCargoGlobal [(_backpack_items select 0) select _i, (_backpack_items select 1) select _i];
+            };
+        };
+    };
 };
 
 //Jetpack deactivation function. Terminates all things that can't run in background unnoticed by player.
@@ -918,6 +991,13 @@ fnc_SLE_JET_Disable_Jetpack = {
                 deleteVehicle _x;
             };
     } forEach nearestObjects [player, ["all"], 2] - allUnits;
+
+    [false] call fnc_SLE_JET_up;
+    [false] call fnc_SLE_JET_forw;
+    [false] call fnc_SLE_JET_backw;
+    [false] call fnc_SLE_JET_left;
+    [false] call fnc_SLE_JET_right;
+    [false, true] call fnc_SLE_JET_brake;
 
     player setVariable ["SLE_JET_Jetpak_activation_state", false, false];
 };

@@ -153,7 +153,7 @@ class CfgVehicles
     class B_JETPACK_Yesspace_off_SLE: B_AssaultPack_blk
     {
         author = "SLE";
-        displayName = "Jetpack (Scriped storage, Folding engines)";
+        displayName = "Jetpack (Experemental scriped storage, Folding engines)";
         maximumLoad = 100;
         mass = 120;
         model = "sle_jetpack_core\model\JetPackPas.p3d";
@@ -177,6 +177,7 @@ class CfgVehicles
         author = "SLE";
         displayName = "Jetpack sound emitter";
         model = "\A3\Weapons_F\empty.p3d";
+        scopeEditor = 0;
     };
 };
 
