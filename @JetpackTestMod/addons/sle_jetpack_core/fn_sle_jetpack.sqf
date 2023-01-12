@@ -245,6 +245,8 @@ fnc_SLE_JET_Jetpack_activation = {
             } else {
                 _FPV_distance = (_LiInSu select 0 select 0) vectorDistance _legs_pos; //And if impact point is not over water it's far more straightforward.
             };
+        } else {
+            _FPV_distance = 5000; //Fix for potential bugs.
         };
 
         player setVariable ["SLE_JET_FPV_distance", _FPV_distance, false]; //Sending some data to UI eventhandler.
@@ -328,6 +330,7 @@ fnc_SLE_JET_Jetpack_activation = {
     //Hover over water. Jetpack does not work in water. like at all. Game engine says flyswim is a no no. And it would be unfortunate to get stuck in the lake.
     //Autobrake wasn't working over water at first so it was used to stop player from checking water/concrete hardness ratio with face on 80 meter drop. Now it's fine. I mean brake, not testing water hardnes.
     //By default it's turned off in CBA settings but can be activated anytime.
+    //This is legacy function and it will not be updated.
     if (SLE_JET_water_hover_CBAS) then {
         SLE_JET_autohover_over_water_spawn_handle = [] spawn {
             while {true} do {
@@ -815,21 +818,22 @@ FUCK IT. Create object. Attach object to player. Make object invisible with remo
 Remember that you still need to make logical function that will handle how sound behaves and all of this process need to be integrated into it and repeated multiple times.
 pepeSad
 Usually called of takeoff and landings. It is horrendous chunk of code written in sadness in frustration. I'm defenetly not proud of it.
+Now it is actually decent after implementation of new sound emitter object and rewrite.
 */
 
 fnc_SLE_JET_engine_sound_core = {
   private _jet_sound_state = param [0, false, [true]];
-    if (_jet_sound_state) then {
-        if (!isNull SLE_JET_stop_sound_repeater_spawn_handle) then {
+    if (_jet_sound_state) then { //Takeoff event.
+        if (!isNull SLE_JET_stop_sound_repeater_spawn_handle) then { //Deletes engine stop sound emitter if it exists. This way the player won't keep hearing engines wind down after landing and immediate takeoff.
             terminate SLE_JET_stop_sound_repeater_spawn_handle;
             deleteVehicle SLE_JET_engine_stop_sound_emitter;
         };
-        if (isNull SLE_JET_sound_repeater_spawn_handle) then {
-            SLE_JET_engine_sound_emitter = "SLE_JET_Sound_emitter" createVehicle position player;
-            SLE_JET_engine_sound_emitter attachTo [player, [0, -0.1, 1.2]];
+        if (isNull SLE_JET_sound_repeater_spawn_handle) then { //Check to ensure no duplicates.
+            SLE_JET_engine_sound_emitter = "SLE_JET_Sound_emitter" createVehicle position player; //Create sound emitter.
+            SLE_JET_engine_sound_emitter attachTo [player, [0, -0.1, 1.2]]; //Attach it to player's back.
             SLE_JET_sound_repeater_spawn_handle = [] spawn {
-                [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_start", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
-                uiSleep 1.4;
+                [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_start", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false]; //Emmit engine start sound.
+                uiSleep 1.4; //wait 1.4 seconds before starting the loop. As we dealing with sound that have certain real time length we must use uiSleep.
                 while {(!isTouchingGround player) and
                       (!(((animationState player) find "aswm" != -1) or
                       ((animationState player) find "absw" != -1) or
@@ -837,11 +841,11 @@ fnc_SLE_JET_engine_sound_core = {
                       ((animationState player) find "asdv" != -1) or
                       ((animationState player) find "assw" != -1)
                       ))} do {
-                    waitUntil {!isGamePaused};
+                    waitUntil {!isGamePaused}; //Pause execution if player paused of alt-tabbed. This is necessary. I can tell from experience.
                     [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_run", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
-                    for "_i" from 0 to 44 step 1 do {
+                    for "_i" from 0 to 44 step 1 do { //Actuall sound loop delay made in small chunks to ensure engine shutdown sound plays right after landing.
                       uiSleep 0.1;
-                      if ((isTouchingGround player) or
+                      if ((isTouchingGround player) or //If player lands on ground or falls in water loop will be stopped.
                       ((animationState player) find "aswm" != -1) or
                       ((animationState player) find "absw" != -1) or
                       ((animationState player) find "adve" != -1) or
@@ -850,24 +854,24 @@ fnc_SLE_JET_engine_sound_core = {
                       ) exitWith {};
                     };
                 };
-                [false] call fnc_SLE_JET_engine_sound_core;
+                [false] call fnc_SLE_JET_engine_sound_core; //As the aforementioned loop stops we'll arrive here. More precisely we'll arrive here either way. (Unless player flies indefently or his PC dies.) Calls in sound core with argument "false" which starts landing sequence. Also sound core can be called externaly with same argument by player going unconscious or lack of fuel.
             };
         };
-    } else {
-        if (!isNull SLE_JET_sound_repeater_spawn_handle) then {
+    } else { //Landing event.
+        if (!isNull SLE_JET_sound_repeater_spawn_handle) then { //Stops engine sound only if it exists. If there is no active engine sound no action is taken at all.
             terminate SLE_JET_sound_repeater_spawn_handle;
             deleteVehicle SLE_JET_engine_sound_emitter;
-            if (!isNull SLE_JET_stop_sound_repeater_spawn_handle) then {
+            if (!isNull SLE_JET_stop_sound_repeater_spawn_handle) then { //Stops engine STOP sound if it exists. Heh.
                 terminate SLE_JET_stop_sound_repeater_spawn_handle;
                 deleteVehicle SLE_JET_engine_stop_sound_emitter;
             };
             SLE_JET_stop_sound_repeater_spawn_handle = [] spawn {
-                SLE_JET_engine_stop_sound_emitter = "SLE_JET_Sound_emitter" createVehicle position player;
-                SLE_JET_engine_stop_sound_emitter attachTo [player, [0, -0.1, 1.2]];
-                [SLE_JET_engine_stop_sound_emitter, ["SLE_JET_engine_shutdown", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
+                SLE_JET_engine_stop_sound_emitter = "SLE_JET_Sound_emitter" createVehicle position player; //Again create emitter.
+                SLE_JET_engine_stop_sound_emitter attachTo [player, [0, -0.1, 1.2]]; //Attach.
+                [SLE_JET_engine_stop_sound_emitter, ["SLE_JET_engine_shutdown", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false]; //Play sound
                 uiSleep 3.5;
-                deleteVehicle SLE_JET_engine_stop_sound_emitter;
-                [false] call fnc_SLE_JET_backpack_swapper;
+                deleteVehicle SLE_JET_engine_stop_sound_emitter; //Delete emitter after sound played.
+                [false] call fnc_SLE_JET_backpack_swapper; //Also call backpack swapper. This may look wierd but this part of sound core executes on landing (or if jet shuts down for other reasons). And this is perfect spot right after engine stop sound is done playing.
             };
         };
     };

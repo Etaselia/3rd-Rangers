@@ -176,7 +176,7 @@
     "SLIDER", // setting type
     ["Hover animation speed", "Default game value is 1. Mainly it stops falling animation which would make aimed shots almost impossible. On other hand it can make some actions (going prone in air for example) feel sluggish. Only affects falling animations. You can't decrease sway from falling animation by holding breath like with normal sway."], // [Name, Tooltip]
     ["Smart Jet", "3. Aim fix"], // Category name
-    [0, 3, 0, 2, false], // ValueInfo
+    [0, 1, 0.05, 2, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {}, // OnChage code
     false // Show mission restart nedded warning
