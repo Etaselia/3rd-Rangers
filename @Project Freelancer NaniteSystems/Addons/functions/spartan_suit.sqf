@@ -684,11 +684,12 @@ Nano_Sneak2_ACT = {
             if (ShotBreakInvis_SPARTAN) then {InvisBreakRDY = 1;};
             [player, true] remoteExec ["hideObject", 0, false];
             [player, false] remoteExec ["hideObject", player, false];
+
+            //VEHICLE IF
             if ((vehicle player) != player) then{
               if (eta_cloak_vehicles_SPARTAN) then {
                 if (InvisActive == 0) then {
                   player setVariable ["tts_cloak_isCloaked", false,true];
-                  systemChat "VehicleStealth Activated";
                   [vehicle player] call fnc_vehicle_stealth;
                   _player_stealth_vehicle_exit_EH = player addEventHandler ["GetOutMan",
                   {
@@ -716,6 +717,8 @@ Nano_Sneak2_ACT = {
                 };
               };
             }
+
+            //PLAYER NOT IN VEHICLE
             else
             {
               if (InvisActive == 0) then {
@@ -728,6 +731,7 @@ Nano_Sneak2_ACT = {
               player setCaptive true;
             };
             };
+              //ENERGY MODE ADVANCED
               if (AdvancedInvisibility_SPARTAN) then {
                 PlayerSpeed = (((abs(velocity player select 0)) + (abs(velocity player select 1)) + (abs(velocity player select 2)))*3.6);
                 EnergyConsumption = (exp (PlayerSpeed*0.005)-0.95)+((PlayerSpeed^3)/10000);
@@ -744,6 +748,8 @@ Nano_Sneak2_ACT = {
               };
           [] call Nano_Sneak2;
         } else {
+          //OUT OF ENERGY BRANCH
+
           if (SuitPower_SPARTAN > -5) then {systemChat "Out of energy"; playSound "Alarm";};
           AbiliyActive = 0;
           InvisActive = 0;
@@ -762,6 +768,7 @@ Nano_Sneak2_ACT = {
           if (ActiveScan == 0) then {[] spawn{[] call GeneratorScan;};};
         };
         }
+        //TRIGGER InvisSTOP
         else
         {
         if (vehicle player != player) then
@@ -778,9 +785,9 @@ Nano_Sneak2_ACT = {
         InvisSTOP = 0;
         if (TextureHandling) then {player setObjectTextureGlobal [0,TextureIdle];};
         if (AndZeroPower_SPARTAN) then {SuitPower_SPARTAN = 0;};
-    };
+      };
   };
-    };
+};
 
   comment "Speed global switch.";
     if (MaximumSpeedSwitch_SPARTAN) then {

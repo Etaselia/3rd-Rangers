@@ -184,7 +184,7 @@ class cfgFactionClasses
 			};
       class activate_suit_SPARTAN
       {
-      condition = "uniform _player == 'MJOLNIR_MKVI_Undersuit'";
+      condition = "uniform _player == 'MJOLNIR_MKVI_Undersuit_v1'";
       displayName = "Activate NaniteSuit";
       statement = "[ [], 'Nano_Suit_SPARTAN', player ] call BIS_fnc_MP;";
       };
@@ -259,11 +259,25 @@ class cfgWeapons
 		    };
     };
     class MJOLNIR_MKVI_Undersuit;
+    class MJOLNIR_MKVI_Undersuit_v1: MJOLNIR_MKVI_Undersuit
+    {
+      scope = 2;
+      author = "Eta";
+      displayName = "PF Primary Suit";
+      class ItemInfo: UniformItem
+        {
+          uniformClass="MJOLNIR_Mark_VI_Undersuit";
+          containerClass="Supply300";
+          mass=10;
+        };
+    };
+
+
     class MJOLNIR_MKVI_Undersuit_v2: MJOLNIR_MKVI_Undersuit
     {
       scope = 2;
       author = "Eta";
-      displayName = "MJOLNIR MKVI Undersuit v2";
+      displayName = "PF Secondary Suit";
       class ItemInfo: UniformItem
         {
           uniformClass="MJOLNIR_Mark_VI_Undersuit";
@@ -277,7 +291,7 @@ class cfgWeapons
     {
       scope = 2;
       author = "Eta";
-      displayName = "MJOLNIR MKVI Undersuit v1.Medical";
+      displayName = "PF Medical Suit";
       class ItemInfo: UniformItem
         {
           uniformClass="MJOLNIR_Mark_VI_Undersuit";
@@ -290,7 +304,7 @@ class cfgWeapons
     {
       scope = 2;
       author = "Eta";
-      displayName = "MJOLNIR MKVI Undersuit v1.Speed";
+      displayName = "PF Speed Suit";
       class ItemInfo: UniformItem
         {
           uniformClass="MJOLNIR_Mark_VI_Undersuit";
@@ -303,7 +317,7 @@ class cfgWeapons
     {
         scope = 2;
         author = "Eta";
-        displayName = "NaniteSuit (active)";
+        displayName = "PF Miniaturized Suit";
         model = "\A3\Characters_F\Common\Suitpacks\suitpack_blufor_diver";
         class ItemInfo: ItemInfo
         {
@@ -318,7 +332,7 @@ class cfgWeapons
     {
       scope = 2;
       author = "Eta";
-      displayName = "Medical NaniteSuit";
+      displayName = "PF Miniaturized Medical Suit";
       model = "\A3\Characters_F\Common\Suitpacks\suitpack_blufor_diver";
       class ItemInfo: ItemInfo
       {
@@ -334,7 +348,7 @@ class cfgWeapons
     {
       scope = 2;
       author = "Eta";
-      displayName = "Speed NaniteSuit";
+      displayName = "PF Miniaturized Speed Suit";
       model = "\A3\Characters_F\Common\Suitpacks\suitpack_blufor_diver";
       class ItemInfo: ItemInfo
       {

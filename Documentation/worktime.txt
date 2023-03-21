@@ -1,0 +1,96 @@
+Time spent on per day
+
+Stealth Enhancements:
+  2h40min 2021-08-27
+    Personal Stealth Field / Initial Vehicle Stealth Tests
+    BUGS:
+      Unknown, likely to change due to experimental nature of current build
+
+  3h20min 2021-08-29
+    Implementation of Vehicle Stealth
+    BUGS:
+      Vehicle Stealth does NOT deactivate correctly
+      Personal Stealth particles active in vehicle causing LAG
+
+  1h55min 2021-08-30
+    Bugfixing / Implementation
+    Fixes:
+      Vehicle Stealth used to be actived every tick which overwrote saved textures
+      Stealth Particles deactivated in vehicles, Lag was likely caused by above issue
+
+  TOTAL:
+  7h55min
+
+  Cost:
+  120€ (*rounded up 55min to 1h for ease of use*) *(15€/h)*
+
+Stealth Enhancment Adjustments (adding top and bottom REFLACTION to the vehicle stealth field)
+  1h10min 2021-08-31
+  Adding Top/Bottom Reflactions on vehicle stealth field
+  BUGS:
+    Testing inconclusive
+
+Stealth Changes, Shield Recharge, Vehicle Shield Options
+  1h55min 2021-09-18
+  Adding:
+    - Shield Charge Up time (customizable)
+    - Shield Cooldown Timer (customizable)
+    - Spartan Energy Shield Charge Function
+    - Vehicle Shield Options
+  BUGS:
+    Debugging complete, no further bugs found
+
+  MEDICAL SUIT:
+    4h23min 2022-08-19
+    Adding:
+      - Medical Suit (WIP)
+      - Medical Suit Functions (DONE)
+      - Medical Suit UI (WIP)
+    3h45min 2022-08-15
+    Adding:
+      - Medical Suit UI
+      - Medical Suit UI implementation
+      - Medical Suit Settings
+    3h00min 2022-08-15
+    Adding:
+      - Medical Suit UI Percentage indicator *(good 2.5h)*
+      - Finalizing Mod
+
+    Total:
+    11h * 20€     --> 220€
+    Reduced Total --> 150€ (Half pay for UI work) --> offer but don't insist
+
+    SPEED SUIT:
+    6h45min 2022-08-22
+    Adding:
+      - Speed Suit Functions
+      - WIP UI for all Suits *(definitely 3h or so)*
+      - Scaling Energy System
+    1h30min 2022-08-23
+    Adding:
+      - Finalizing Speed Suit
+      - Debugging
+    TOTAL: ~8h --> 8 * 20 --> 160€
+
+    SHIELDWALL:
+      1h00 2022-10-26
+      Testing:
+        - Given Model
+        - Feasibility of Implementation in IMS
+        - HitPart EventHandler
+      2h30 2022-10-28
+      Initial Implementation:
+        - Spawn/Despawn of Shield + Energy Handling
+      3h30 2022-12-28
+      Implementation + Debugging
+        - Finalized logic
+        - Added 3 further models
+        - Added Soundeffects
+        - Added Hotkeys
+        - Added Item
+        - Debugging
+      1h00 2023-01-06
+      Debugging + Additional Features
+        - Added "Active Recharge"
+        - Debugged Recharge System / Shot Disabler
+      Total: 8h --> 8*20 = 160€
