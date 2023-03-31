@@ -1,6 +1,4 @@
 /*
-I tried to make this code beginner friendly. If you know what you doing - ignore comments to the right of the code. Comments that take separate lines should still be useful.
-
 Non-local stuff used:
 
   Playerbound variables.
@@ -67,6 +65,8 @@ CBA Settings:
 Setting | Global variable name | data type | default value
   1. Features
 CCIP mode constant, only in air, off | SLE_JET_CCIP_mode_CBAS | str | "Const", "InAir", "Off"
+CCIP ballistic calculations complexity for guns | SLE_JET_CCIP_ballistic_guns_CBAS | str | "Simp", "Adv", "Advg"
+CCIP ballistic calculations complexity for launchers | SLE_JET_CCIP_ballistic_launchers_CBAS | str | "Simp", "Adv", "Advg"
 Autobrake mode | SLE_JET_autobrake_mode_CBAS | bool | true
 Height limiter | SLE_JET_height_limiter_CBAS | bool | true
 Over water hover | SLE_JET_water_hover_CBAS | bool | false
@@ -94,8 +94,8 @@ Jetpack UI compatable facewear | SLE_JET_jetpack_HUD_capable_items_CBAS | str
 */
 
 //TODO
+//CCIP ballistic formula for AT rockets.
 //Conditional sounds like alarms and maybe voicelines.
-//Maybe actually do CCIP ballistic formula for AT rockets.
 //Add better 3D model?
 
 
@@ -187,7 +187,7 @@ fnc_SLE_JET_item_check = {
     };
     _return_val; //And here we actually return value.
 };
-//Reboot jetpack. Called in on CBA setting changes. "Have you tried to tun it off and on?"
+//Reboot jetpack. Called in on CBA setting changes. "Have you tried to turn it off and on?"
 fnc_SLE_JET_setting_change_reboot = {
     if (player getVariable "SLE_JET_Jetpak_activation_state") then {
         [] call fnc_SLE_JET_Disable_Jetpack;
@@ -228,8 +228,8 @@ fnc_SLE_JET_Jetpack_activation = {
             ((animationState player) find "assw" != -1)
             ) exitWith {};
         //Magic, math and middle school physics happening here.
-        private _legs_pos = [getPosASL player select 0, getPosASL player select 1, (getPosASL player select 2) - 1]; //Gives player one meter of space for errors.
-        private _LiInSu = lineIntersectsSurfaces [_legs_pos, AGLtoASL (player modelToWorld (velocityModelSpace player vectorMultiply 100)), vehicle player, objNull, true, 1, "FIRE", "NONE"];
+        private _long_legs_pos = [getPosASL player select 0, getPosASL player select 1, (getPosASL player select 2) - 1]; //Gives player one meter of space for errors.
+        private _LiInSu = lineIntersectsSurfaces [_long_legs_pos, AGLtoASL (player modelToWorld (velocityModelSpace player vectorMultiply 100)), vehicle player, objNull, true, 1, "FIRE", "NONE"];
         player setVariable ["SLE_JET_LiInSu", _LiInSu, false]; //Sending some data to UI eventhandler.
         private _FPV_distance = 5000;
 
@@ -238,12 +238,12 @@ fnc_SLE_JET_Jetpack_activation = {
             if (surfaceIsWater (_LiInSu select 0 select 0)) then { //Check if impact point is over water.
               private _velocity_to_gravity_angle = acos ((vectorNormalized (velocity player)) vectorDotProduct [0, 0, -1]); //If impact point is over water it's a bit complicated. First we get angle between two vectors. If you not sure how it works consult nearest geometry teacher.
               if (_velocity_to_gravity_angle < 90) then { //And if it's less that 90 proceed to caluculations since we kinda falling. Otherwise just set it to 5000.
-                  _FPV_distance = ((getPosASL player select 2) / (cos _velocity_to_gravity_angle) min ((_LiInSu select 0 select 0) vectorDistance _legs_pos)); //Select minimal result between geometric approximation and lineIntersectsSurfaces (Needed for landing on structures over water like piers and so on).
+                  _FPV_distance = ((getPosASL player select 2) / (cos _velocity_to_gravity_angle) min ((_LiInSu select 0 select 0) vectorDistance _long_legs_pos)); //Select minimal result between geometric approximation and lineIntersectsSurfaces (Needed for landing on structures over water like piers and so on).
               } else {
                   _FPV_distance = 5000;
               };
             } else {
-                _FPV_distance = (_LiInSu select 0 select 0) vectorDistance _legs_pos; //And if impact point is not over water it's far more straightforward.
+                _FPV_distance = (_LiInSu select 0 select 0) vectorDistance _long_legs_pos; //And if impact point is not over water it's far more straightforward.
             };
         } else {
             _FPV_distance = 5000; //Fix for potential bugs.
@@ -396,7 +396,7 @@ fnc_SLE_JET_Jetpack_ui_activation = {
             ((animationState player) find "asdv" != -1) or
             ((animationState player) find "assw" != -1)
             ) exitWith {};
-        //This UI eventhandler gets some values from autobrake calculator.
+        //This UI eventhandler gets most values from autobrake calculator.
         private _LiInSuUI = player getVariable "SLE_JET_LiInSu";
         private _estimated_time_to_splat = 0;
         private _brake_time = player getVariable "SLE_JET_Brake_time";
@@ -433,6 +433,7 @@ fnc_SLE_JET_Jetpack_ui_activation = {
     //Continiously(Constantly) calculated(computed) impact point. Damn definition ambiguity.
     //CCIP only initialized if it's actually not off in settings.
     if (SLE_JET_CCIP_mode_CBAS != "OFF") then {
+
         MEH_JET_CCIP = addMissionEventHandler ["Draw3D", {
             //Stops drawing if player on the ground and CBA setting set to only in air.
             if ((isTouchingGround player) and (SLE_JET_CCIP_mode_CBAS == "InAir")) exitWith {};
@@ -443,55 +444,77 @@ fnc_SLE_JET_Jetpack_ui_activation = {
                 ((animationState player) find "asdv" != -1) or
                 ((animationState player) find "assw" != -1)
                 ) exitWith {};
-
-            private _ammo_speed = 0;
-            //Player have primary weapon in hands
-            if (currentWeapon player == primaryWeapon player) then {
-                if (currentMuzzle player == primaryWeapon player) then {
-                    //Pull initial ammo speed from gun config. Arma doing it a bit convoluted way for some weapons so...
-                    _ammo_speed = getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed");
-                    if (_ammo_speed < 0) then {
-                        //... if weapon have bullet speed of -1.x you need to search for ammo speed and use weapon speed (absolute) value as multiplier. And it gets worse...
-                        _ammo_speed = (abs (getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed"))) *
-                        (getNumber (configFile >> "CfgMagazines" >> currentMagazine player >> "initSpeed"));
-                    };
-                    //Exception for GL weapons like M32 and M320 sidearm from RHS. And you know... Steam workshop is BIG.
-                    if (_ammo_speed == 0) then {
-                        _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
-                    };
-                } else {
-                    //... when player have UGL on his gun. This bit here pulls ammo speed for GL.
-                    _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
+            //Choose method of calculations for guns depending on complexity setting.
+            if ((currentWeapon player == primaryWeapon player) or (currentWeapon player == handgunWeapon player)) then {
+                if (SLE_JET_CCIP_ballistic_guns_CBAS == "Simp") then {
+                    [] call fnc_SLE_JET_simple_ballistic_calculator;
+                };
+                if (SLE_JET_CCIP_ballistic_guns_CBAS == "Adv") then {
+                    [] call fnc_SLE_JET_simple_ballistic_calculator;  //stub
+                };
+                if (SLE_JET_CCIP_ballistic_guns_CBAS == "Advg") then {
+                    [] call fnc_SLE_JET_simple_ballistic_calculator;  //stub
                 };
             };
-            //Player have pistol in hands.
-            if (currentWeapon player == handgunWeapon player) then {
+            if (currentWeapon player == secondaryWeapon player) then {
+                if (SLE_JET_CCIP_ballistic_guns_CBAS == "Adv") then {
+                    [] call fnc_SLE_JET_simple_ballistic_calculator;  //stub
+                };
+                if (SLE_JET_CCIP_ballistic_guns_CBAS == "Advg") then {
+                    [] call fnc_SLE_JET_simple_ballistic_calculator;  //stub
+                };
+            };
+        }];
+
+        fnc_SLE_JET_simple_ballistic_calculator = {
+            private _ammo_speed = 0;
+            //Player have primary weapon or pistol in hands.
+            if ((currentWeapon player == primaryWeapon player) or (currentWeapon player == handgunWeapon player)) then {
+                //Pull ammo initial ammo speed. Arma doing it a bit convoluted way for some weapons so...
                 _ammo_speed = getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed");
                 if (_ammo_speed < 0) then {
+                    //... if weapon have bullet speed of -1.x you need to search for ammo speed and use weapon speed (absolute) value as multiplier.
                     _ammo_speed = (abs (getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed"))) *
                     (getNumber (configFile >> "CfgMagazines" >> currentMagazine player >> "initSpeed"));
                 };
+                //Exception for GL weapons like M32 and M320 sidearm from RHS. And you know... Steam workshop is BIG.
                 if (_ammo_speed == 0) then {
                     _ammo_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
                 };
             };
-            //Player have AT in hands.
-            if (currentWeapon player == secondaryWeapon player) then {
-                //This is ridicuosly oversimplified formula that does not requre to calculate distance to target and air friction. Still should be fine for VERY short range.
-                //Tested. Not fine at all for some AT like RPG 32/7 and alike. I'll probably rework it in the future.
-                //For now use MAAWS instead. MAAWS is best universal AT anyway.
-                _ammo_speed = (
-                              getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed") +
-                                  (
-                                  getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrust") *
-                                  getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrustTime")
-                                  )
-                              );
-            };
+            //Player have launcher in hands. Simple inplementation is pretty much useless for launchers so that's a skip.
+            if (currentWeapon player == secondaryWeapon player) exitWith {};
 
             //When it comes to math it's pretty straightforward when you realize that vectors and coordinates are not so different in their nature. MATH, BITCH. IT JUST WORKS.
             private _weapon_dir = ((player weaponDirection currentWeapon player) vectorMultiply _ammo_speed);
             private _CCIP_pos = (((eyePos player) vectorAdd  _weapon_dir) vectorAdd (velocity player));
+            [_CCIP_pos] call fnc_SLE_JET_CCIP_visualizer;
+        };
+
+        fnc_SLE_JET_advanced_ballistic_calculator = {
+            //under construction.
+        };
+
+        fnc_JET_CCIP_Build_rangetable = {
+            //under construction.
+            private _ammo_init_speed = 0;
+                _ammo_init_speed = getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed");
+                if (_ammo_init_speed < 0) then {
+                    _ammo_init_speed = (abs (getNumber (configfile >> "CfgWeapons" >> (currentWeapon player) >> "initSpeed"))) *
+                    (getNumber (configFile >> "CfgMagazines" >> currentMagazine player >> "initSpeed"));
+                };
+                if (_ammo_init_speed == 0) then {
+                    _ammo_init_speed = getNumber (configfile >> "CfgMagazines" >> currentMagazine player >> "initSpeed");
+                };
+            private _ammo_airFriction = getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "airFriction");
+            private _ammo_maxSpeed = getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "maxSpeed");
+            private _ammo_timeToLive = getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "timeToLive");
+            private _ammo_thrust = getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrust");
+            private _ammo_thrustTime = getNumber (configfile >> "CfgAmmo" >> (getText (configfile >> "CfgMagazines" >> currentMagazine player >> "ammo")) >> "thrustTime");
+        };
+
+        fnc_SLE_JET_CCIP_visualizer = {
+          private _CCIP_pos = param [0, [0,0,0], [[]]];
             //Changes CCIP colo(u)r based on hover state.
             private _CCIP_color = [];
             if ((player getVariable "SLE_JET_Semi_auto_hover_counter") <= (SLE_JET_autohover_delay_CBAS * 20)) then {
@@ -514,8 +537,10 @@ fnc_SLE_JET_Jetpack_ui_activation = {
                 'center', //text allignment
                 true //off-screen arrows
             ];
-        }];
+        };
+
     };
+
     //Variable tied to jetpack UI state.
     player setVariable ["SLE_JET_Jetpak_ui_activation_state", true, false];
     //Enable fuel bar.
@@ -843,7 +868,7 @@ fnc_SLE_JET_engine_sound_core = {
                       ))} do {
                     waitUntil {!isGamePaused}; //Pause execution if player paused of alt-tabbed. This is necessary. I can tell from experience.
                     [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_run", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
-                    for "_i" from 0 to 44 step 1 do { //Actuall sound loop delay made in small chunks to ensure engine shutdown sound plays right after landing.
+                    for "_i" from 0 to 42 step 1 do { //Actuall sound loop delay made in small chunks to ensure engine shutdown sound plays right after landing.
                       uiSleep 0.1;
                       if ((isTouchingGround player) or //If player lands on ground or falls in water loop will be stopped.
                       ((animationState player) find "aswm" != -1) or
