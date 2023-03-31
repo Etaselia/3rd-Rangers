@@ -123,7 +123,7 @@
     "SLIDER", // setting type
     ["Base fuel consumption", "Number in percent per second. Nuff said really. If you wish your jetpack to be more like jump pack set both consumption and recharge higher. If you on a large map or just want infinite flight set it lower of to 0. Note that this is consumption for one action. For example if you flying forward and left at the same time it will double the fuel cost."], // [Name, Tooltip]
     ["Smart Jet", "2. Fuel"], // Category name
-    [0, 20, 1, 2, false], // ValueInfo
+    [0, 30, 1, 2, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {}, // OnChage code
     false // Show mission restart nedded warning

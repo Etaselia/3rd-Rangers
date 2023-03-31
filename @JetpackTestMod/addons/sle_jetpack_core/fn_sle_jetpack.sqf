@@ -255,9 +255,9 @@ fnc_SLE_JET_Jetpack_activation = {
 
         private _velocity_norm = vectorNormalized (velocityModelSpace player);
         private _one_tick_acceleraton = (vectorMagnitude [
-            -((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13.3)),
-            -((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13.3)),
-            -((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13.3)) + 0.6
+            -((_velocity_norm select 0) * (2.3 max (SLE_JET_base_acceleration_CBAS / 13.3))),
+            -((_velocity_norm select 1) * (2.3 max (SLE_JET_base_acceleration_CBAS / 13.3))),
+            -((_velocity_norm select 2) * (2.3 max (SLE_JET_base_acceleration_CBAS / 13.3))) + 0.6
         ]); //It's technically backwards acceleration aka deceleration but anyway.
         private _brake_time = _velocity / (_one_tick_acceleraton * 40);
         player setVariable ["SLE_JET_Brake_time", _brake_time, false];
@@ -812,9 +812,9 @@ fnc_SLE_JET_autobrake =
                           private _velocity = velocityModelSpace player;
                           private _velocity_norm = vectorNormalized _velocity;
                           player setVelocityModelSpace [
-                              (_velocity select 0) - ((_velocity_norm select 0) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))), //Making something dependant on FPS is generraly a bad choice. But with lower framerate Arma slows down custom code. As i can't tap into game tick generator that's probably most elegant fix.
-                              (_velocity select 1) - ((_velocity_norm select 1) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))),
-                              (_velocity select 2) - ((_velocity_norm select 2) * (SLE_JET_base_acceleration_CBAS / 13) * (60 / (25 max (60 min diag_fps)))) + 0.6
+                              (_velocity select 0) - ((_velocity_norm select 0) * (2.3 max (SLE_JET_base_acceleration_CBAS / 13.3)) * (60 / (25 max (60 min diag_fps)))), //Making something dependant on FPS is generraly a bad choice. But with lower framerate Arma slows down custom code. As i can't tap into game tick generator that's probably most elegant fix.
+                              (_velocity select 1) - ((_velocity_norm select 1) * (2.3 max (SLE_JET_base_acceleration_CBAS / 13.3)) * (60 / (25 max (60 min diag_fps)))),
+                              (_velocity select 2) - ((_velocity_norm select 2) * (2.3 max (SLE_JET_base_acceleration_CBAS / 13.3)) * (60 / (25 max (60 min diag_fps)))) + 0.6
                           ];
                           ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, true] call fnc_SLE_JET_fuel_core;
                           sleep 0.05;
