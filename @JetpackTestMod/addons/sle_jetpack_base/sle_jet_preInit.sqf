@@ -48,9 +48,29 @@
 // 1. Features
 [   "SLE_JET_CCIP_mode_CBAS", // Variable tag
     "LIST", // setting type
-    ["CCIP mode", "When Continuously Calculated Impact Point will be shown. WARNING! Current version of CCIP does not account for gravity and air friction. Also it's widely inaccurate for AT rockets. I recommend to use MAAWS instead."], // [Name, Tooltip]
+    ["CCIP visibility mode", "When Continuously Calculated Impact Point will be shown."], // [Name, Tooltip]
     ["Smart Jet", "1. Features"], // Category name
     [["Const", "InAir", "Off"], ["Always ON", "Only in air", "OFF"], 1], // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "SLE_JET_CCIP_ballistic_guns_CBAS", // Variable tag
+    "LIST", // setting type
+    ["CCIP complexity for guns", "Complexity of ballistic calculations for CCIP. Simple takes into account initial velocity of your projectile and your speed. Advanced also accounts for air friction. +Gravity additionally does what you think it does. Due to way +Gravity works you may see indicator slowly moving."], // [Name, Tooltip]
+    ["Smart Jet", "1. Features"], // Category name
+    [["Simp", "Adv", "Advg"], ["Simple", "Advanced", "Advanced+Gravity"], 1], // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "SLE_JET_CCIP_ballistic_launchers_CBAS", // Variable tag
+    "LIST", // setting type
+    ["CCIP complexity for launchers", "Complexity of ballistic calculations for CCIP. This one starts with advanced and accounts for initial velocity of your projectile, air friction, rocket acceleration, and your speed. +Gravity additionally does what you think it does. Due to way +Gravity works you may see indicator slowly moving."], // [Name, Tooltip]
+    ["Smart Jet", "1. Features"], // Category name
+    [["Simp", "Adv", "Advg"], ["OFF", "Advanced", "Advanced+Gravity"], 1], // ValueInfo
     0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
@@ -154,7 +174,7 @@
 // 3. Hover fix
 [   "SLE_JET_hover_aim_fix_CBAS", // Variable tag
     "CHECKBOX", // setting type
-    ["Flight / hover aim fix", "It will allow you to aim in flight. However it stops/slows down your fall animation. Also allows to adjust weapon sway in air."], // [Name, Tooltip]
+    ["Flight / hover aim fix", "It will allow you to aim in flight. However it stops/slows down your animation. Also allows to adjust weapon sway in air."], // [Name, Tooltip]
     ["Smart Jet", "3. Aim fix"], // Category name
     true, // ValueInfo
     0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
@@ -270,7 +290,7 @@
 // 5. Advanced
 [   "SLE_JET_jetpack_capable_items_CBAS", // Variable tag
     "EDITBOX", // setting type
-    ["Jetpack compatable backpacks", "Classes of jetpack compatable backpacks. Format: class1,class2,class3"], // [Name, Tooltip]
+    ["Jetpack compatable backpacks", "Classes of jetpack compatable backpacks. No spacebars! Format: class1,class2,class3"], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
     "B_JETPACK_Nospace_off_SLE,B_JETPACK_Nospace_on_SLE,B_JETPACK_Yesspace_fixed_SLE,B_JETPACK_Yesspace_off_SLE,B_JETPACK_Yesspace_on_SLE,OPTRE_S12_SOLA_Jetpack,OPTRE_S12_SOLA_Jetpack_On", // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
@@ -290,7 +310,7 @@
 
 [   "SLE_JET_jetpack_HUD_capable_items_CBAS", // Variable tag
     "EDITBOX", // setting type
-    ["Jetpack UI compatable facewear", "Classes of jetpack UI compatable facewear. Format: class1,class2,class3"], // [Name, Tooltip]
+    ["Jetpack UI compatable facewear", "Classes of jetpack UI compatable facewear. No spacebars! Format: class1,class2,class3"], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
     "G_Jet_UI_Clear,G_Jet_UI_Shade,G_Jet_UI_VR", // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
