@@ -1,4 +1,4 @@
-"
+/*
 Not so brief classes overview.
 Generally most classes have 4 various abilities. Exception of this rule is tactician and coordinator which essentially have 2 as they centered around certain concepts.
 Each class utilize shared cooldown system which means that using one ability will disable all abilities for duration based on cooldown of used skill.
@@ -57,7 +57,7 @@ AT / HE launcher – Teleports AT4 HP/HEDP launcher in his hands. Cooldown: 60 s
 M32 MGL – Teleports M32 in hands while placing current weapon in pocket dimention. Weapon in pocet dimention gets full magazine and can be retrieved at any time. Cooldown: 60 s.
 EXPLOSION – Act as grenade teleport but with GBU-12 :D. Renders user unconscious for 90 seconds. Cooldown: 180 s.
 Return weapon – Returns weapon from pocket dimension. No cooldown.
-"
+*/
 
 
 

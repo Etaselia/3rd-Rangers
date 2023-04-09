@@ -88,13 +88,20 @@ color of fixed fuel bar | SLE_JET_fuel_bar_color_CBAS | color array
 colors FPV | SLE_JET_FPV_color_normal_CBAS, SLE_JET_FPV_color_warning_CBAS, SLE_JET_FPV_color_danger_CBAS | color array
 colors CCIP | SLE_JET_CCIP_color_normal_CBAS, SLE_JET_CCIP_color_autohover_CBAS | color array
   5. Advanced
-Jetpack compatable backpacks | SLE_JET_jetpack_capable_items_CBAS  | str
+Jetpack compatable inactive backpacks | SLE_JET_jetpack_capable_off_items_CBAS  | str
+Jetpack compatable active backpacks | SLE_JET_jetpack_capable_on_items_CBAS  | str
+Jetpack compatable static backpacks | SLE_JET_jetpack_capable_items_CBAS  | str
 UI facewear check | SLE_JET_facewear_check_CBAS | bool | true
 Jetpack UI compatable facewear | SLE_JET_jetpack_HUD_capable_items_CBAS | str
 */
 
 //TODO
-//CCIP ballistic formula for AT rockets.
+//Add 40K and MWP jetpacks to swapper
+//Fix jetpack in vehicles
+//Top speed limiter vertical and horizontal.
+//Opional initial jump speed.
+//Unstuck functionality.
+//CCIP advanced ballistic formula. +gravity.
 //Conditional sounds like alarms and maybe voicelines.
 //Add better 3D model?
 
@@ -106,8 +113,8 @@ player setVariable ["SLE_JET_Jetpak_ui_activation_state", false, false]; //Same 
 player setVariable ["SLE_JET_Semi_auto_hover_counter", 0, false]; //Used for autohover feature.
 player setVariable ["SLE_JET_Sway_fix_on", false, false]; //Used for sway fix.
 player setVariable ["SLE_JET_backpack_mags", [], false];//These three used to store backpack inventory on takeoff/land backpack swap.
-player setVariable ["SLE_JET_backpack_guns", [], false];//These three used to store backpack inventory on takeoff/land backpack swap.
-player setVariable ["SLE_JET_backpack_items", [], false];//These three used to store backpack inventory on takeoff/land backpack swap.
+player setVariable ["SLE_JET_backpack_guns", [], false];
+player setVariable ["SLE_JET_backpack_items", [], false];
 
 //Initializng spawn handles because it's far easier than accounting for isNil with each check later or setting spawn handles to nil after each terminate.
 SLE_JET_up_spawn_handle = [] spawn {};
@@ -137,7 +144,7 @@ fnc_SLE_JET_item_check = {
     //Core systems
     if (player getVariable "SLE_JET_Jetpak_activation_state") then {
         //jetpack was active
-        if (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ",")) then {
+        if ((backpack player in (SLE_JET_jetpack_capable_off_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_on_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ","))) then {
             if (_with_refuel) then {["", false, 0, true, false] call fnc_SLE_JET_fuel_core;}; //Refuel backpack if fucntion called from arsenal (or just with parameter true)
             _return_val = true; //Return value of this function is essentially used by fnc_SLE_JET_on_key_item_check to choose between proceeding or not doing anything with key input.
         } else {
@@ -147,7 +154,7 @@ fnc_SLE_JET_item_check = {
         };
     } else {
         //jetpack was inactive
-        if (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ",")) then {
+        if ((backpack player in (SLE_JET_jetpack_capable_off_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_on_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ","))) then {
             [] call fnc_SLE_JET_Jetpack_activation;
             if (_with_refuel) then {["", false, 0, true, false] call fnc_SLE_JET_fuel_core;};
             _return_val = true;
@@ -173,13 +180,13 @@ fnc_SLE_JET_item_check = {
     } else {
         if (player getVariable "SLE_JET_Jetpak_ui_activation_state") then {
             //UI was active
-            if (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ",")) then {
+            if ((backpack player in (SLE_JET_jetpack_capable_off_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_on_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ","))) then {
             } else {
                 [] call fnc_SLE_JET_Disable_Jetpack_ui;
             };
         } else {
             //UI was inactive
-            if (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ",")) then {
+            if ((backpack player in (SLE_JET_jetpack_capable_off_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_on_items_CBAS splitString ",")) or (backpack player in (SLE_JET_jetpack_capable_items_CBAS splitString ","))) then {
                 [] call fnc_SLE_JET_Jetpack_ui_activation;
             } else {
             };
@@ -800,8 +807,7 @@ fnc_SLE_JET_brake = {
 /*Automatic brake. Unlike rest of physic functions it can't be directly called by player and not interrupted by lack of fuel.
 It gets called in by automatic brake calculator when player about to cross point of no return and collide into something and only stops when the danger has passed.
 Breaking still consumes fuel to avoid exploiting. This may get fuel below zero which is a normal condition.*/
-fnc_SLE_JET_autobrake =
-{
+fnc_SLE_JET_autobrake = {
   params["_autobrake_signal_state"];
   private _autobrake_signal_state = _this select 0;
     if (!isTouchingGround player) then {
@@ -910,28 +916,23 @@ fnc_SLE_JET_event_sound_core = {
 //Backpack swapper function. Swaps appropriate backpacks on takeoff and landing. Called in similarly to sound core.
 fnc_SLE_JET_backpack_swapper = {
   private _backpack_state = param [0, false, [true]];
+    if ((count (SLE_JET_jetpack_capable_off_items_CBAS splitString ",")) != (count (SLE_JET_jetpack_capable_off_items_CBAS splitString ","))) exitWith {systemChat "Non critical error in compatible items settings. Cannot perform visual change of jetpack.";};
     if (_backpack_state) then {
         //Takeoff
-        if (backpack player == "B_JETPACK_Nospace_off_SLE") then {
-            removeBackpack player;
-            player addBackpack "B_JETPACK_Nospace_on_SLE";
-        };
-        if (backpack player == "B_JETPACK_Yesspace_off_SLE") then {
+        private _array_index = ((SLE_JET_jetpack_capable_off_items_CBAS splitString ",") find (backpack player));
+        if (_array_index != -1) then {
             ["save"] call fnc_SLE_JET_backpack_inventory_saver;
             removeBackpack player;
-            player addBackpack "B_JETPACK_Yesspace_on_SLE";
+            player addBackpack ((SLE_JET_jetpack_capable_on_items_CBAS splitString ",") select _array_index);
             ["load"] call fnc_SLE_JET_backpack_inventory_saver;
         };
     } else {
         //Landing
-        if (backpack player == "B_JETPACK_Nospace_on_SLE") then {
-            removeBackpack player;
-            player addBackpack "B_JETPACK_Nospace_off_SLE";
-        };
-        if (backpack player == "B_JETPACK_Yesspace_on_SLE") then {
+        private _array_index = ((SLE_JET_jetpack_capable_on_items_CBAS splitString ",") find (backpack player));
+        if (_array_index != -1) then {
             ["save"] call fnc_SLE_JET_backpack_inventory_saver;
             removeBackpack player;
-            player addBackpack "B_JETPACK_Yesspace_off_SLE";
+            player addBackpack ((SLE_JET_jetpack_capable_off_items_CBAS splitString ",") select _array_index);
             ["load"] call fnc_SLE_JET_backpack_inventory_saver;
         };
     };

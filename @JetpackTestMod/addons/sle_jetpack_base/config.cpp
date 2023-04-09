@@ -17,6 +17,15 @@ class cfgPatches
         units[] = {};
         weapons[] = {};
     };
+
+    class OPTRE_FunctionsLibrary
+	{
+		units[]={};
+		weapons[]={};
+		requiredVersion=0.1;
+		version=0.11;
+		author="Article 2 Studios";
+	};
 };
 
 //PreInit currently contains CBA keybinds and settings.
@@ -31,14 +40,21 @@ class Extended_PreInit_EventHandlers
 //Whole backend of this mod currently contained in one function.
 class CfgFunctions
 {
-    class ADDON
+    class SLE_JET_ADDON
     {
         class sle_jetpack_core
         {
-            file = "\sle_jetpack_core";
+            file = "\sle_jetpack_core\Logic";
             class sle_jetpack {postInit = 1;};
         };
     };
+    class OPTRE
+        {
+            class Jetpack
+            {
+                file = "\sle_jetpack_core\OptreCompat";
+            };
+        };
 };
 
 //UI classes for fuel bar.
@@ -186,19 +202,19 @@ class CfgSounds
 {
     class SLE_JET_engine_start
     {
-        sound[] = {"sle_jetpack_core\JetSound\1start1_6s.ogg", 1, 1}; //filename volume and pitch levels
+        sound[] = {"sle_jetpack_core\Sound\1start1_6s.ogg", 1, 1}; //filename volume and pitch levels
         titles[] = {}; //subtitle delay in seconds, subtitle text
     };
 
     class SLE_JET_engine_run
     {
-        sound[] = {"sle_jetpack_core\JetSound\2mid5s.ogg", 1, 1}; //filename volume and pitch levels
+        sound[] = {"sle_jetpack_core\Sound\2mid5s.ogg", 1, 1}; //filename volume and pitch levels
         titles[] = {}; //subtitle delay in seconds, subtitle text
     };
 
     class SLE_JET_engine_shutdown
     {
-        sound[] = {"sle_jetpack_core\JetSound\3end3_5s.ogg", 1, 1}; //filename volume and pitch levels
+        sound[] = {"sle_jetpack_core\Sound\3end3_5s.ogg", 1, 1}; //filename volume and pitch levels
         titles[] = {}; //subtitle delay in seconds, subtitle text
     };
 };

@@ -288,11 +288,31 @@
 
 
 // 5. Advanced
+[   "SLE_JET_jetpack_capable_off_items_CBAS", // Variable tag
+    "EDITBOX", // setting type
+    ["Jetpack compatable inactive backpacks", "Classes of compatable inactive backpacks. Format: class1,class2,class3 No spacebars! Classes in compatable item fields will be swapped based on position. Example: Third backpack in inactive items will row be replaced with third backpack in active items row on takeoff." ], // [Name, Tooltip]
+    ["Smart Jet", "5. Advanced"], // Category name
+    "B_JETPACK_Nospace_off_SLE,B_JETPACK_Yesspace_off_SLE,OPTRE_S12_SOLA_Jetpack,OPTRE_S12_SOLA_Jetpack_Spartan", // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "SLE_JET_jetpack_capable_on_items_CBAS", // Variable tag
+    "EDITBOX", // setting type
+    ["Jetpack compatable active backpacks", "Classes of compatable active backpacks. Format: class1,class2,class3 No spacebars! Classes in compatable item fields will be swapped based on position. Example: Third backpack in inactive items will row be replaced with third backpack in active items row on takeoff."], // [Name, Tooltip]
+    ["Smart Jet", "5. Advanced"], // Category name
+    "B_JETPACK_Nospace_on_SLE,B_JETPACK_Yesspace_on_SLE,OPTRE_S12_SOLA_Jetpack_On,OPTRE_S12_SOLA_Jetpack_On_Spartan", // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
 [   "SLE_JET_jetpack_capable_items_CBAS", // Variable tag
     "EDITBOX", // setting type
-    ["Jetpack compatable backpacks", "Classes of jetpack compatable backpacks. No spacebars! Format: class1,class2,class3"], // [Name, Tooltip]
+    ["Jetpack compatable static backpacks", "Classes of compatable active backpacks. Format: class1,class2,class3 No spacebars! These backpacks are not swapped around and easily can be used for storage. Or in case if there's no active model available."], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
-    "B_JETPACK_Nospace_off_SLE,B_JETPACK_Nospace_on_SLE,B_JETPACK_Yesspace_fixed_SLE,B_JETPACK_Yesspace_off_SLE,B_JETPACK_Yesspace_on_SLE,OPTRE_S12_SOLA_Jetpack,OPTRE_S12_SOLA_Jetpack_On", // ValueInfo
+    "B_JETPACK_Yesspace_fixed_SLE", // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
     {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
@@ -300,7 +320,7 @@
 
 [   "SLE_JET_facewear_check_CBAS", // Variable tag
     "CHECKBOX", // setting type
-    ["Facewear check", "If set to on jetpack UI will only appear if player have compatible facewear."], // [Name, Tooltip]
+    ["Facewear check", "If set to on jetpack UI will only appear if player have compatible facewear. If set to off UI will appear if player have jetpack."], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
     true, // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
@@ -310,7 +330,7 @@
 
 [   "SLE_JET_jetpack_HUD_capable_items_CBAS", // Variable tag
     "EDITBOX", // setting type
-    ["Jetpack UI compatable facewear", "Classes of jetpack UI compatable facewear. No spacebars! Format: class1,class2,class3"], // [Name, Tooltip]
+    ["Jetpack UI compatable facewear", "Classes of jetpack UI compatable facewear. Format: class1,class2,class3 No spacebars!"], // [Name, Tooltip]
     ["Smart Jet", "5. Advanced"], // Category name
     "G_Jet_UI_Clear,G_Jet_UI_Shade,G_Jet_UI_VR", // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable

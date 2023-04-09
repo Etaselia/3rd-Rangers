@@ -1,0 +1,1 @@
+systemChat "Smart jet compat loaded. OPTRE jetpack functionality disabled.";
