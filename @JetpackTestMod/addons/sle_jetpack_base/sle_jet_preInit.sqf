@@ -112,10 +112,39 @@
     ["Smart Jet", "1. Features"], // Category name
     [5, 90, 30, 1, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
+[   "SLE_JET_speed_limiter_CBAS", // Variable tag
+    "CHECKBOX", // setting type
+    ["Speed limiter.", "If set to on jetpack vertical and horizontal maximum speed will be artificially limited. After hitting speed limit jetpack won't accelerate but also will not use fuel. Does not affect fall speed. If set to off maximum speed will be limined by arma physics air resistance."], // [Name, Tooltip]
+    ["Smart Jet", "1. Features"], // Category name
+    true, // ValueInfo
+    0, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "SLE_JET_vettical_speed_limit_CBAS", // Variable tag
+    "SLIDER", // setting type
+    ["Vertical speed limit", "Number in meters per second. Limits speed of going up. Does not affect fall speed. Due to technical implementation speed can noticably vary if acceleration is high and maximum speed is low."], // [Name, Tooltip]
+    ["Smart Jet", "1. Features"], // Category name
+    [2, 200, 100, 1, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
+
+[   "SLE_JET_horizontal_speed_limit_CBAS", // Variable tag
+    "SLIDER", // setting type
+    ["Horizontal speed limit", "Number in meters per second. Limits speed of sideways flight. Due to technical implementation speed can noticably vary if acceleration is high and maximum speed is low."], // [Name, Tooltip]
+    ["Smart Jet", "1. Features"], // Category name
+    [2, 400, 200, 1, false], // ValueInfo
+    1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
+    false // Show mission restart nedded warning
+] call CBA_fnc_addSetting;
 
 
 // 2. Fuel
@@ -123,9 +152,9 @@
     "SLIDER", // setting type
     ["Base fuel consumption", "Number in percent per second. Nuff said really. If you wish your jetpack to be more like jump pack set both consumption and recharge higher. If you on a large map or just want infinite flight set it lower of to 0. Note that this is consumption for one action. For example if you flying forward and left at the same time it will double the fuel cost."], // [Name, Tooltip]
     ["Smart Jet", "2. Fuel"], // Category name
-    [0, 30, 1, 2, false], // ValueInfo
+    [0, 50, 1, 2, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -135,7 +164,7 @@
     ["Smart Jet", "2. Fuel"], // Category name
     [0, 1, 0.5, 2, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -163,9 +192,9 @@
     "SLIDER", // setting type
     ["Recharge rate", "Number is percent of fuel/charge regenerated per second."], // [Name, Tooltip]
     ["Smart Jet", "2. Fuel"], // Category name
-    [0, 20, 0.1, 2, false], // ValueInfo
+    [0, 50, 0.1, 2, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -188,7 +217,7 @@
     ["Smart Jet", "3. Aim fix"], // Category name
     [-1, 3, 0.4, 2, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -198,7 +227,7 @@
     ["Smart Jet", "3. Aim fix"], // Category name
     [0, 1, 0.05, 2, false], // ValueInfo
     1, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -211,7 +240,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     [0, 10, 1, 1, false], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -221,7 +250,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     false, // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -231,7 +260,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     [1, 0.58, 0, 1], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -241,7 +270,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     [0,1,1,1], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -251,7 +280,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     [1,1,0,1], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -261,7 +290,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     [1,0,0,1], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -271,7 +300,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     [0,0.8,0,1], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 
@@ -281,7 +310,7 @@
     ["Smart Jet", "4. UI and controls"], // Category name
     [0,1,0,1], // ValueInfo
     2, // Globality 0-default 1-Owerwrite/sychroized 2--Non overridable
-    {}, // OnChage code
+    {[] call fnc_SLE_JET_setting_change_reboot;}, // OnChage code
     false // Show mission restart nedded warning
 ] call CBA_fnc_addSetting;
 

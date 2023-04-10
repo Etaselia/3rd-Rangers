@@ -69,3 +69,8 @@ EH_ShotsFired = player addEventHandler ["FiredMan", {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+onEachFrame {
+  hint formatText ["Speed: %1 %2 %3", (velocityModelSpace player ) select 0, (velocityModelSpace player ) select 1, (velocityModelSpace player ) select 3];
+  };

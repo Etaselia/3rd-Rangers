@@ -71,6 +71,9 @@ Autobrake mode | SLE_JET_autobrake_mode_CBAS | bool | true
 Height limiter | SLE_JET_height_limiter_CBAS | bool | true
 Over water hover | SLE_JET_water_hover_CBAS | bool | false
 Typical Acceleration | SLE_JET_base_acceleration_CBAS | val | 30 (m/s)
+Speed limiter | SLE_JET_speed_limiter_CBAS | bool | true
+Vertical speed limit | SLE_JET_vettical_speed_limit_CBAS | val | 100 (m/s)
+Horizontal speed limit | SLE_JET_horizontal_speed_limit_CBAS | val | 200 (m/s)
   2. Fuel
 Typical fuel consumption | SLE_JET_fuel_consumption_CBAS | val | 1
 Hover fuel consumption | SLE_JET_hover_fuel_consumption_CBAS | val | 0.5
@@ -97,8 +100,6 @@ Jetpack UI compatable facewear | SLE_JET_jetpack_HUD_capable_items_CBAS | str
 
 //TODO
 //Add 40K and MWP jetpacks to swapper
-//Fix jetpack in vehicles
-//Top speed limiter vertical and horizontal.
 //Opional initial jump speed.
 //Unstuck functionality.
 //CCIP advanced ballistic formula. +gravity.
@@ -232,7 +233,8 @@ fnc_SLE_JET_Jetpack_activation = {
             ((animationState player) find "absw" != -1) or
             ((animationState player) find "adve" != -1) or
             ((animationState player) find "asdv" != -1) or
-            ((animationState player) find "assw" != -1)
+            ((animationState player) find "assw" != -1) or
+            (vehicle player != player)
             ) exitWith {};
         //Magic, math and middle school physics happening here.
         private _long_legs_pos = [getPosASL player select 0, getPosASL player select 1, (getPosASL player select 2) - 1]; //Gives player one meter of space for errors.
@@ -401,7 +403,8 @@ fnc_SLE_JET_Jetpack_ui_activation = {
             ((animationState player) find "absw" != -1) or
             ((animationState player) find "adve" != -1) or
             ((animationState player) find "asdv" != -1) or
-            ((animationState player) find "assw" != -1)
+            ((animationState player) find "assw" != -1) or
+            (vehicle player != player)
             ) exitWith {};
         //This UI eventhandler gets most values from autobrake calculator.
         private _LiInSuUI = player getVariable "SLE_JET_LiInSu";
@@ -449,7 +452,8 @@ fnc_SLE_JET_Jetpack_ui_activation = {
                 ((animationState player) find "absw" != -1) or
                 ((animationState player) find "adve" != -1) or
                 ((animationState player) find "asdv" != -1) or
-                ((animationState player) find "assw" != -1)
+                ((animationState player) find "assw" != -1) or
+                (vehicle player != player)
                 ) exitWith {};
             //Choose method of calculations for guns depending on complexity setting.
             if ((currentWeapon player == primaryWeapon player) or (currentWeapon player == handgunWeapon player)) then {
@@ -565,7 +569,8 @@ fnc_SLE_JET_on_key_item_check = {
         ((animationState player) find "absw" != -1) or
         ((animationState player) find "adve" != -1) or
         ((animationState player) find "asdv" != -1) or
-        ((animationState player) find "assw" != -1)
+        ((animationState player) find "assw" != -1) or
+        (vehicle player != player)
         ) exitWith {
         [false] call fnc_SLE_JET_up;
         [false] call fnc_SLE_JET_forw;
@@ -644,7 +649,10 @@ fnc_SLE_JET_up = {
             SLE_JET_up_spawn_handle = [] spawn {
                 while {true} do {
                     //Acceleration will work only below 80 meters. From 80 to 100 meters player will be accelerated downwards. However if player breaks 100m ceeling and enter halojump animation this barrier is lifted. That way actuall jumps from aircraft will be seamless.
-                    if (((animationState player) find "halofreefall" != -1) or ((ASLToAGL getPosASL player) select 2 < 80)) then {
+                    if (
+                        ((!SLE_JET_height_limiter_CBAS) or ((animationState player) find "halofreefall" != -1) or ((ASLToAGL getPosASL player) select 2 < 80)) and
+                        ((!SLE_JET_speed_limiter_CBAS) or (((velocity player) select 2) < SLE_JET_vettical_speed_limit_CBAS))
+                    ) then {
                         private _velocity = velocity player;
                         player setVelocity [(_velocity select 0),(_velocity select 1), (_velocity select 2) + ((SLE_JET_base_acceleration_CBAS / 20) + 1)];
                         ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
@@ -674,10 +682,12 @@ fnc_SLE_JET_forw = {
             if (isNull SLE_JET_forw_spawn_handle) then {
                 SLE_JET_forw_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
-                        private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) + (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 2)];
-                        ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
-                        sleep 0.05;
+                        if ((!SLE_JET_speed_limiter_CBAS) or ((((velocityModelSpace player) select 1) < SLE_JET_horizontal_speed_limit_CBAS))) then {
+                            private _velocity = velocityModelSpace player;
+                            player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) + (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 2)];
+                            ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
+                            sleep 0.05;
+                        };
                     };
                 };
             };
@@ -697,10 +707,12 @@ fnc_SLE_JET_backw = {
             if (isNull SLE_JET_backw_spawn_handle) then {
                 SLE_JET_backw_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
-                        private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) - (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 2)];
-                        ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
-                        sleep 0.05;
+                        if ((!SLE_JET_speed_limiter_CBAS) or ((((velocityModelSpace player) select 1) > (0 - SLE_JET_horizontal_speed_limit_CBAS)))) then {
+                            private _velocity = velocityModelSpace player;
+                            player setVelocityModelSpace [(_velocity select 0), (_velocity select 1) - (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 2)];
+                            ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
+                            sleep 0.05;
+                        };
                     };
                 };
             };
@@ -720,10 +732,12 @@ fnc_SLE_JET_left = {
             if (isNull SLE_JET_left_spawn_handle) then {
                 SLE_JET_left_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
-                        private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0) - (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 1), (_velocity select 2)];
-                        ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
-                        sleep 0.05;
+                        if ((!SLE_JET_speed_limiter_CBAS) or ((((velocityModelSpace player) select 0) > (0 - SLE_JET_horizontal_speed_limit_CBAS)))) then {
+                            private _velocity = velocityModelSpace player;
+                            player setVelocityModelSpace [(_velocity select 0) - (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 1), (_velocity select 2)];
+                            ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
+                            sleep 0.05;
+                        };
                     };
                 };
             };
@@ -743,10 +757,12 @@ fnc_SLE_JET_right = {
             if (isNull SLE_JET_right_spawn_handle) then {
                 SLE_JET_right_spawn_handle = [] spawn {
                     while {!isTouchingGround player} do {
-                        private _velocity = velocityModelSpace player;
-                        player setVelocityModelSpace [(_velocity select 0) + (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 1), (_velocity select 2)];
-                        ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
-                        sleep 0.05;
+                        if ((!SLE_JET_speed_limiter_CBAS) or ((((velocityModelSpace player) select 0) < SLE_JET_horizontal_speed_limit_CBAS))) then {
+                            private _velocity = velocityModelSpace player;
+                            player setVelocityModelSpace [(_velocity select 0) + (SLE_JET_base_acceleration_CBAS / 20), (_velocity select 1), (_velocity select 2)];
+                            ["", false, -(SLE_JET_fuel_consumption_CBAS / 20), false, false] call fnc_SLE_JET_fuel_core;
+                            sleep 0.05;
+                        };
                     };
                 };
             };
@@ -870,7 +886,8 @@ fnc_SLE_JET_engine_sound_core = {
                       ((animationState player) find "absw" != -1) or
                       ((animationState player) find "adve" != -1) or
                       ((animationState player) find "asdv" != -1) or
-                      ((animationState player) find "assw" != -1)
+                      ((animationState player) find "assw" != -1) or
+                      (vehicle player != player)
                       ))} do {
                     waitUntil {!isGamePaused}; //Pause execution if player paused of alt-tabbed. This is necessary. I can tell from experience.
                     [SLE_JET_engine_sound_emitter, ["SLE_JET_engine_run", 300, 1, false, 0]] remoteExec ["say3D", ([0, -2] select isDedicated), false];
@@ -881,7 +898,8 @@ fnc_SLE_JET_engine_sound_core = {
                       ((animationState player) find "absw" != -1) or
                       ((animationState player) find "adve" != -1) or
                       ((animationState player) find "asdv" != -1) or
-                      ((animationState player) find "assw" != -1)
+                      ((animationState player) find "assw" != -1) or
+                      (vehicle player != player)
                       ) exitWith {};
                     };
                 };
