@@ -1,21 +1,21 @@
 /*
-**Code Documentation: NaniteGeneratorV3**
+NaniteGeneratorV3
 
-**Global Variables:**
-1. `naniteGeneratorActive` (Boolean): Represents the activation state of the nanite generator for the player. This variable is set to `true` when the generator is active.
-2. `naniteEnergyStartingValue` (Number): Represents the initial value of the player's nanite energy. If not set, it defaults to `25`.
-3. `naniteEnergy` (Number): Represents the current value of the player's nanite energy. It starts with the value of `naniteEnergyStartingValue` and increases over time.
-4. `naniteEnergyRechargePerSecond` (Number): Represents the rate at which the player's nanite energy recharges per second. If not set, it defaults to `1`.
+Description: This code represents a nanite generator functionality in SQF (Scripting Language for Arma series). The nanite generator allows the player to recharge their nanite energy over time.
 
-The code utilizes a function named `NaniteGeneratorV3`. When called, it sets the player's `naniteGeneratorActive` variable to `true` and spawns a separate thread to handle the nanite energy regeneration process.
+Usage: Call 'NaniteGeneratorV3' to activate the nanite generator for the player. Call 'NaniteGeneratorStop' to deactivate the nanite generator.
 
-Inside the spawned thread, the player's initial nanite energy value is obtained from `naniteEnergyStartingValue`. Then, a loop runs as long as `naniteGeneratorActive` is `true`. During each iteration, the `_naniteEnergy` variable is incremented by the value specified in `naniteEnergyRechargePerSecond`. The updated nanite energy value is then set back to the player's `naniteEnergy` variable.
-Finally, the thread sleeps for `1` second using the `sleep` command to control the recharge rate.
-
-Make sure to initialize the necessary variables before calling the `NaniteGeneratorV3` function to ensure proper functionality.
+Global Variables:
+- naniteActivationState (Boolean): Represents the activation state of the nanite generator for the player. Set to 'true' when the generator is active.
+- naniteGeneratorActive (Boolean): Represents the current state of the nanite generator. Set to 'true' when the generator is active.
+- naniteEnergyStartingValue (Number): Represents the initial value of the player's nanite energy. Default value is 25.
+- naniteEnergy (Number): Represents the current value of the player's nanite energy.
+- naniteEnergyRechargePerSecond (Number): Represents the rate at which the player's nanite energy recharges per second. Default value is 1.
 */
 
 NaniteGeneratorV3 = {
+	if (!player getVariable["naniteActivationState",false]) exitWith {};
+
 	player setVariable["naniteGeneratorActive",true];
 	player spawn {
 		private _naniteStartingValue = player getVariable["naniteEnergyStartingValue",25];
@@ -25,5 +25,10 @@ NaniteGeneratorV3 = {
 			player setVariable["naniteEnergy",_naniteEnergy];
 			sleep 1;
 		};
+		private _naniteEnergy = player getVariable["naniteEnergy",_naniteStartingValue];
 	};
+};
+
+NaniteGeneratorStop = {
+	player setVariable["naniteGeneratorActive",false];
 };
