@@ -22,7 +22,7 @@ NaniteWeaponHandling = {
   private _controlSignal = param [0, false, [true]];
 
 	if (_controlSignal) then {
-			if (!(player getVariable "WeaponHandlingState")) then {
+			if (!(player getVariable ["WeaponHandlingState", false])) then {
 			MEH_NoSwayWC = addMissionEventHandler ["EachFrame", {player setCustomAimCoef (player getVariable"swayModificator");}];
 			};
 		if (player getVariable "traceBullets") then {[player, (player getVariable "traceNumber")] spawn BIS_fnc_traceBullets;};
