@@ -3,7 +3,7 @@ NaniteGeneratorV3
 
 Description: This code represents a nanite generator functionality in SQF (Scripting Language for Arma series). The nanite generator allows the player to recharge their nanite energy over time.
 
-Usage: Call 'NaniteGeneratorV3' to activate the nanite generator for the player. Call 'NaniteGeneratorStop' to deactivate the nanite generator.
+Usage: Call 'NaniteGeneratorV3' (with parameter [false]) to activate the nanite generator for the player. Call 'NaniteGeneratorV3' with parameter [true] to reset player's energy to initial value. Call 'NaniteGeneratorStop' to deactivate the nanite generator.
 
 Global Variables:
 - naniteActivationState (Boolean): Represents the activation state of the nanite generator for the player. Set to 'true' when the generator is active.
@@ -14,7 +14,14 @@ Global Variables:
 */
 
 NaniteGeneratorV3 = {
+  private _energyReset = param [0, false, [true]];
+
 	if (!player getVariable["naniteActivationState",false]) exitWith {};
+
+	if (_energyReset) exitWith {
+		private _naniteStartingValue = player getVariable["naniteEnergyStartingValue",25];
+		player setVariable["naniteEnergy",_naniteStartingValue];
+	};
 
 	player setVariable["naniteGeneratorActive",true];
 	player spawn {
