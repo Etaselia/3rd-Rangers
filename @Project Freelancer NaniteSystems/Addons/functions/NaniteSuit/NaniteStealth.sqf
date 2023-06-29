@@ -13,16 +13,15 @@ Global Variables:
 - naniteStealthEnergyDrainVehicle (Number): Represents the rate at which nanite energy drains while in vehicle stealth mode. Default value is 50.
 - naniteStealthVehicleIsActive (Boolean): Represents the activation state of the vehicle stealth. Set to 'true' when the vehicle stealth is active.
 - naniteCloakVehicleStealthIsAllowed (Boolean): Represents whether vehicle stealth is allowed for the player.
+- NaniteStealthSuppressors (Array): Contains the muzzle attachment class names that indicate the presence of a suppressor.
 
 Functions:
 - NaniteStealth: Activates nanite stealth for the player.
 - NaniteStealthStop: Deactivates nanite stealth for the player.
-
-Note: Additional checks and code adjustments may be required for specific use cases, such as exiting a vehicle while in stealth mode.
 */
 
 
-NaniteStealth = {
+NaniteStealth ={
 	//general Stealth Skill
 	player setVariable ["naniteCloakisActive",true];
 	player setVariable ["tts_cloak_isCloaked", true,true];
@@ -35,6 +34,25 @@ NaniteStealth = {
 	[player, true] remoteExec ["setCaptive", 0, true];
 
 	if (vehicle player == player) then {
+		_NaniteStealthFiredEventHanlder = player addEventHandler ["Fired", {
+			params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_gunner"];
+			_suppressorArray = player getVariable ["NaniteStealthSuppressors"];
+			_hasSuppressor = _unit weaponAccessories currentMuzzle _unit param [0, ""] in _suppressorArray;
+			if (!_hasSuppressor) then {
+				_fullDrainEnergy = player getVariable["NaniteStealthIsFullDrainEnergyOnUnsuppressedShot",true];
+				if (_fullDrainEnergy) then {
+					player setVariable["naniteEnergy",-10];	
+					player call NaniteStealthStop;
+				};
+				_naniteUnsuppressedShotDrain = player getVariable["NaniteStealthUnsuppressedEnergyDrainPerShot",40];
+				_naniteEnergy = player getVariable["naniteEnergy",0];
+				_naniteEnergy = _naniteEnergy - _naniteUnsuppressedShotDrain;
+				player setVariable["naniteEnergy",_naniteEnergy];
+				player call NaniteStealthStop;
+			};
+		}];
+		player setVariable["NaniteStealthFiredEventHandler",_NaniteStealthFiredEventHandler];
+
 		player spawn {
 			while {player getVariable["naniteCloakisActive",true]} do {
 				_naniteEnergy = player getVariable["naniteEnergy",0];
@@ -54,6 +72,12 @@ NaniteStealth = {
 		if (_vehicleStealthIsAllowed) then {
 			vehicle player call fnc_vehicle_stealth;
 			player setVariable ["naniteStealthVehicleIsActive",true];
+
+			_naniteStealthVehicleEventHandler = vehicle player addEventHandler ["GetOut", {
+				params ["_vehicle", "_role", "_unit", "_turret"];
+				player call NaniteStealthStop;
+			}];
+
 			player spawn {
 				while {player getVariable["naniteCloakisActive",true]} do {
 					_naniteEnergy = player getVariable["naniteEnergy",0];
@@ -63,8 +87,6 @@ NaniteStealth = {
 					if (_naniteEnergy <= 0) then {
 						player setVariable["naniteCloakisActive",false];
 						player setVariable ["naniteStealthVehicleIsActive",false];
-						//TODO
-						// this is going to need additional checks for someone exiting the vehicle
 						vehicle player call fnc_remove_vehicle_stealth;
 						player call NaniteStealthStop;
 					};
@@ -72,7 +94,6 @@ NaniteStealth = {
 				};
 			};
 		} else {
-			systemChat "Suit Stealth Generator not calibrated for Vehicle Stealth";	
 			player call NaniteStealthStop;
 		};
 	};
@@ -85,11 +106,10 @@ NaniteStealthStop ={
 		[player, false] remoteExec ["hideObject", 0, true];
 		[player, false] remoteExec ["setCaptive", 0, true];
 		//vehicle Stealth
-		if (player getVariable ["naniteStealthVehicleIsActive",false]) then {
+		if (player getVariable ["naniteStealthVehicleIsActive",true]) then {
 			vehicle player call fnc_remove_vehicle_stealth;
 			player setVariable ["naniteStealthVehicleIsActive",false];
 		};
+		_naniteStealthFiredEventHandler = player getVariable["NaniteStealthFiredEventHandler",objNull];
+		player removeEventHandler["Fired",_naniteStealthFiredEventHandler];
 };
-
-// TODO
-// Write a EH that stops vehicle stealth if anyone exits the vehicle
